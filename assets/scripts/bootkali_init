@@ -71,21 +71,21 @@ mount_sdcard() {
 	return 1
 }
 
-#mount_external_sd() {
-#	mountpoint -q "$mnt/external_sd" && return 0
-#
-#	for external_sd in \
-#		/storage/extSdCard \
-#		/storage/sdcard1 \
-#		/storage/external_sd \
-#		/external_sd
-#	do
-#		[ -d "$external_sd" ] &&
-#			$busybox mount -o bind "$external_sd" "$mnt/external_sd" &&
-#				return 0
-#	done
-#	return 1
-#}
+mount_external_sd() {
+	mountpoint -q "$mnt/external_sd" && return 0
+
+	for external_sd in \
+		/storage/extSdCard \
+		/storage/sdcard1 \
+		/storage/external_sd \
+		/external_sd
+	do
+		[ -d "$external_sd" ] &&
+			$busybox mount -o bind "$external_sd" "$mnt/external_sd" &&
+				return 0
+	done
+	return 1
+}
 
 mount_usbdisk() {
 	mountpoint -q "$mnt/mnt/usbdisk" && return 0
@@ -119,6 +119,7 @@ mount_external_storage() {
 		fi
 	done
 }
+
 
 mount_kali_chroot() {
 
