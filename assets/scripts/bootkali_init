@@ -200,12 +200,12 @@ mount_kali_chroot() {
 
     # Enable depmod/modprobe support in rootfs
     if [ ! "$(mountpoint $mnt/lib/modules 2> /dev/null | grep 'is a')" ]; then
-       $busybox mount -r -o bind /system/lib/modules $mnt/lib/modules && bklog "[+] mounted /lib/modules"
+       $busybox mount -r -o bind /system/lib/modules /data/local/nhsystem/kali-armhf/system/lib/modules && bklog "[+] mounted /lib/modules"
     fi
 
     ######### MOUNT INTERNAL | EXTERNAL SDCARD | USBDISK ########
     mount_sdcard
-    #mount_external_sd
+    mount_external_sd
 
     #########
     $busybox chmod 666 /dev/null

@@ -21,3 +21,6 @@
 -dontwarn android.support.v7.**
 -keep class android.support.v7.** { *; }
 -keep interface android.support.v7.** { *; }
+-keepnames class com.google.common.**
+-keep class com.google.common.**
+-dontwarn com.google.common.**
