@@ -126,6 +126,7 @@ mount_kali_chroot() {
 
     mkdir -p $mnt/dev
     mkdir -p $mnt/dev/shm
+    mkdir -p $mnt/lib/modules
     mkdir -p $mnt/proc
     mkdir -p $mnt/sys
     mkdir -p $mnt/system
@@ -200,7 +201,11 @@ mount_kali_chroot() {
 
     #enable depmod/modprobe support in rootfs
     if [ ! "$(mountpoint $mnt/lib/modules 2> /dev/null | grep 'is a')" ]; then
-       $busybox mount -r -o bind /system/lib/modules $mnt/lib/modules && bklog "[+] mounted /lib/modules"
+        if [ ! -d /system/lib/modules ]; then
+	    bklog "[-] no kernel modules found. Not mounting /lib/modules]"
+	else
+            $busybox mount -r -o bind /system/lib/modules $mnt/lib/modules && bklog "[+] mounted /lib/modules"
+	fi
     fi
 
     ######### MOUNT INTERNAL | EXTERNAL SDCARD | USBDISK ########
