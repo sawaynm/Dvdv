@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
@@ -87,10 +88,17 @@ public class MacchangerFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        context = getContext();
+        activity = getActivity();
         nh = new NhPaths();
         exe = new ShellExecuter();
-        sharedpreferences = getActivity().getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+        sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         View rootView = inflater.inflate(R.layout.macchanger, container, false);
         // get views
@@ -121,7 +129,7 @@ public class MacchangerFragment extends Fragment {
             ifacesList = delFromArray(ifacesList, ifacesList.length - 1);
 
         }
-        interfaceSpinner.setAdapter(new ArrayAdapter<>(getContext(),
+        interfaceSpinner.setAdapter(new ArrayAdapter<>(activity,
                 R.layout.macchanger_ifaces_item, ifacesList));
         final TextView macResult = rootView.findViewById(R.id.macResult);
 
@@ -182,7 +190,7 @@ public class MacchangerFragment extends Fragment {
         });
         setHostname.setOnClickListener(v -> new Thread(() -> {
             setHostname(phoneName.getText().toString());
-            v.post(() -> nh.showMessage("Hostname changed"));
+            v.post(() -> nh.showMessage(context, "Hostname changed"));
         }).start());
         reloadMAC.setOnClickListener(v -> {
             String selectedInterface = interfaceSpinner.getSelectedItem().toString();
@@ -227,7 +235,7 @@ public class MacchangerFragment extends Fragment {
         setMacButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                PowerManager pm = (PowerManager) getContext().getSystemService(Context.POWER_SERVICE);
+                PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
                 PowerManager.WakeLock mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                         getClass().getName());
                 mWakeLock.acquire(10*60*1000L /*10 minutes*/);
@@ -260,7 +268,7 @@ public class MacchangerFragment extends Fragment {
                             exe.RunAsRootWithException(finalCommand);
                             macModeSpinner.post(() -> new android.os.Handler().postDelayed(
                                     () -> {
-                                        nh.showMessage("Refreshing the current MAC.");
+                                        nh.showMessage(context,"Refreshing the current MAC.");
                                         refreshMAc();
 
                                     }, 1000));
@@ -285,7 +293,7 @@ public class MacchangerFragment extends Fragment {
                 if (macModeSpinner.getSelectedItem().toString().equals("Custom MAC")) {
                     if (macsArray != null) {
                         if (macsArray.length() != 17) {
-                            nh.showMessage("Invalid custom MAC. Review it.");
+                            nh.showMessage(context,"Invalid custom MAC. Review it.");
                             return;
                         }
                     }
@@ -307,7 +315,7 @@ public class MacchangerFragment extends Fragment {
                             exe.RunAsRootWithException(finalCommand);
                             macModeSpinner.post(() -> new android.os.Handler().postDelayed(
                                     () -> {
-                                        nh.showMessage("Refreshing the current MAC.");
+                                        nh.showMessage(context,"Refreshing the current MAC.");
                                         refreshMAc();
                                     }, 1000));
                         }).start();
@@ -405,7 +413,7 @@ public class MacchangerFragment extends Fragment {
                         setMacButton.setEnabled(true);
                         currMac.setText(_res); //set the current mac if found
 
-                        sharedpreferences = getActivity().getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+                        sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
                         String slt = sharedpreferences.getString("macchanger_opts", "");
 
 
@@ -439,7 +447,7 @@ public class MacchangerFragment extends Fragment {
         final String cleanInterface = selectedInterface.split(" ")[0];
         String command;
         if (cleanInterface.equals("wlan0")) {
-            nh.showMessage("Resetting " + cleanInterface + " MAC");
+            nh.showMessage(context,"Resetting " + cleanInterface + " MAC");
             if (isOPO()) {
                 Log.d("opo_original_mac", sharedpreferences.getString("opo_original_mac", ""));
                 command = "settings put global airplane_mode_on 1" +
@@ -461,7 +469,7 @@ public class MacchangerFragment extends Fragment {
                 exe.RunAsRootWithException(finalCommand);
                 interfaceSpinner.post(() -> new android.os.Handler().postDelayed(
                         () -> {
-                            nh.showMessage("Refreshing the current MAC.");
+                            nh.showMessage(context,"Refreshing the current MAC.");
                             refreshMAc();
                         }, 1000));
             }).start();
@@ -512,7 +520,7 @@ public class MacchangerFragment extends Fragment {
     }
 
     public void loadSavedMacDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle("Load saved MAC:");
         builder.setMessage("Not implemented WIP");
         builder.setPositiveButton("OK", (dialog, which) -> {

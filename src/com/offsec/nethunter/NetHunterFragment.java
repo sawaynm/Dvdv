@@ -29,6 +29,7 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import static android.os.StrictMode.setThreadPolicy;
@@ -40,7 +41,6 @@ public class NetHunterFragment extends Fragment {
      * fragment.
      */
 
-    private static NhPaths nh;
     private static final String ARG_SECTION_NUMBER = "section_number";
     private static final String IP_REGEX = "\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b";
     private static final Pattern IP_REGEX_PATTERN = Pattern.compile(IP_REGEX);
@@ -64,8 +64,15 @@ public class NetHunterFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        context = getContext();
+        activity = getActivity();
+        nh = new NhPaths();
+    }
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.nethunter, container, false);
         TextView ip = rootView.findViewById(R.id.editText2);
         ip.setFocusable(false);
@@ -82,7 +89,7 @@ public class NetHunterFragment extends Fragment {
     @SuppressLint("SetTextI18n")
     private void getExternalIp() {
 
-        final TextView ip = getActivity().findViewById(R.id.editText2);
+        final TextView ip = activity.findViewById(R.id.editText2);
         ip.setText("Please wait...");
 
         new Thread(new Runnable() {
@@ -291,9 +298,9 @@ public class NetHunterFragment extends Fragment {
             android.content.ClipboardManager clipboard = (android.content.ClipboardManager) Objects.requireNonNull(getContext()).getSystemService(Context.CLIPBOARD_SERVICE);
             android.content.ClipData clip = android.content.ClipData.newPlainText("WordKeeper", text);
             clipboard.setPrimaryClip(clip);
-            Toast.makeText(getContext(), "Copied: " + text, Toast.LENGTH_SHORT).show();
+            nh.showMessage(context, "Copied: " + text);
         } catch (Exception e) {
-            Toast.makeText(getContext(), "Error copying: " + text, Toast.LENGTH_SHORT).show();
+           nh.showMessage(context, "Error copying: " + text);
         }
     }
     private String getDeviceName() {

@@ -57,6 +57,7 @@ import java.util.Objects;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
@@ -123,6 +124,8 @@ ChrootManagerFragment extends Fragment {
     private SharedPreferences sharedpreferences;
     private AlertDialog ad;
     private NhPaths nh;
+    private Context context;
+    private Activity activity;
 
     public static ChrootManagerFragment newInstance(int sectionNumber) {
         ChrootManagerFragment fragment = new ChrootManagerFragment();
@@ -134,8 +137,15 @@ ChrootManagerFragment extends Fragment {
 
     @SuppressLint("SetTextI18n")
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        context = getContext();
+        activity = getActivity();
         nh = new NhPaths();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.createchroot, container, false);
         statusText = rootView.findViewById(R.id.statusText);
         statusText.setMovementMethod(new ScrollingMovementMethod());
@@ -218,8 +228,8 @@ ChrootManagerFragment extends Fragment {
     private void checkForExistingChroot() {
 
         // does chroot directory exist?
-        if (getActivity() != null) {
-            statusLog(getActivity().getString(R.string.checkingforchroot) + nh.CHROOT_PATH);
+        if (activity != null) {
+            statusLog(activity.getString(R.string.checkingforchroot) + nh.CHROOT_PATH);
             new Thread(() -> {
                 String command = "if [ -d " + nh.CHROOT_PATH + " ];then echo 1; fi"; //check the dir existence
                 final String _res = x.RunAsRootOutput(command);
@@ -227,20 +237,20 @@ ChrootManagerFragment extends Fragment {
                     SharedPreferences.Editor editor = sharedpreferences.edit();
 
                     if (_res.equals("1")) {
-                        statusLog(getActivity().getString(R.string.existingchrootfound));
-                        installButton.setText(getActivity().getResources().getString(R.string.removekalichrootbutton));
+                        statusLog(activity.getString(R.string.existingchrootfound));
+                        installButton.setText(activity.getResources().getString(R.string.removekalichrootbutton));
                         installButton.setEnabled(true);
                         updateButton.setVisibility(View.VISIBLE);
                         editor.putBoolean(CHROOT_INSTALLED_TAG, true);
                         editor.apply();
                     } else {
                         // chroot not found
-                        statusLog(getActivity().getString(R.string.nokalichrootfound));
+                        statusLog(activity.getString(R.string.nokalichrootfound));
                         x.RunAsRootOutput("mkdir -p " + nh.NH_SYSTEM_PATH);
                         // prevents muts 'dirty' install issue /nhsystem is nethunter property.
                         statusLog("Cleaning install directory");
                         x.RunAsRootOutput("rm -rf " + nh.NH_SYSTEM_PATH + "/*");
-                        installButton.setText(getActivity().getResources().getString(R.string.installkalichrootbutton));
+                        installButton.setText(activity.getResources().getString(R.string.installkalichrootbutton));
                         installButton.setEnabled(true);
                         updateButton.setVisibility(View.GONE);
                         editor.putBoolean(CHROOT_INSTALLED_TAG, false);
@@ -404,7 +414,7 @@ ChrootManagerFragment extends Fragment {
             }
             statusLog("Metapackages selected: " + packages);
         } catch (Exception e) {
-            nh.showMessage(getString(R.string.toast_install_terminal));
+            nh.showMessage(context, getString(R.string.toast_install_terminal));
             statusLog("Error: Terminal app not found, cant continue. Install a terminal.");
             checkForExistingChroot();
         }
@@ -502,7 +512,7 @@ ChrootManagerFragment extends Fragment {
                                     .setNegativeButton("Abort installation", (dialog, id) -> {
                                         statusLog("Error: " + checksumResponse[1]);
                                         pd.dismiss();
-                                        statusLog(getActivity().getString(R.string.downloadfailscheck));
+                                        statusLog(activity.getString(R.string.downloadfailscheck));
                                         checkForExistingChroot();
                                     });
 
@@ -597,7 +607,7 @@ ChrootManagerFragment extends Fragment {
         final PowerManager powerManager = (PowerManager) Objects.requireNonNull(getActivity()).getSystemService(POWER_SERVICE);
         @SuppressLint("InvalidWakeLockTag")
         final PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                "ChrootWakelockTag");
+                "com.offsec.nethunter:ChrootWakelockTag");
 
         Boolean isStarted = false;
 
@@ -608,7 +618,7 @@ ChrootManagerFragment extends Fragment {
             pd.show();
             pd.setCancelable(false);
             pd.setCanceledOnTouchOutside(false);
-            statusLog(getActivity().getString(R.string.unzippinganduntarring));
+            statusLog(activity.getString(R.string.unzippinganduntarring));
             super.onPreExecute();
         }
 
