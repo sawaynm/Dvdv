@@ -1,6 +1,5 @@
 package com.offsec.nethunter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -32,8 +31,6 @@ import com.offsec.nethunter.utils.ShellExecuter;
 
 import java.util.List;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import android.widget.SearchView;
 import androidx.fragment.app.Fragment;
@@ -46,6 +43,7 @@ public class CustomCommandsFragment extends Fragment {
     private static final String ARG_SECTION_NUMBER = "section_number";
     private static final String TAG = "CustomCommandsFragment";
     private CustomCommandsSQL database;
+    private Context mContext;
     private ListView commandListView;
     private CmdLoader commandAdapter;
     private List<CustomCommand> commandList;
@@ -54,8 +52,7 @@ public class CustomCommandsFragment extends Fragment {
     private String custom_commands_runlevel;
     private final ShellExecuter exe = new ShellExecuter();
     private NhPaths nh;
-    private Context context;
-    private Activity activity;
+
     public CustomCommandsFragment() {
 
     }
@@ -74,17 +71,12 @@ public class CustomCommandsFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        context = getContext();
-        activity = getActivity();
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        SharedPreferences sharedpreferences = getActivity().getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+        //this runs BEFORE the ui is available
+        mContext = getActivity().getApplicationContext();
         nh = new NhPaths();
-    }
-
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {//this runs BEFORE the ui is available
-        SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-        database = new CustomCommandsSQL(context);
+        database = new CustomCommandsSQL(mContext);
         if (!sharedpreferences.contains("initial_commands")) {
             SharedPreferences.Editor editor = sharedpreferences.edit();
             editor.putString("initial_commands", "added");
@@ -200,7 +192,7 @@ public class CustomCommandsFragment extends Fragment {
         commandListView = rootView.findViewById(R.id.commandList);
         TextView customComandsInfo = rootView.findViewById(R.id.customComandsInfo);
         commandList = database.getAllCommands();
-        commandAdapter = new CmdLoader(context, commandList);
+        commandAdapter = new CmdLoader(mContext, commandList);
 
 
         if (commandAdapter.getCount() == 0) {
@@ -209,7 +201,7 @@ public class CustomCommandsFragment extends Fragment {
 
         commandListView.setAdapter(commandAdapter);
         commandListView.setOnItemLongClickListener((parent, view, position, id) -> {
-            ((Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE)).vibrate(50);
+            ((Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE)).vibrate(50);
 
             CustomCommand currenCommand = (CustomCommand) commandListView.getItemAtPosition(position);
             showCommandDialog("EDIT", currenCommand, position);
@@ -228,10 +220,10 @@ public class CustomCommandsFragment extends Fragment {
 
     private void showCommandDialog(String action, CustomCommand commandInfo, int position) {
         // common setup
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View promptsView = inflater.inflate(R.layout.custon_commands_dialog, null);
 
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
         alertDialogBuilder.setView(promptsView);
         alertDialogBuilder.setCancelable(false);
         alertDialogBuilder.setNegativeButton("Cancel",
@@ -282,7 +274,7 @@ public class CustomCommandsFragment extends Fragment {
                                         userInputCommand.getText().toString(),
                                         command_exec_mode.getSelectedItem().toString(),
                                         command_run_in_shell.getSelectedItem().toString(), _run_at_boot);
-                                nh.showMessage(context,"Command created.");
+                                nh.showMessage("Command created.");
 
                                 if (_run_at_boot == 1) {
                                     addToBoot(_insertedCommand);
@@ -291,7 +283,7 @@ public class CustomCommandsFragment extends Fragment {
                                 commandList.add(0, _insertedCommand);
                                 commandAdapter.notifyDataSetChanged();
                             } else {
-                                nh.showMessage(context, getString(R.string.toast_input_error_launcher));
+                                nh.showMessage(getString(R.string.toast_input_error_launcher));
                             }
                             hideSoftKeyboard(getView());
                         });
@@ -356,12 +348,12 @@ public class CustomCommandsFragment extends Fragment {
                                 } else {
                                     removeFromBoot(_updatedCommand.getId());
                                 }
-                                nh.showMessage(context, "Command Updated");
+                                nh.showMessage("Command Updated");
                                 commandList.set(position, _updatedCommand);
                                 commandAdapter.notifyDataSetChanged();
 
                             } else {
-                                nh.showMessage(context, getString(R.string.toast_input_error_launcher));
+                                nh.showMessage(getString(R.string.toast_input_error_launcher));
                             }
                             hideSoftKeyboard(getView());
                         })
@@ -372,7 +364,7 @@ public class CustomCommandsFragment extends Fragment {
                             commandList.remove(position);
                             commandAdapter.notifyDataSetChanged();
                             hideSoftKeyboard(getView());
-                            nh.showMessage(context, "Command Deleted");
+                            nh.showMessage("Command Deleted");
                         });
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
@@ -380,7 +372,7 @@ public class CustomCommandsFragment extends Fragment {
 
     private void setUpInitialCommands() {
         database.addCommand("Update Kali metapackages", nh.makeTermTitle("Updating Kali") + "apt-get update && apt-get upgrade", "INTERACTIVE", "KALI", 0);
-        database.addCommand("Wlan1 Monitor Mode", nh.makeTermTitle("Wlan1 Monitor UP") + "sudo ifconfig wlan1 down && sudo iwconfig wlan1 mode monitor && sudo ifconfig wlan1 up && echo \"wlan1 Monitor mode enabled\" && sleep 3 && exit", "INTERACTIVE", "KALI", 0);
+        database.addCommand("Wlan1 Monitor Mode", nh.makeTermTitle("Wlan1 Monitor UP") + "sudo ip link set wlan1 down && sudo iw dev wlan0 set type monitor && sudo ip link set wlan1 up && echo \"wlan1 Monitor mode enabled\" && sleep 3 && exit", "INTERACTIVE", "KALI", 0);
         database.addCommand("Launch Wifite", nh.makeTermTitle("Wifite") + "wifite", "INTERACTIVE", "KALI", 0);
         database.addCommand("Dump Mifare", nh.makeTermTitle("DumpMifare") + "dumpmifare.sh", "INTERACTIVE", "KALI", 0);
         database.addCommand("Backup Kali Chroot", nh.makeTermTitle("Backup_Kali_Chroot") + "su --mount-master -c 'chroot_backup /data/local/nhsystem/kali-armhf /sdcard/kalifs-backup.tar.gz'",
@@ -392,7 +384,7 @@ class CmdLoader extends BaseAdapter {
 
     private final List<CustomCommand> _commandList;
     private final Context _mContext;
-    private NhPaths nh;
+
     private final ShellExecuter exe = new ShellExecuter();
 
 
@@ -400,7 +392,7 @@ class CmdLoader extends BaseAdapter {
 
         _mContext = context;
         _commandList = commandList;
-        this.nh = new NhPaths();
+
     }
 
     static class ViewHolderItem {
@@ -497,11 +489,15 @@ class CmdLoader extends BaseAdapter {
         if (_mode.equals("BACKGROUND")) {
             if (_sendTo.equals("KALI")) {
                 new BootKali(_cmd).run_bg();
-                nh.showMessage(_mContext, "Kali cmd done.");
+                Toast.makeText(_mContext,
+                        "Kali cmd done.",
+                        Toast.LENGTH_SHORT).show();
             } else {
                 // dont run all the bg commands as root
                 exe.Executer(_cmd);
-                nh.showMessage(_mContext, "Android cmd done.");
+                Toast.makeText(_mContext,
+                        "Android cmd done.",
+                        Toast.LENGTH_SHORT).show();
             }
         } else try {
             // INTERACTIVE
@@ -527,9 +523,9 @@ class CmdLoader extends BaseAdapter {
         } catch (Exception e) {
             if (!checkTerminalExternalPermission("com.offsec.nhterm.permission.RUN_SCRIPT_NH") ||
                     !checkTerminalExternalPermission("com.offsec.nhterm.permission.RUN_SCRIPT")) {
-                nh.showMessage(_mContext, _mContext.getString(R.string.toast_error_permissions));
+                Toast.makeText(_mContext, _mContext.getString(R.string.toast_error_permissions), Toast.LENGTH_SHORT).show();
             } else {
-                nh.showMessage(_mContext, _mContext.getString(R.string.toast_install_terminal));
+                Toast.makeText(_mContext, _mContext.getString(R.string.toast_install_terminal), Toast.LENGTH_SHORT).show();
             }
         }
     }
