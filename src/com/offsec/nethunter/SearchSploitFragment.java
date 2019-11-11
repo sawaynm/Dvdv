@@ -1,6 +1,5 @@
 package com.offsec.nethunter;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -33,7 +32,6 @@ import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
 import java.util.List;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
@@ -42,8 +40,11 @@ import androidx.fragment.app.Fragment;
 
 public class SearchSploitFragment extends Fragment {
 
+    private Context mContext;
     private static final String TAG = "SearchSploitFragment";
     private static final String ARG_SECTION_NUMBER = "section_number";
+
+
     private Boolean withFilters = true;
     private String sel_type;
     private String sel_platform;
@@ -55,8 +56,6 @@ public class SearchSploitFragment extends Fragment {
     private List<SearchSploit> full_exploitList;
     // Create and handle database
     private SearchSploitSQL database;
-    private Context context;
-    private Activity activity;
     private NhPaths nh;
 
     public static SearchSploitFragment newInstance(int sectionNumber) {
@@ -69,20 +68,15 @@ public class SearchSploitFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        context = getContext();
-        activity = getActivity();
-        nh = new NhPaths();
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.searchsploit, container, false);
 
+        final View rootView = inflater.inflate(R.layout.searchsploit, container, false);
+        mContext = getActivity().getApplicationContext();
+
+        nh = new NhPaths();
         setHasOptionsMenu(true);
-        database = new SearchSploitSQL(context);
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        database = new SearchSploitSQL(mContext);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Exploit Database Archive");
         builder.setMessage("Loading...wait");
 
@@ -127,7 +121,9 @@ public class SearchSploitFragment extends Fragment {
                 final Boolean isFeeded = database.doDbFeed();
                 searchSearchSploit.post(() -> {
                     if (isFeeded) {
-                        nh.showMessage_long(context, "DB FEED DONE");
+                        Toast.makeText(getActivity(),
+                                "DB FEED DONE",
+                                Toast.LENGTH_LONG).show();
                         try {
                             // Search List
                             //String sd = nh.SD_PATH;
@@ -155,8 +151,9 @@ public class SearchSploitFragment extends Fragment {
                         }
                         // main(rootView);
                     } else {
-                        nh.showMessage_long(context,
-                                "Unable to find Searchsploit files.csv database. Install exploitdb in chroot");
+                        Toast.makeText(getActivity(),
+                                "Unable to find Searchsploit files.csv database. Install exploitdb in chroot",
+                                Toast.LENGTH_LONG).show();
                     }
                 });
             }).start();
@@ -186,7 +183,7 @@ public class SearchSploitFragment extends Fragment {
                     loadExploits();
                     hideSoftKeyboard(getView());
                 } else {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                     builder.setTitle("Raw search warning");
 
                     builder.setMessage("The exploit db is pretty big (+30K exploits), activating raw search will make the search slow.\nIs useful to do global searches when you don't find a exploit.")
@@ -234,7 +231,7 @@ public class SearchSploitFragment extends Fragment {
 
         final List<String> platformList = database.getPlatforms();
         Spinner platformSpin = rootView.findViewById(R.id.exdb_platform_spinner);
-        ArrayAdapter<String> adp12 = new ArrayAdapter<>(activity, android.R.layout.simple_list_item_1, platformList);
+        ArrayAdapter<String> adp12 = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, platformList);
         adp12.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         platformSpin.setAdapter(adp12);
         platformSpin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -251,7 +248,7 @@ public class SearchSploitFragment extends Fragment {
 
         final List<String> typeList = database.getTypes();
         Spinner typeSpin = rootView.findViewById(R.id.exdb_type_spinner);
-        ArrayAdapter<String> adp13 = new ArrayAdapter<>(activity, android.R.layout.simple_list_item_1, typeList);
+        ArrayAdapter<String> adp13 = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, typeList);
         adp13.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         typeSpin.setAdapter(adp13);
         typeSpin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -286,7 +283,7 @@ public class SearchSploitFragment extends Fragment {
                 return;
             }
             numex.setText(String.format("%d results", exploitList.size()));
-            ExploitLoader exploitAdapter = new ExploitLoader(context, exploitList);
+            ExploitLoader exploitAdapter = new ExploitLoader(mContext, exploitList);
             searchSploitListView.setAdapter(exploitAdapter);
             if (!isLoaded) {
                 // preloading the long list lets see if is more performant
@@ -305,6 +302,8 @@ class ExploitLoader extends BaseAdapter {
 
     private final List<SearchSploit> _exploitList;
     private final Context _mContext;
+    static NhPaths nh;
+
 
     ExploitLoader(Context context, List<SearchSploit> exploitList) {
 

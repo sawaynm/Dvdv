@@ -1,7 +1,5 @@
 package com.offsec.nethunter;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -30,8 +28,6 @@ import com.offsec.nethunter.utils.ShellExecuter;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
@@ -42,6 +38,7 @@ public class MITMfFragment extends Fragment {
 
     View.OnClickListener checkBoxListener;
     private TabsPagerAdapter tabsPagerAdapter;
+
     public interface CommandProvider {
         void getCommands(StringBuilder stringBuilder);
     }
@@ -61,10 +58,13 @@ public class MITMfFragment extends Fragment {
     String M_Responder_WRedir; // --wredir
 
 
-    private NhPaths nh;
-    private Context context;
-    private Activity activity;
+    private static NhPaths nh;
+
     private static final String ARG_SECTION_NUMBER = "section_number";
+
+    public MITMfFragment() {
+    }
+
 
     public static MITMfFragment newInstance(int sectionNumber) {
         MITMfFragment fragment = new MITMfFragment();
@@ -75,26 +75,20 @@ public class MITMfFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        context = getContext();
-        activity = getActivity();
-        nh = new NhPaths();
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         cleanCmd();
         View rootView = inflater.inflate(R.layout.mitmf, container, false);
-        tabsPagerAdapter = new TabsPagerAdapter(getChildFragmentManager());
+        tabsPagerAdapter = new TabsPagerAdapter(getActivity().getSupportFragmentManager());
 
         ViewPager mViewPager = rootView.findViewById(R.id.pagerMITMF);
         mViewPager.setAdapter(tabsPagerAdapter);
 
+        nh = new NhPaths();
+
         mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
-                activity.invalidateOptionsMenu();
+                getActivity().invalidateOptionsMenu();
             }
         });
         setHasOptionsMenu(true);
@@ -130,14 +124,14 @@ public class MITMfFragment extends Fragment {
         }
 
         intentClickListener_NH("mitmf " + sb.toString());
-        nh.showMessage(context, "MITMf Started!");
+        nh.showMessage("MITMf Started!");
     }
 
     private void stop() {
         ShellExecuter exe = new ShellExecuter();
         String[] command = new String[1];
         exe.RunAsRoot(command);
-        nh.showMessage(context, "MITMf Stopped!");
+        nh.showMessage("MITMf Stopped!");
     }
     /* Stop execution menu */
 
@@ -182,7 +176,7 @@ public class MITMfFragment extends Fragment {
             }
         }
 
-        private List<CommandProvider> getCommandProviders() {
+        public List<CommandProvider> getCommandProviders() {
             return commandProviders;
         }
 
@@ -218,19 +212,14 @@ public class MITMfFragment extends Fragment {
 
         private ArrayAdapter<CharSequence> interfaceAdapter;
         private int interfaceSelection;
-        private Context context;
+
 
         MitmfGeneralBinding generalBinding;
         MITMFViewModel mViewModel;
 
-        @Override
-        public void onCreate(@Nullable Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            context = getContext();
-        }
 
         @Override
-        public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             generalBinding = MitmfGeneralBinding.inflate(inflater, container, false);
             mViewModel = new MITMFViewModel();
@@ -238,7 +227,7 @@ public class MITMfFragment extends Fragment {
 
             // Optional Presets Spinner
             Spinner interfaceSpinner = generalBinding.mitmfInterface;
-            interfaceAdapter = ArrayAdapter.createFromResource(context,
+            interfaceAdapter = ArrayAdapter.createFromResource(getActivity(),
                     R.array.mitmf_interface_array, android.R.layout.simple_spinner_item);
             interfaceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             interfaceSpinner.setAdapter(interfaceAdapter);
@@ -287,7 +276,7 @@ public class MITMfFragment extends Fragment {
         MITMFViewModel mViewModel = new MITMFViewModel();
 
         @Override
-        public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             injectBinding = MitmfInjectBinding.inflate(inflater, container, false);
             injectBinding.setViewModel(mViewModel);
@@ -331,16 +320,10 @@ public class MITMfFragment extends Fragment {
         private MitmfSpoofBinding spoofBinding;
         private int arpModeOption;
         private MITMFViewModel viewModel;
-        private Context context;
+
 
         @Override
-        public void onCreate(@Nullable Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            context = getContext();
-        }
-
-        @Override
-        public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             spoofBinding = MitmfSpoofBinding.inflate(inflater, container, false);
             viewModel = new MITMFViewModel();
@@ -349,7 +332,7 @@ public class MITMfFragment extends Fragment {
 
             // Redirect Spinner
             final Spinner redirectSpinner = spoofBinding.mitmfSpoofRedirectspin;
-            redirectAdapter = ArrayAdapter.createFromResource(context,
+            redirectAdapter = ArrayAdapter.createFromResource(getActivity(),
                     R.array.mitmf_spoof_type, android.R.layout.simple_spinner_item);
             redirectAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             redirectSpinner.setAdapter(redirectAdapter);
@@ -373,7 +356,7 @@ public class MITMfFragment extends Fragment {
             });
 
             // ARP Mode Spinner
-            ArrayAdapter<CharSequence> arpAdapter = ArrayAdapter.createFromResource(context,
+            ArrayAdapter<CharSequence> arpAdapter = ArrayAdapter.createFromResource(getActivity(),
                     R.array.mitmf_spoof_arpmode, android.R.layout.simple_spinner_item);
             arpAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spoofBinding.mitmfSpoofArpmodespin.setAdapter(arpAdapter);
@@ -433,7 +416,7 @@ public class MITMfFragment extends Fragment {
         private MitmfResponderBinding responderBinding;
 
         @Override
-        public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             responderBinding = MitmfResponderBinding.inflate(inflater, container, false);
             MITMFViewModel viewModel = new MITMFViewModel();
@@ -459,18 +442,9 @@ public class MITMfFragment extends Fragment {
     }
 
     public static class MITMfConfigFragment extends Fragment {
-        private Context context;
-        private NhPaths nh;
-        private String configFilePath;
-        final ShellExecuter exe = new ShellExecuter();
 
-        @Override
-        public void onCreate(@Nullable Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            context = getContext();
-            nh = new NhPaths();
-            configFilePath = nh.CHROOT_PATH + "/etc/mitmf/mitmf.conf";
-        }
+        private final String configFilePath = nh.CHROOT_PATH + "/etc/mitmf/mitmf.conf";
+        final ShellExecuter exe = new ShellExecuter();
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -486,11 +460,12 @@ public class MITMfFragment extends Fragment {
             exe.ReadFile_ASYNC(configFilePath, source);
             Button button = rootView.findViewById(R.id.update);
             button.setOnClickListener(v -> {
-                Boolean isSaved = exe.SaveFileContents(source.getText().toString(), configFilePath);
+                EditText source1 = rootView.findViewById(R.id.source);
+                Boolean isSaved = exe.SaveFileContents(source1.getText().toString(), configFilePath);
                 if (isSaved) {
-                    nh.showMessage(context, "Source updated");
+                    nh.showMessage("Source updated");
                 } else {
-                    nh.showMessage(context, "Source not updated");
+                    nh.showMessage("Source not updated");
                 }
             });
             return rootView;
@@ -513,7 +488,7 @@ public class MITMfFragment extends Fragment {
             intent.putExtra("com.offsec.nhterm.iInitialCommand", command);
             startActivity(intent);
         } catch (Exception e) {
-            nh.showMessage(context, getString(R.string.toast_install_terminal));
+            Toast.makeText(getActivity().getApplicationContext(), getString(R.string.toast_install_terminal), Toast.LENGTH_SHORT).show();
         }
     }
 }

@@ -34,7 +34,7 @@ class SQLPersistence extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + LauncherApp.TABLE);
+        db.execSQL("DROP TABLE IF EXISTS");
         this.onCreate(db);
     }
 

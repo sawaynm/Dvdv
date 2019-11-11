@@ -21,6 +21,7 @@ class SearchSploitSQL extends SQLiteOpenHelper {
 
     SearchSploitSQL(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        NhPaths nh = new NhPaths();
 
     }
 
@@ -32,7 +33,7 @@ class SearchSploitSQL extends SQLiteOpenHelper {
                 SearchSploit.DATE + " TEXT," +
                 SearchSploit.AUTHOR + " TEXT," +
                 SearchSploit.TYPE + " TEXT," +
-           		  SearchSploit.PLATFORM + " TEXT," +
+ 		SearchSploit.PLATFORM + " TEXT," +
                 SearchSploit.PORT + " INTEGER DEFAULT 0)";
 
         database.execSQL(CREATE_SEARCHSPLOIT_TABLE);
@@ -62,6 +63,7 @@ class SearchSploitSQL extends SQLiteOpenHelper {
         exe.RunAsRootOutput(_cmd2);
         return true;
     }
+
 
     long getCount() {
         String sql = "SELECT COUNT(*) FROM " + SearchSploit.TABLE;
@@ -117,8 +119,8 @@ class SearchSploitSQL extends SQLiteOpenHelper {
                 _exploit.setDescription(cursor.getString(2));      // desc
                 _exploit.setDate(cursor.getString(3));             // date
                 _exploit.setAuthor(cursor.getString(4));           // author
-                _exploit.setPlatform(cursor.getString(5));         // platform
-                _exploit.setType(cursor.getString(6));             // type
+                _exploit.setType(cursor.getString(5));		   // platform
+                _exploit.setPlatform(cursor.getString(6));	   // type
                 _exploit.setPort(cursor.getInt(7));                // port
                 commandList.add(_exploit);
             } while (cursor.moveToNext());
@@ -126,7 +128,6 @@ class SearchSploitSQL extends SQLiteOpenHelper {
         cursor.close();
         return commandList;
     }
-
 
     List<String> getTypes() {
         String query = "SELECT DISTINCT " + SearchSploit.TYPE +
@@ -158,5 +159,4 @@ class SearchSploitSQL extends SQLiteOpenHelper {
         cursor.close();
         return strList;
     }
-
 }
