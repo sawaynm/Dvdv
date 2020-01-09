@@ -193,7 +193,7 @@ public class ChrootManagerFragment extends Fragment {
                     kaliFolderTextView.setText(NhPaths.ARCH_FOLDER);
                     sharedPreferences.edit().putString(SharePrefTag.CHROOT_ARCH_SHAREPREF_TAG, NhPaths.ARCH_FOLDER).commit();
                     sharedPreferences.edit().putString(SharePrefTag.CHROOT_PATH_SHAREPREF_TAG, NhPaths.CHROOT_PATH()).commit();
-                    new ShellExecuter().RunAsRootOutput("ln -s " + NhPaths.CHROOT_PATH() + " " + NhPaths.CHROOT_SYMLINK_PATH);
+                    new ShellExecuter().RunAsRootOutput("ln -sfn " + NhPaths.CHROOT_PATH() + " " + NhPaths.CHROOT_SYMLINK_PATH);
                     compatCheck();
                 }
                 dialogInterface.dismiss();
