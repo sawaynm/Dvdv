@@ -189,7 +189,7 @@ if [ ! $# -eq 0 ]; then
                       if [ -d "$DIR" ]; then
                           bklog "[+] kernel modules exists and linked."
                           else
-                          bklog "[-] $i ${DIR} doesn't exist or isn't mounted. ."
+                          bklog "[+] $i ${DIR} doesn't exist or isn't mounted. That's not a bad thing."
                       fi
 
                       if [ $ISALLREADY -eq 0 ]; then
