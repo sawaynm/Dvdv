@@ -208,7 +208,7 @@ if [ ! $# -eq 0 ]; then
                           elif [ -d "$MODPATH6" ]; then
                           bklog "[+] kernel modules exists and found at '$MODPATH6'."
                           else
-                          bklog "[+] No kernel modules path was found (sad)."
+                          bklog "[+] Kernel does not have loadable modules. Very good."
                       fi
 
                       if [ $ISALLREADY -eq 0 ]; then
