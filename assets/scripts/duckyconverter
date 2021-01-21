@@ -2923,7 +2923,8 @@ function command_interpreter(){
         if [ "$TMP_CMD" = "STRING" ]; then
             #### Thanks to the tools 'fold' and 'xxd' from busybox that make things easier
             ## convert the whole string to a non-space hex string with '0a' between each unicode characters.
-            TMP_CONTENT=$(echo "$TMP_CONTENT" | $BUSYBOX fold -w1 | $BUSYBOX xxd -p)
+            ### Replacing xxd and fold with od and sed for NetHunter busbox
+            TMP_CONTENT=$(echo -n "$TMP_CONTENT" | $BUSYBOX od -A n -t x1 | $BUSYBOX sed 's/^ //;s/ /0a/g;s/$/0a/')
             ## split the string into array by the delimiter '0a'
             TMP_CONTENT=(${TMP_CONTENT//0a/ })
             ## loop each hex string and then pass it to convert_ducky function to do the match

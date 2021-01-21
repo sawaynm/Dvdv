@@ -117,7 +117,7 @@ public class CustomCommandsAsyncTask extends AsyncTask<List<CustomCommandsModel>
                                 returnValue = ANDROID_CMD_FAIL;
                             }
 						} else {
-							intent.putExtra("env", "kali").putExtra("cmd", customCommandsModelList.get(position).getCommand());
+							intent.putExtra("env", "boot_kali").putExtra("cmd", customCommandsModelList.get(position).getCommand());
 							context.get().startService(intent);
 							returnValue = new ShellExecuter().RunAsChrootReturnValue(customCommandsModelList.get(position).getCommand());
                             if (returnValue == 0){

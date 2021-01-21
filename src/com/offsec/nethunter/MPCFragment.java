@@ -257,12 +257,12 @@ public class MPCFragment extends Fragment {
         // Buttons
         addClickListener(R.id.mpc_GenerateSDCARD, v -> {
             Log.d("thecmd", "cd /sdcard/; msfpc " + getCmd(rootView));
-            intentClickListener_NH("cd /sdcard/; msfpc " + getCmd(rootView)); // since is a kali command we can send it as is
+            intentClickListener_NH("cd /sdcard/; msfpc " + getCmd(rootView)); // since is a boot_kali command we can send it as is
         }, rootView);
 
         addClickListener(R.id.mpc_GenerateHTTP, v -> {
             Log.d("thecmd", "cd /var/www/html; msfpc " + getCmd(rootView));
-            intentClickListener_NH("cd /var/www/html; msfpc " + getCmd(rootView)); // since is a kali command we can send it as is
+            intentClickListener_NH("cd /var/www/html; msfpc " + getCmd(rootView)); // since is a boot_kali command we can send it as is
         }, rootView);
 
         return rootView;
