@@ -67,6 +67,7 @@ public class SettingsFragment extends Fragment {
     private Activity activity;
     private static final String ARG_SECTION_NUMBER = "section_number";
     private String selected_animation;
+    private String selected_version;
     private String prevusr = "boot_kali";
     private Integer posu;
     private Integer posd = 0;
@@ -314,6 +315,48 @@ public class SettingsFragment extends Fragment {
             intentClickListener_NHSU("echo -ne \"\\033]0;Uninstalling NetHunter\\007\" && clear;if [ \"$(getprop ro.build.system_root_image)\" == \"true\" ]; then export SYSTEM=/; else export SYSTEM=/system; " +
                         "fi && mount -o rw,remount $SYSTEM && rm " + NhSystemApp + " && pm clear com.offsec.nethunter && echo \"Done! Reboot your device to complete the process. Exiting in 3secs..\" && sleep 3 && exit");
                 }
+        });
+
+        //Busybox
+        TextView BusyboxVersion = rootView.findViewById(R.id.busybox_version);
+        File busybox_nh = new File("/system/xbin/busybox_nh");
+        if (busybox_nh.length() == 0) {
+            BusyboxVersion.setText("None");
+        } else {
+            String busybox_ver = exe.RunAsRootOutput(busybox_nh + " | head -n1 | cut -c 10-15");
+            BusyboxVersion.setText(busybox_ver);
+        }
+        final String[] busybox_file = {null};
+        String[] versions = new String[]{"1.25.0", "1.32.0"};
+        Spinner busybox_spinner = rootView.findViewById(R.id.bb_spinner);
+        File busybox = new File("/system/xbin/" + busybox_file[0]);
+        busybox_spinner.setAdapter(new ArrayAdapter<>(getContext(),
+                android.R.layout.simple_list_item_1, versions));
+
+        //Select Version
+        busybox_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int pos, long id) {
+                selected_version = parentView.getItemAtPosition(pos).toString();
+                if (selected_version.equals("1.25.0")) {
+                    busybox_file[0] = "busybox_nh-1.25";
+                } else if (selected_version.equals("1.32.0")){
+                    busybox_file[0] = "busybox_nh";
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+            }
+        });
+
+        final Button BusyboxButton = rootView.findViewById(R.id.select_bb);
+        BusyboxButton.setOnClickListener( v -> {
+            if (busybox.length() == 0) {
+                Toast.makeText(getActivity().getApplicationContext(), "Selected busybox doesn't exist! Please flash the latest NetHunter zip!", Toast.LENGTH_LONG).show();
+            } else {
+                exe.RunAsRoot(new String[]{"ln -s /system/xbin/" + busybox_file[0] + " /system/xbin/busybox"});
+                Toast.makeText(getActivity().getApplicationContext(), "Busybox has been successfully linked", Toast.LENGTH_SHORT).show();
+            }
         });
         return rootView;
     }
