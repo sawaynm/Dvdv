@@ -33,10 +33,10 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
                     "android", "interactive", "0"},
             {"2", "Update Kali Metapackages",
                     "apt update && apt-get -y upgrade",
-                    "boot_kali", "interactive", "0"},
+                    "kali", "interactive", "0"},
             {"3", "Launch Wifite",
                     "wifite",
-                    "boot_kali", "interactive", "0"},
+                    "kali", "interactive", "0"},
             {"4", "Start wlan0 in monitor mode",
                     "su -c \"ip link set wlan0 down; echo 4 > /sys/module/wlan/parameters/con_mode;ip link set wlan0 up\";exit",
                     "android", "interactive", "0"},
@@ -45,7 +45,7 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
                     "android", "interactive", "0"},
             {"6", "Start wlan1 in monitor mode",
                     "ip link set wlan1 down && iw wlan1 set monitor control && ip link set wlan1 up;exit",
-                    "boot_kali", "interactive", "0"}
+                    "kali", "interactive", "0"}
     };
 
     public synchronized static CustomCommandsSQL getInstance(Context context){

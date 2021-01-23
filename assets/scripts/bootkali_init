@@ -10,7 +10,7 @@ if [ -z "$BUSYBOX" ]; then
     exit 1
 fi
 
-## Validate boot_kali Chroot path.
+## Validate kali Chroot path.
 if [ -z "$MNT" ]; then
     bklog "[-] The \$MNT variable is not defined, please run nethunter app first."
     exit 2

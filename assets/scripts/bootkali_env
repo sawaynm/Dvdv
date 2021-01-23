@@ -15,7 +15,7 @@ NHSYSTEM_PATH=/data/local/nhsystem
 ## Define chroot sudo path
 CHROOT_EXEC=/usr/bin/sudo
 
-## Combine android $PATH to boot_kali chroot $PATH
+## Combine android $PATH to kali chroot $PATH
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
 
 ## Define busybox path.

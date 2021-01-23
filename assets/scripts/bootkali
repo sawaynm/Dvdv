@@ -146,7 +146,7 @@ else
 		$BUSYBOX chroot $MNT sudo chmod 755 $4
 	fi
 	if [ "$1" == "duck-hunt-run" ]; then
-		if [ ! -f /data/local/nhsystem/boot_kali-armhf$2 ] || [ ! -f /data/local/nhsystem/kalifs$2 ]; then
+		if [ ! -f /data/local/nhsystem/kali-armhf$2 ] || [ ! -f /data/local/nhsystem/kalifs$2 ]; then
 			echo "File not found"
 		else
 			echo "File /data/local/nhsystem/kalifs$2 found"

@@ -20,7 +20,7 @@ import java.util.ArrayList;
  * This class has 2 main functions:
 
  **********
- * 1.- Send commands to boot_kali:
+ * 1.- Send commands to kali:
  **********
  *
  *    - new BootKali(CMD).run() and new BootKali(CMD).run_bg()
@@ -72,7 +72,7 @@ public class BootKali {
     }
 
     private String GET_KALI_ENV() {
-        // add strings here , they will be in the boot_kali env
+        // add strings here , they will be in the kali env
         String[] ENV = {
                 "USER=root",
                 "SHELL=/bin/bash",
@@ -145,7 +145,7 @@ public class BootKali {
 
 
     // blocking with output
-    // sends a command to boot_kali
+    // sends a command to kali
     public String run() {
         String output = "";
         String line;
@@ -177,7 +177,7 @@ public class BootKali {
         return output;
     }
 
-    // sends a command to boot_kali
+    // sends a command to kali
     // no blocking but atm no output
     public void run_bg() {
         new Thread(() -> {

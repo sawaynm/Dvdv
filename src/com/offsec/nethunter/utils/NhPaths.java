@@ -53,7 +53,7 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
         APP_SD_SQLBACKUP_PATH           = APP_SD_FILES_PATH + "/nh_sql_backups";
         BASE_PATH                       = "/data/local";
         NH_SYSTEM_PATH                  = BASE_PATH + "/nhsystem";
-        ARCH_FOLDER                     = sharedPreferences.getString(SharePrefTag.CHROOT_ARCH_SHAREPREF_TAG, "boot_kali-arm64");
+        ARCH_FOLDER                     = sharedPreferences.getString(SharePrefTag.CHROOT_ARCH_SHAREPREF_TAG, "kali-arm64");
         CHROOT_SUDO                     = "/usr/bin/sudo";
         CHROOT_INITD_SCRIPT_PATH        = APP_INITD_PATH + "/80postservices";
         CHROOT_SD_PATH                  = "/sdcard";
@@ -75,7 +75,7 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(SharePrefTag.CHROOT_ARCH_SHAREPREF_TAG)){
-            ARCH_FOLDER = sharedPreferences.getString(SharePrefTag.CHROOT_ARCH_SHAREPREF_TAG, "boot_kali-arm64");
+            ARCH_FOLDER = sharedPreferences.getString(SharePrefTag.CHROOT_ARCH_SHAREPREF_TAG, "kali-arm64");
         }
     }
 

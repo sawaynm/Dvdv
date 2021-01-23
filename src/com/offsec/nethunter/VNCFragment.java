@@ -54,7 +54,7 @@ public class VNCFragment extends Fragment {
     private boolean showingAdvanced;
     private boolean localhost;
     private boolean confirm_res;
-    private String prevusr = "boot_kali";
+    private String prevusr = "kali";
     private Integer posu;
     private Integer posd = 0;
     private static final int MIN_UID = 100000;
@@ -329,7 +329,7 @@ public class VNCFragment extends Fragment {
         refreshVNC(rootView);
 
         addClickListener(SetupVNCButton, v -> {
-            intentClickListener_NH("echo -ne \"\\033]0;Setting up Server\\007\" && clear;echo $'\n'\"Please enter your new VNC server password\"$'\n' && sudo -u " + selected_user + " vncpasswd && sleep 2 && exit"); // since is a boot_kali command we can send it as is
+            intentClickListener_NH("echo -ne \"\\033]0;Setting up Server\\007\" && clear;echo $'\n'\"Please enter your new VNC server password\"$'\n' && sudo -u " + selected_user + " vncpasswd && sleep 2 && exit"); // since is a kali command we can send it as is
         });
         addClickListener(StartVNCButton, v -> {
             if(selected_user.equals("root")) {
@@ -360,10 +360,10 @@ public class VNCFragment extends Fragment {
             }
         });
         addClickListener(StopVNCButton, v -> {
-            intentClickListener_NH("echo -ne \"\\033]0;Killing Server\\007\" && clear;sudo -u " + selected_user + " vncserver -kill :" + selected_display + " ;sleep 2 && exit"); // since is a boot_kali command we can send it as is
+            intentClickListener_NH("echo -ne \"\\033]0;Killing Server\\007\" && clear;sudo -u " + selected_user + " vncserver -kill :" + selected_display + " ;sleep 2 && exit"); // since is a kali command we can send it as is
         });
         addClickListener(OpenVNCButton, v -> {
-            intentClickListener_VNC(); // since is a boot_kali command we can send it as is
+            intentClickListener_VNC(); // since is a kali command we can send it as is
         });
         addClickListener(Advanced, v -> {
             if (!showingAdvanced) {

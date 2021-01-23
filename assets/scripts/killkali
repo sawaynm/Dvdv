@@ -14,7 +14,7 @@ if [ -z "$BUSYBOX" ]; then
     exit 1
 fi
 
-## Validate boot_kali Chroot path.
+## Validate kali Chroot path.
 if [ ! -d "$MNT" ]; then
     bklog "[-] \"$MNT\" directory not exist!"
     bklog "[!] Click the button [INSTALL KALI CHROOT] down below now!"
@@ -31,7 +31,7 @@ isAllunmounted=0
 #### DEFINE FUNCTIONS ####
 ##########################
 
-########## Kill all running boot_kali services and processes ##########
+########## Kill all running kali services and processes ##########
 f_kill_pids() {
     bklog "[!] Killing all running kali services .."
     local lsof_full=$($BUSYBOX lsof | awk '{print $1}' | grep -c '^lsof')
