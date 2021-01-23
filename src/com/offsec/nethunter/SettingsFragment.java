@@ -319,17 +319,16 @@ public class SettingsFragment extends Fragment {
 
         //Busybox
         TextView BusyboxVersion = rootView.findViewById(R.id.busybox_version);
-        File busybox_nh = new File("/system/xbin/busybox_nh");
-        if (busybox_nh.length() == 0) {
+        File busybox_linked = new File("/system/xbin/busybox");
+        if (busybox_linked.length() == 0) {
             BusyboxVersion.setText("None");
         } else {
-            String busybox_ver = exe.RunAsRootOutput(busybox_nh + " | head -n1 | cut -c 10-15");
+            String busybox_ver = exe.RunAsRootOutput(busybox_linked + " | head -n1 | cut -c 10-15");
             BusyboxVersion.setText(busybox_ver);
         }
         final String[] busybox_file = {null};
         String[] versions = new String[]{"1.25.0", "1.32.0"};
         Spinner busybox_spinner = rootView.findViewById(R.id.bb_spinner);
-        File busybox = new File("/system/xbin/" + busybox_file[0]);
         busybox_spinner.setAdapter(new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_list_item_1, versions));
 
@@ -351,11 +350,12 @@ public class SettingsFragment extends Fragment {
 
         final Button BusyboxButton = rootView.findViewById(R.id.select_bb);
         BusyboxButton.setOnClickListener( v -> {
+            File busybox = new File("/system/xbin/" + busybox_file[0]);
             if (busybox.length() == 0) {
-                Toast.makeText(getActivity().getApplicationContext(), "Selected busybox doesn't exist! Please flash the latest NetHunter zip!", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity().getApplicationContext(), "Selected busybox doesn't exist! Please check your busybox binaries!", Toast.LENGTH_LONG).show();
             } else {
-                exe.RunAsRoot(new String[]{"ln -s /system/xbin/" + busybox_file[0] + " /system/xbin/busybox"});
-                Toast.makeText(getActivity().getApplicationContext(), "Busybox has been successfully linked", Toast.LENGTH_SHORT).show();
+                exe.RunAsRoot(new String[]{"if [ \"$(getprop ro.build.system_root_image)\" == \"true\" ]; then export SYSTEM=/; else export SYSTEM=/system;fi;mount -o rw,remount $SYSTEM && rm /system/xbin/busybox;ln -s " + busybox + " /system/xbin/busybox"});
+                Toast.makeText(getActivity().getApplicationContext(), "Busybox has been successfully symlinked", Toast.LENGTH_SHORT).show();
             }
         });
         return rootView;

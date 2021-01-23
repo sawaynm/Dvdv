@@ -19,7 +19,7 @@ CHROOT_EXEC=/usr/bin/sudo
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
 
 ## Define busybox path.
-BUSYBOX=`which busybox_nh | head -n1`
+BUSYBOX=`which busybox | head -n1`
 if [ -z "$BUSYBOX" ]; then
     if [ -x "/system/xbin/busybox_nh" ]; then
         BUSYBOX="/system/xbin/busybox_nh"
