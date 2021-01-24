@@ -433,10 +433,18 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="10dp"
-                android:text="Change"
+                android:text="Apply"
                 android:textColor="#ffffffff" />
 
         </LinearLayout>
+
+            <Button
+                android:id="@+id/system_bb"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:text="Use as default system busybox"
+                android:textColor="#ffffffff" />
 
       </LinearLayout>
 
