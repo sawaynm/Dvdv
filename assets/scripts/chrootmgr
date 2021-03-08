@@ -184,14 +184,6 @@ if [ ! $# -eq 0 ]; then
                             fi
                         done
 
-                      KERNEL="$(uname -r)"
-                      DIR="/lib/modules/$KERNEL"
-                      if [ -d "$DIR" ]; then
-                          bklog "[+] kernel modules exists and linked."
-                          else
-                          bklog "[-] $i ${DIR} doesn't exist or isn't mounted. ."
-                      fi
-
                       if [ $ISALLREADY -eq 0 ]; then
                             bklog "[+] Chroot environment has been set and started."
                             bklog "[!] You may click \"STOP KALI CHROOT\" to shutdown the chroot environment."
