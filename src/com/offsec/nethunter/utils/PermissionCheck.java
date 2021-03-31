@@ -41,7 +41,7 @@ public class PermissionCheck {
 
     //First check the permissions everytime the app is freshly run.
     public void checkPermissions(String[] PERMISSIONS, int REQUEST_CODE) {
-        if (hasPermissions(context, PERMISSIONS)) {
+        if (!hasPermissions(context, PERMISSIONS)) {
             ActivityCompat.requestPermissions(activity, PERMISSIONS, REQUEST_CODE);
         }
     }
