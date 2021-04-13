@@ -231,10 +231,10 @@ public class SettingsFragment extends Fragment {
             if (ConvertCheckbox.isChecked()) {
                 if (selected_animation.equals("Burning")) foldersCMD = ""; else foldersCMD = " new/part1 new/part2";
                 resizeCMD = " -resize " + ImageWidth.getText().toString() + "x" + ImageHeight.getText().toString() + " ";
-                imagesCMD = " mkdir -p new/part0" + foldersCMD + " && echo \"Converting images...\"" +
+                imagesCMD = " mkdir -p new/part0" + foldersCMD + " && echo 'Converting images...'" +
                         "&& for i in {0000..0100}; do convert" + resizeCMD + animation_dir[0] + "/part0/$i.jpg new/part0/$i.jpg >/dev/null 2>&1; done; echo \"[+] part0 done\" " +
-                        "&& if [ -d new/part1 ]; then for i in {0000..0200}; do convert" + resizeCMD + animation_dir[0] + "/part1/$i.jpg new/part1/$i.jpg >/dev/null 2>&1; done; fi; echo \"[+] part1 done\" " +
-                        "&& if [ -d new/part2 ]; then for i in {0000..0200}; do convert" + resizeCMD + animation_dir[0] + "/part2/$i.jpg new/part2/$i.jpg >/dev/null 2>&1; done; fi; echo \"[+] part2 done\" ";
+                        "&& if [ -d new/part1 ]; then for i in {0000..0200}; do convert" + resizeCMD + animation_dir[0] + "/part1/$i.jpg new/part1/$i.jpg >/dev/null 2>&1; done; fi; echo '[+] part1 done' " +
+                        "&& if [ -d new/part2 ]; then for i in {0000..0200}; do convert" + resizeCMD + animation_dir[0] + "/part2/$i.jpg new/part2/$i.jpg >/dev/null 2>&1; done; fi; echo '[+] part2 done' ";
             } else {
                 imagesCMD = " mkdir new && cp -r " + animation_dir[0] + "/part* new/";
             }
@@ -251,8 +251,8 @@ public class SettingsFragment extends Fragment {
                     if (AnimationZip.length() == 0)
                         Toast.makeText(getActivity().getApplicationContext(), "Bootanimation zip is not created!!", Toast.LENGTH_SHORT).show();
                     else {
-                        intentClickListener_NHSU("echo -ne \"\\033]0;Installing animation\\007\" && clear;if [ \"$(getprop ro.build.system_root_image)\" == \"true\" ]; then export SYSTEM=/; else export SYSTEM=/system; " +
-                                "fi && mount -o rw,remount $SYSTEM && cp " + nh.SD_PATH + "/bootanimation.zip " + BootanimationPath.getText().toString() + " " +
+                        intentClickListener_NHSU("echo -ne \"\\033]0;Installing animation\\007\" && clear;grep ' / ' /proc/mounts | grep -qv 'rootfs' || grep -q ' /system_root ' /proc/mounts && SYSTEM=/ || SYSTEM=/system " +
+                                "&& mount -o rw,remount $SYSTEM && cp " + nh.SD_PATH + "/bootanimation.zip " + BootanimationPath.getText().toString() + " " +
                                 "&& echo \"Done. Please reboot to check the result! Exiting in 3secs..\" && sleep 3 && exit");
                     }
         });
@@ -295,8 +295,8 @@ public class SettingsFragment extends Fragment {
         if (NhSystemApp.length() == 0) {
             Toast.makeText(getActivity().getApplicationContext(), "NetHunter was not flashed as system app! Please remove it from Android settings.", Toast.LENGTH_LONG).show();
         } else {
-            intentClickListener_NHSU("echo -ne \"\\033]0;Uninstalling NetHunter\\007\" && clear;if [ \"$(getprop ro.build.system_root_image)\" == \"true\" ]; then export SYSTEM=/; else export SYSTEM=/system; " +
-                        "fi && mount -o rw,remount $SYSTEM && rm " + NhSystemApp + " && pm clear com.offsec.nethunter && echo \"Done! Reboot your device to complete the process. Exiting in 3secs..\" && sleep 3 && exit");
+            intentClickListener_NHSU("echo -ne \"\\033]0;Uninstalling NetHunter\\007\" && clear;grep ' / ' /proc/mounts | grep -qv 'rootfs' || grep -q ' /system_root ' /proc/mounts && SYSTEM=/ || SYSTEM=/system " +
+                        "&& mount -o rw,remount $SYSTEM && rm " + NhSystemApp + " && pm clear com.offsec.nethunter && echo 'Done! Reboot your device to complete the process. Exiting in 3secs..' && sleep 3 && exit");
                 }
         });
         return rootView;
@@ -344,16 +344,16 @@ public class SettingsFragment extends Fragment {
 
     public void RunSetup() {
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-        intentClickListener_NH("echo -ne \"\\033]0;Bootanimation Setup\\007\" && clear;if [[ -f /usr/bin/convert ]];then echo \"Imagemagick is installed!\"; else " +
-                "apt-get update && apt-get install imagemagick -y;fi; if [[ -f /root/nethunter-bootanimation ]];then echo \"Nethunter-bootanimation is installed!\"; else " +
-                "git clone https://gitlab.com/kalilinux/nethunter/apps/kali-nethunter-bootanimation /root/nethunter-bootanimation;fi; echo \"Everything is ready! Closing in 3secs..\"; sleep 3 && exit ");
+        intentClickListener_NH("echo -ne \"\\033]0;Bootanimation Setup\\007\" && clear;if [[ -f /usr/bin/convert ]];then echo 'Imagemagick is installed!'; else " +
+                "apt-get update && apt-get install imagemagick -y;fi; if [[ -f /root/nethunter-bootanimation ]];then echo 'Nethunter-bootanimation is installed!'; else " +
+                "git clone https://gitlab.com/kalilinux/nethunter/apps/kali-nethunter-bootanimation /root/nethunter-bootanimation;fi; echo 'Everything is ready! Closing in 3secs..'; sleep 3 && exit ");
         sharedpreferences.edit().putBoolean("animation_setup_done", true).apply();
     }
 
     public void RunUpdate() {
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
         intentClickListener_NH("echo -ne \"\\033]0;Bootanimation Update\\007\" && clear;apt-get update && apt-get install imagemagick -y;if [[ -d /root/nethunter-bootanimation ]];then cd /root/nethunter-bootanimation;git pull" +
-                ";fi; echo \"Done! Closing in 3secs..\"; sleep 3 && exit ");
+                ";fi; echo 'Done! Closing in 3secs..'; sleep 3 && exit ");
         sharedpreferences.edit().putBoolean("animation_setup_done", true).apply();
     }
 
