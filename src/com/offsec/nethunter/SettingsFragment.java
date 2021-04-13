@@ -59,21 +59,11 @@ import java.util.Set;
 
 public class SettingsFragment extends Fragment {
 
-    private static final String TAG = "VNCFragment";
-    private String xwidth;
-    private String xheight;
-    private String localhostonly = "";
     private Context context;
     private Activity activity;
     private static final String ARG_SECTION_NUMBER = "section_number";
     private String selected_animation;
-    private String prevusr = "boot_kali";
-    private Integer posu;
-    private Integer posd = 0;
-    private static final int MIN_UID = 100000;
-    private static final int MAX_UID = 101000;
-    NhPaths nh; //= new NhPaths();
-    String BUSYBOX_NH= nh.getBusyboxPath();
+    NhPaths nh;
     private SharedPreferences sharedpreferences;
 
     public SettingsFragment() {
@@ -169,12 +159,6 @@ public class SettingsFragment extends Fragment {
             }
         });
 
-        //   ProgressDialog progressDialog = new ProgressDialog(context);
-        //   progressDialog.setMessage("Loading...");
-        //   progressDialog.setCancelable(false);
-        //   progressDialog.show();
-        //        progressDialog.dismiss();
-
         //Convert Checkbox
         CheckBox ConvertCheckbox = rootView.findViewById(R.id.convert);
         EditText ImageWidth = rootView.findViewById(R.id.image_width);
@@ -250,7 +234,7 @@ public class SettingsFragment extends Fragment {
                 imagesCMD = " mkdir -p new/part0" + foldersCMD + " && echo \"Converting images...\"" +
                         "&& for i in {0000..0100}; do convert" + resizeCMD + animation_dir[0] + "/part0/$i.jpg new/part0/$i.jpg >/dev/null 2>&1; done; echo \"[+] part0 done\" " +
                         "&& if [ -d new/part1 ]; then for i in {0000..0200}; do convert" + resizeCMD + animation_dir[0] + "/part1/$i.jpg new/part1/$i.jpg >/dev/null 2>&1; done; fi; echo \"[+] part1 done\" " +
-                        "&& if [ -d new/part2 ]; then for i in {0000..0100}; do convert" + resizeCMD + animation_dir[0] + "/part2/$i.jpg new/part2/$i.jpg >/dev/null 2>&1; done; fi; echo \"[+] part2 done\" ";
+                        "&& if [ -d new/part2 ]; then for i in {0000..0200}; do convert" + resizeCMD + animation_dir[0] + "/part2/$i.jpg new/part2/$i.jpg >/dev/null 2>&1; done; fi; echo \"[+] part2 done\" ";
             } else {
                 imagesCMD = " mkdir new && cp -r " + animation_dir[0] + "/part* new/";
             }
