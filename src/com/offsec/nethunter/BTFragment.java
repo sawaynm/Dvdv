@@ -130,12 +130,12 @@ public class BTFragment extends Fragment {
     public void RunSetup() {
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
                 intentClickListener_NH("echo -ne \"\\033]0;BT Arsenal Setup\\007\" && clear;if [[ -f /usr/bin/hciconfig && -f /usr/bin/l2ping && " +
-                        "-f /usr/bin/fang && -f /usr/bin/blueranger &&-f /usr/bin/bluelog && -f /usr/bin/sdptool && -f /usr/bin/spooftooph && -f /usr/bin/sox ]];then echo \"All packages are installed!\"; else " +
+                        "-f /usr/bin/fang && -f /usr/bin/blueranger &&-f /usr/bin/bluelog && -f /usr/bin/sdptool && -f /usr/bin/spooftooph && -f /usr/bin/sox ]];then echo 'All packages are installed!'; else " +
                         "apt-get update && apt-get install bluetooth bluez bluez-tools bluez-obexd libbluetooth3 sox spooftooph " +
-                        "libbluetooth-dev redfang bluelog blueranger -y;fi; if [[ -f /usr/bin/carwhisperer && -f /usr/bin/rfcomm_scan ]];then echo \"All scripts are installed!\"; else " +
+                        "libbluetooth-dev redfang bluelog blueranger -y;fi; if [[ -f /usr/bin/carwhisperer && -f /usr/bin/rfcomm_scan ]];then echo 'All scripts are installed!'; else " +
                         "git clone https://github.com/yesimxev/carwhisperer-0.2 /root/carwhisperer;" +
                         "cd /root/carwhisperer;make && make install;git clone https://github.com/yesimxev/bt_audit /root/bt_audit;cd /root/bt_audit/src;make;" +
-                        "cp rfcomm_scan /usr/bin/;fi; echo \"Everything is installed! Closing in 3secs..\"; sleep 3 && exit ");
+                        "cp rfcomm_scan /usr/bin/;fi; echo 'Everything is installed! Closing in 3secs..'; sleep 3 && exit ");
                 sharedpreferences.edit().putBoolean("setup_done", true).apply();
     }
 
@@ -143,7 +143,7 @@ public class BTFragment extends Fragment {
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
         intentClickListener_NH("echo -ne \"\\033]0;BT Arsenal Update\\007\" && clear;apt-get update && apt-get install bluetooth bluez bluez-tools bluez-obexd libbluetooth3 sox spooftooph " +
                 "libbluetooth-dev redfang bluelog blueranger -y;if [[ -f /usr/bin/carwhisperer && -f /usr/bin/rfcomm_scan ]];then cd /root/carwhisperer/;git pull && make && make install;cd /root/bt_audit; git pull; cd src && make;" +
-                "cp rfcomm_scan /usr/bin/;fi; echo \"Done! Closing in 3secs..\"; sleep 3 && exit ");
+                "cp rfcomm_scan /usr/bin/;fi; echo 'Done! Closing in 3secs..'; sleep 3 && exit ");
         sharedpreferences.edit().putBoolean("setup_done", true).apply();
     }
 
@@ -318,7 +318,7 @@ public class BTFragment extends Fragment {
             File ScanLog = new File(nh.CHROOT_PATH() + "/root/blue.log");
             StartScanButton.setOnClickListener( v -> {
                 if (!selected_iface.equals("None")) {
-                    String hci_current = exe.RunAsRootOutput("bootkali custom_cmd hciconfig "+ selected_iface + " | grep \"UP RUNNING\" | cut -f2 -d$'\\t'");
+                    String hci_current = exe.RunAsRootOutput("bootkali custom_cmd hciconfig "+ selected_iface + " | grep 'UP RUNNING' | cut -f2 -d$'\\t'");
                     if (hci_current.equals("UP RUNNING ")) {
                         final String scantime = BTtime.getText().toString();
                         AsyncTask.execute(new Runnable() {
@@ -412,7 +412,7 @@ public class BTFragment extends Fragment {
                         BTstatus.setText("Stopped");
                         btSwitch.setChecked(false);
                     }
-                    String hci_statusCMD = exe.RunAsRootOutput("bootkali custom_cmd hciconfig "+ selected_iface + " | grep \"UP RUNNING\" | cut -f2 -d$'\\t'");
+                    String hci_statusCMD = exe.RunAsRootOutput("bootkali custom_cmd hciconfig "+ selected_iface + " | grep 'UP RUNNING' | cut -f2 -d$'\\t'");
                     if (hci_statusCMD.equals("UP RUNNING ")) {
                         HCIstatus.setText("Up");
                         hciSwitch.setChecked(true);
@@ -646,9 +646,10 @@ public class BTFragment extends Fragment {
                 } else {
                     final String target_classname = target_class + target_name;
                     if (!target_address.equals(" -a ")) {
-                        intentClickListener_NH("echo -ne \"\\033]0;Spoofing Bluetooth\\007\" && clear;echo \"Spooftooph started..\";spooftooph -i " + target_interface + target_address + "; sleep 2 && hciconfig " + target_interface + " up && spooftooph -i " + target_interface + target_classname + " && echo \"\nBringing interface up with hciconfig..\n\nClass/Name changed, closing in 3 secs..\";sleep 3 && exit");
+                        intentClickListener_NH("echo -ne \"\\033]0;Spoofing Bluetooth\\007\" && clear;echo 'Spooftooph started..';spooftooph -i " + target_interface + target_address +
+                                "; sleep 2 && hciconfig " + target_interface + " up && spooftooph -i " + target_interface + target_classname + " && echo '\nBringing interface up with hciconfig..\n\nClass/Name changed, closing in 3 secs..';sleep 3 && exit");
                     } else {
-                        intentClickListener_NH("echo -ne \"\\033]0;Spoofing Bluetooth\\007\" && clear;echo \"Spooftooph started..\";spooftooph -i " + target_interface + target_classname + " && echo \"\nClass/Name changed, closing in 3 secs..\";sleep 3 && exit");
+                        intentClickListener_NH("echo -ne \"\\033]0;Spoofing Bluetooth\\007\" && clear;echo 'Spooftooph started..';spooftooph -i " + target_interface + target_classname + " && echo '\nClass/Name changed, closing in 3 secs..';sleep 3 && exit");
                     }
                 }
             });
@@ -763,10 +764,11 @@ public class BTFragment extends Fragment {
                     String cw_injectfile = injectfilename.getText().toString();
 
                     if (selected_mode.equals("Listen")) {
-                        intentClickListener_NH("echo -ne \"\\033]0;Listening BT audio\\007\" && clear;echo \"Carwhisperer starting..\nReturn to NetHunter to kill, or to listen live!\"$'\n';carwhisperer " + cw_iface + " /root/carwhisperer/in.raw /sdcard/rec.raw " + cw_target + " " + cw_channel + " && echo \"Converting to wav to target directory..\";sox -t raw -r 8000 -e signed -b 16 /sdcard/rec.raw -r 8000 -b 16 /sdcard/" + cw_listenfile + ";echo Done! || echo \"No convert file!\"");
+                        intentClickListener_NH("echo -ne \"\\033]0;Listening BT audio\\007\" && clear;echo 'Carwhisperer starting..\nReturn to NetHunter to kill, or to listen live!'$'\n';carwhisperer " + cw_iface + " /root/carwhisperer/in.raw /sdcard/rec.raw " + cw_target + " " + cw_channel +
+                                " && echo 'Converting to wav to target directory..';sox -t raw -r 8000 -e signed -b 16 /sdcard/rec.raw -r 8000 -b 16 /sdcard/" + cw_listenfile + ";echo Done! || echo 'No convert file!'");
                     } else if (selected_mode.equals("Inject")) {
-                        intentClickListener_NH("echo -ne \"\\033]0;Injecting BT audio\\007\" && clear;echo \"Carwhisperer starting..\";length=$(($(soxi -D " + cw_injectfile + " | cut -d. -f1)+8));sox " + cw_injectfile + " -r 8000 -b 16 -c 1 tempi.raw && timeout $length " +
-                                "carwhisperer " + cw_iface + " tempi.raw tempo.raw " + cw_target + " " + cw_channel + "; rm tempi.raw && rm tempo.raw;echo \"\nInjection done, closing in 3 secs..\";sleep 3 && exit");
+                        intentClickListener_NH("echo -ne \"\\033]0;Injecting BT audio\\007\" && clear;echo 'Carwhisperer starting..';length=$(($(soxi -D '" + cw_injectfile + "' | cut -d. -f1)+8));sox '" + cw_injectfile + "' -r 8000 -b 16 -c 1 tempi.raw && timeout $length " +
+                                "carwhisperer " + cw_iface + " tempi.raw tempo.raw " + cw_target + " " + cw_channel + "; rm tempi.raw && rm tempo.raw;echo '\nInjection done, closing in 3 secs..';sleep 3 && exit");
                     }
                 } else
                     Toast.makeText(getActivity().getApplicationContext(), "No target address!", Toast.LENGTH_SHORT).show();
