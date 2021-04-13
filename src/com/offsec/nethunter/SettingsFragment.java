@@ -161,12 +161,20 @@ public class SettingsFragment extends Fragment {
 
         //Convert Checkbox
         CheckBox ConvertCheckbox = rootView.findViewById(R.id.convert);
+
+        //Image and Final size
         EditText ImageWidth = rootView.findViewById(R.id.image_width);
         EditText ImageHeight = rootView.findViewById(R.id.image_height);
         EditText FinalWidth = rootView.findViewById(R.id.final_width);
         EditText FinalHeight = rootView.findViewById(R.id.final_height);
+        final Button ImageResMinus = rootView.findViewById(R.id.imageresminus);
+        final Button ImageResPlus = rootView.findViewById(R.id.imageresplus);
+        final Button FinalResMinus = rootView.findViewById(R.id.finalresminus);
+        final Button FinalResPlus = rootView.findViewById(R.id.finalresplus);
         ImageWidth.setEnabled(false);
         ImageHeight.setEnabled(false);
+        ImageResMinus.setEnabled(false);
+        ImageResPlus.setEnabled(false);
         ConvertCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
@@ -174,13 +182,53 @@ public class SettingsFragment extends Fragment {
                     ImageWidth.setTextColor(Color.parseColor("#FFFFFF"));
                     ImageHeight.setEnabled(true);
                     ImageHeight.setTextColor(Color.parseColor("#FFFFFF"));
+                    ImageResMinus.setEnabled(true);
+                    ImageResMinus.setTextColor(Color.parseColor("#FFFFFF"));
+                    ImageResPlus.setEnabled(true);
+                    ImageResPlus.setTextColor(Color.parseColor("#FFFFFF"));
                 } else {
                     ImageWidth.setEnabled(false);
                     ImageWidth.setTextColor(Color.parseColor("#40FFFFFF"));
                     ImageHeight.setEnabled(false);
                     ImageHeight.setTextColor(Color.parseColor("#40FFFFFF"));
+                    ImageResMinus.setEnabled(false);
+                    ImageResMinus.setTextColor(Color.parseColor("#40FFFFFF"));
+                    ImageResPlus.setEnabled(false);
+                    ImageResPlus.setTextColor(Color.parseColor("#40FFFFFF"));
                 }
             }
+        });
+        addClickListener(ImageResMinus, v -> {
+            String imagewidth = ImageWidth.getText().toString();
+            int finalValueIW=Integer.parseInt(imagewidth)-108;
+            ImageWidth.setText(String.valueOf(finalValueIW));
+            String imageheight = ImageHeight.getText().toString();
+            int finalValueIH=Integer.parseInt(imageheight)-192;
+            ImageHeight.setText(String.valueOf(finalValueIH));
+        });
+        addClickListener(ImageResPlus, v -> {
+            String imagewidth = ImageWidth.getText().toString();
+            int finalValueIW=Integer.parseInt(imagewidth)+108;
+            ImageWidth.setText(String.valueOf(finalValueIW));
+            String imageheight = ImageHeight.getText().toString();
+            int finalValueIH=Integer.parseInt(imageheight)+192;
+            ImageHeight.setText(String.valueOf(finalValueIH));
+        });
+        addClickListener(FinalResMinus, v -> {
+            String finalwidth = FinalWidth.getText().toString();
+            int finalValueFW=Integer.parseInt(finalwidth)-108;
+            FinalWidth.setText(String.valueOf(finalValueFW));
+            String finalheight = FinalHeight.getText().toString();
+            int finalValueFH=Integer.parseInt(finalheight)-192;
+            FinalHeight.setText(String.valueOf(finalValueFH));
+        });
+        addClickListener(FinalResPlus, v -> {
+            String finalwidth = FinalWidth.getText().toString();
+            int finalValueFW=Integer.parseInt(finalwidth)+108;
+            FinalWidth.setText(String.valueOf(finalValueFW));
+            String finalheight = FinalHeight.getText().toString();
+            int finalValueFH=Integer.parseInt(finalheight)+192;
+            FinalHeight.setText(String.valueOf(finalValueFH));
         });
 
         //Preview Checkbox
