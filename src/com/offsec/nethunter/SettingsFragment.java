@@ -347,6 +347,58 @@ public class SettingsFragment extends Fragment {
                         "&& mount -o rw,remount $SYSTEM && rm " + NhSystemApp + " && pm clear com.offsec.nethunter && echo 'Done! Reboot your device to complete the process. Exiting in 3secs..' && sleep 3 && exit");
                 }
         });
+
+        //Busybox
+        TextView BusyboxVersion = rootView.findViewById(R.id.busybox_version);
+            String busybox_ver = exe.RunAsRootOutput("/system/xbin/busybox | head -n1 | cut -c 10-13");
+            BusyboxVersion.setText(busybox_ver);
+
+        final String[] busybox_file = {null};
+
+        //Version Spinner
+        Spinner busybox_spinner = rootView.findViewById(R.id.bb_spinner);
+        String commandBB = ("ls /system/xbin | grep busybox_nh- | cut -f 2 -d '-'");
+        String outputBB = exe.RunAsRootOutput(commandBB);
+        final String[] bbArray = outputBB.split("\n");
+        ArrayAdapter usersadapter = new ArrayAdapter<>(getContext(),android.R.layout.simple_list_item_1, bbArray);
+        busybox_spinner.setAdapter(usersadapter);
+
+        //Select Version
+        busybox_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int pos, long id) {
+                selected_version = parentView.getItemAtPosition(pos).toString();
+                if (selected_version.equals("1.25")) {
+                    busybox_file[0] = "busybox_nh-1.25";
+                } else if (selected_version.equals("1.32")){
+                    busybox_file[0] = "busybox_nh-1.32";
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+            }
+        });
+
+        //Apply button
+        final Button BusyboxButton = rootView.findViewById(R.id.select_bb);
+        BusyboxButton.setOnClickListener( v -> {
+            File busybox = new File("/system/xbin/" + busybox_file[0]);
+                exe.RunAsRoot(new String[]{"if [ \"$(getprop ro.build.system_root_image)\" == \"true\" ]; then export SYSTEM=/; else export SYSTEM=/system;fi;mount -o rw,remount $SYSTEM && rm /system/xbin/busybox_nh;ln -s " + busybox + " /system/xbin/busybox_nh"});
+                Toast.makeText(getActivity().getApplicationContext(), "NetHunter BusyBox version has been successfully modified", Toast.LENGTH_SHORT).show();
+        });
+        final Button BusyboxSystemButton = rootView.findViewById(R.id.system_bb);
+        String busybox_system = exe.RunAsRootOutput("/system/xbin/busybox | head -n1 | grep -iF nethunter");
+        if (busybox_system.equals("")) {
+            BusyboxSystemButton.setEnabled(true);
+            BusyboxSystemButton.setTextColor(Color.parseColor("#FFFFFFFF"));
+        } else {
+            BusyboxSystemButton.setEnabled(false);
+            BusyboxSystemButton.setTextColor(Color.parseColor("#40FFFFFF"));
+        }
+        BusyboxSystemButton.setOnClickListener( v -> {
+                exe.RunAsRoot(new String[]{"if [ \"$(getprop ro.build.system_root_image)\" == \"true\" ]; then export SYSTEM=/; else export SYSTEM=/system;fi;mount -o rw,remount $SYSTEM && rm /system/xbin/busybox;ln -s /system/xbin/busybox_nh /system/xbin/busybox"});
+                Toast.makeText(getActivity().getApplicationContext(), "Default system BusyBox has been changed", Toast.LENGTH_SHORT).show();
+        });
         return rootView;
     }
 

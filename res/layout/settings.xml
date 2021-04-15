@@ -14,7 +14,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingLeft="@dimen/base_listItem_LR"
-            android:paddingRight="@dimen/base_listItem_LR">
+            android:paddingRight="@dimen/base_listItem_LR"
+            android:paddingBottom="@dimen/base_listItem_TB">
 
             <TextView
                 android:layout_width="match_parent"
@@ -438,6 +439,82 @@
                 android:layout_weight="5"
                 android:paddingBottom="10dp"
                 android:text="Uninstall NetHunter App"
+                android:textColor="#ffffffff" />
+
+            <View
+                android:id="@+id/divider9"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="CURRENT BUSYBOX VERSION"
+                android:paddingTop="10dp"
+                android:padding="4dp"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:id="@+id/busybox_version"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Loading.."
+                android:paddingTop="10dp"
+                android:padding="4dp"
+                android:layout_weight="3"/>
+
+        </LinearLayout>
+
+            <View
+                android:id="@+id/divider8"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="NEW VERSION"
+                    android:padding="4dp"/>
+
+            <Spinner
+                android:id="@+id/bb_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:dropDownWidth="match_parent"
+                android:saveEnabled="false" />
+
+            <Button
+                android:id="@+id/select_bb"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:text="Apply"
+                android:textColor="#ffffffff" />
+
+        </LinearLayout>
+
+            <Button
+                android:id="@+id/system_bb"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:text="Use as default system busybox"
                 android:textColor="#ffffffff" />
 
       </LinearLayout>
