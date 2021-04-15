@@ -329,7 +329,7 @@ public class VNCFragment extends Fragment {
         refreshVNC(rootView);
 
         addClickListener(SetupVNCButton, v -> {
-            intentClickListener_NH("echo -ne \"\\033]0;Setting up Server\\007\" && clear;echo $'\n'\"Please enter your new VNC server password\"$'\n' && sudo -u " + selected_user + " vncpasswd && sleep 2 && exit"); // since is a kali command we can send it as is
+            intentClickListener_NH("echo -ne \"\\033]0;Setting up Server\\007\" && chmod +x ~" + selected_user + "/.vnc/xstartup && clear;echo $'\n'\"Please enter your new VNC server password\"$'\n' && sudo -u " + selected_user + " vncpasswd && sleep 2 && exit"); // since is a kali command we can send it as is
         });
         addClickListener(StartVNCButton, v -> {
             if(selected_user.equals("root")) {
