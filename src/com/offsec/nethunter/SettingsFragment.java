@@ -367,7 +367,7 @@ public class SettingsFragment extends Fragment {
         busybox_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int pos, long id) {
-                selected_version = parentView.getItemAtPosition(pos).toString();
+                String selected_version = parentView.getItemAtPosition(pos).toString();
                 if (selected_version.equals("1.25")) {
                     busybox_file[0] = "busybox_nh-1.25";
                 } else if (selected_version.equals("1.32")){
