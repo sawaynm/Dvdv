@@ -231,7 +231,7 @@ public class BTFragment extends Fragment {
             AsyncTask.execute(new Runnable() {
                 @Override
                 public void run() {
-                    outputHCI[0] = exe.RunAsRootOutput("bootkali custom_cmd hciconfig | grep hci | cut -d: -f1");
+                    outputHCI[0] = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig | grep hci | cut -d: -f1");
                 }
             });
             final ArrayList<String> hciIfaces = new ArrayList<>();
@@ -273,23 +273,23 @@ public class BTFragment extends Fragment {
             dbusSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         if (isChecked) {
-                            exe.RunAsRoot(new String[]{"bootkali custom_cmd service dbus start"});
+                            exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service dbus start"});
                             DBUSstatus.setText("Running");
                         } else {
-                            exe.RunAsRoot(new String[]{"bootkali custom_cmd service dbus stop"});
+                            exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service dbus stop"});
                             DBUSstatus.setText("Stopped");
                         }
                 }
             });
             btSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    String dbus_statusCMD = exe.RunAsRootOutput("bootkali custom_cmd service dbus status | grep dbus");
+                    String dbus_statusCMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service dbus status | grep dbus");
                     if (dbus_statusCMD.equals("dbus is running.")) {
                         if (isChecked) {
-                            exe.RunAsRoot(new String[]{"bootkali custom_cmd service bluetooth start"});
+                            exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service bluetooth start"});
                             BTstatus.setText("Running");
                         } else {
-                            exe.RunAsRoot(new String[]{"bootkali custom_cmd service bluetooth stop"});
+                            exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service bluetooth stop"});
                             BTstatus.setText("Stopped");
                         }
                     } else {
@@ -301,10 +301,10 @@ public class BTFragment extends Fragment {
             hciSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     if (isChecked) {
-                        exe.RunAsRoot(new String[]{"bootkali custom_cmd hciconfig " + selected_iface + " up noscan"});
+                        exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig " + selected_iface + " up noscan"});
                         HCIstatus.setText("Up");
                     } else {
-                        exe.RunAsRoot(new String[]{"bootkali custom_cmd hciconfig " + selected_iface + " down"});
+                        exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig " + selected_iface + " down"});
                         HCIstatus.setText("Down");
                     }
                 }
@@ -318,7 +318,7 @@ public class BTFragment extends Fragment {
             File ScanLog = new File(nh.CHROOT_PATH() + "/root/blue.log");
             StartScanButton.setOnClickListener( v -> {
                 if (!selected_iface.equals("None")) {
-                    String hci_current = exe.RunAsRootOutput("bootkali custom_cmd hciconfig "+ selected_iface + " | grep 'UP RUNNING' | cut -f2 -d$'\\t'");
+                    String hci_current = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig "+ selected_iface + " | grep 'UP RUNNING' | cut -f2 -d$'\\t'");
                     if (hci_current.equals("UP RUNNING ")) {
                         final String scantime = BTtime.getText().toString();
                         AsyncTask.execute(new Runnable() {
@@ -332,8 +332,8 @@ public class BTFragment extends Fragment {
                                         targets.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, scanning));
                                     }
                                 });
-                                exe.RunAsRoot(new String[]{"bootkali custom_cmd rm /root/blue.log"});
-                                exe.RunAsRoot(new String[]{"bootkali custom_cmd timeout " + scantime + " bluelog -i " + selected_iface + " -ncqo /root/blue.log;hciconfig " + selected_iface + " noscan"});
+                                exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd rm /root/blue.log"});
+                                exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd timeout " + scantime + " bluelog -i " + selected_iface + " -ncqo /root/blue.log;hciconfig " + selected_iface + " noscan"});
                                  getActivity().runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -394,7 +394,7 @@ public class BTFragment extends Fragment {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    String dbus_statusCMD = exe.RunAsRootOutput("bootkali custom_cmd service dbus status | grep dbus");
+                    String dbus_statusCMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service dbus status | grep dbus");
                     if (dbus_statusCMD.equals("dbus is running.")) {
                         DBUSstatus.setText("Running");
                         dbusSwitch.setChecked(true);
@@ -403,7 +403,7 @@ public class BTFragment extends Fragment {
                         DBUSstatus.setText("Stopped");
                         dbusSwitch.setChecked(false);
                     }
-                    String bt_statusCMD = exe.RunAsRootOutput("bootkali custom_cmd service bluetooth status | grep bluetooth");
+                    String bt_statusCMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service bluetooth status | grep bluetooth");
                     if (bt_statusCMD.equals("bluetooth is running.")) {
                         BTstatus.setText("Running");
                         btSwitch.setChecked(true);
@@ -412,7 +412,7 @@ public class BTFragment extends Fragment {
                         BTstatus.setText("Stopped");
                         btSwitch.setChecked(false);
                     }
-                    String hci_statusCMD = exe.RunAsRootOutput("bootkali custom_cmd hciconfig "+ selected_iface + " | grep 'UP RUNNING' | cut -f2 -d$'\\t'");
+                    String hci_statusCMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig "+ selected_iface + " | grep 'UP RUNNING' | cut -f2 -d$'\\t'");
                     if (hci_statusCMD.equals("UP RUNNING ")) {
                         HCIstatus.setText("Up");
                         hciSwitch.setChecked(true);
@@ -421,7 +421,7 @@ public class BTFragment extends Fragment {
                         HCIstatus.setText("Down");
                         hciSwitch.setChecked(false);
                     }
-                    String outputHCI = exe.RunAsRootOutput("bootkali custom_cmd hciconfig | grep hci | cut -d: -f1");
+                    String outputHCI = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig | grep hci | cut -d: -f1");
                     final ArrayList<String> hciIfaces = new ArrayList<>();
                     if (outputHCI.equals("")) {
                         hciIfaces.add("None");
@@ -577,7 +577,7 @@ public class BTFragment extends Fragment {
                 @Override
                 public void run() {
                     if (!sdp_target.equals("")) {
-                        String CMDout = exe.RunAsRootOutput("bootkali custom_cmd sdptool -i " + sdp_interface + " browse " + sdp_target + " | sed '/^\\[/d' | sed '/^Linux/d'");
+                        String CMDout = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd sdptool -i " + sdp_interface + " browse " + sdp_target + " | sed '/^\\[/d' | sed '/^Linux/d'");
                         output.setText(CMDout);
                     } else
                         Toast.makeText(getActivity().getApplicationContext(), "No target address!", Toast.LENGTH_SHORT).show();
@@ -669,17 +669,17 @@ public class BTFragment extends Fragment {
                 @Override
                 public void run() {
                     String selectedIface = spoof_interface.getText().toString();
-                    String currentAddress_CMD = exe.RunAsRootOutput("bootkali custom_cmd hciconfig " + selectedIface + " | awk '/Address/ { print $3 }'");
+                    String currentAddress_CMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig " + selectedIface + " | awk '/Address/ { print $3 }'");
                     if (!currentAddress_CMD.equals("")) {
                         currentAddress.setText(currentAddress_CMD);
 
-                        String currentClassCMD = exe.RunAsRootOutput("bootkali custom_cmd hciconfig " + selectedIface + " -a | awk '/Class:/ { print $2 }' | sed '/^Class:/d'");
+                        String currentClassCMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig " + selectedIface + " -a | awk '/Class:/ { print $2 }' | sed '/^Class:/d'");
                         currentClass.setText(currentClassCMD);
 
-                        String currentClassTypeCMD = exe.RunAsRootOutput("bootkali custom_cmd hciconfig " + selectedIface + " -a | awk '/Device Class:/ { print $3, $4, $5 }'");
+                        String currentClassTypeCMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig " + selectedIface + " -a | awk '/Device Class:/ { print $3, $4, $5 }'");
                         currentClassType.setText(currentClassTypeCMD);
 
-                        String currentNameCMD = exe.RunAsRootOutput("bootkali custom_cmd hciconfig " + selectedIface + " -a | grep Name | cut -d\\\' -f2");
+                        String currentNameCMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig " + selectedIface + " -a | grep Name | cut -d\\\' -f2");
                         currentName.setText(currentNameCMD);
                     } else
                         Toast.makeText(getActivity().getApplicationContext(), "Interface is down!", Toast.LENGTH_SHORT).show();
@@ -777,7 +777,7 @@ public class BTFragment extends Fragment {
             //Kill
             Button StopCWButton = rootView.findViewById(R.id.stop_cw);
             StopCWButton.setOnClickListener( v -> {
-                    exe.RunAsRoot(new String[]{"bootkali custom_cmd pkill carwhisperer"});
+                    exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd pkill carwhisperer"});
                     Toast.makeText(getActivity().getApplicationContext(), "Killed", Toast.LENGTH_SHORT).show();
                     });
 
