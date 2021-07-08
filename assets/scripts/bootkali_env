@@ -6,6 +6,11 @@
 
 unset LD_PRELOAD
 
+# unset termux TMPDIR PREFIX from env
+env | grep -qv termux && TERMUX_SHELL=true
+[ "$TERMUX_SHELL" ] && unset TMPDIR PREFIX
+
+
 ## Define the nethunter app package name.
 APP_PGK_NAME=com.offsec.nethunter
 
