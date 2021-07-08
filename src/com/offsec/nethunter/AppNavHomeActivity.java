@@ -78,6 +78,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     private BroadcastReceiver nethunterReceiver;
     public static Boolean isBackPressEnabled = true;
     private int desiredFragment = -1;
+    public CopyBootFilesAsyncTask copyBootFilesAsyncTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +104,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
 
         // Start copying the app files to the corresponding path.
         ProgressDialog progressDialog = new ProgressDialog(this);
-        CopyBootFilesAsyncTask copyBootFilesAsyncTask = new CopyBootFilesAsyncTask(getApplicationContext(), this, progressDialog);
+        copyBootFilesAsyncTask = new CopyBootFilesAsyncTask(getApplicationContext(), this, progressDialog);
         copyBootFilesAsyncTask.setListener(new CopyBootFilesAsyncTask.CopyBootFilesAsyncTaskListener() {
             @Override
             public void onAsyncTaskPrepare() {
@@ -148,7 +149,30 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                 }
             }
         });
-        copyBootFilesAsyncTask.execute();
+        // We must not attempt to copy files unless we have storage permissions
+        if (isAllRequiredPermissionsGranted()) {
+            copyBootFilesAsyncTask.execute();
+        } else {
+            // Crude way of waiting for the permissions to be granted before we continue
+            int t=0;
+            while (!permissionCheck.isAllPermitted(PermissionCheck.DEFAULT_PERMISSIONS)) {
+                try {
+                    Thread.sleep(1000);
+                    t++;
+                    Log.d(TAG, "Permissions missing. Waiting ..." + t);
+                } catch (InterruptedException e) {
+                    Log.d(TAG, "Permissions missing. Waiting ...");
+                }
+                if (t>=10) {
+                    break;
+                }
+            }
+            if (permissionCheck.isAllPermitted(PermissionCheck.DEFAULT_PERMISSIONS)) {
+                copyBootFilesAsyncTask.execute();
+            } else {
+                showWarningDialog("Permissions required", "Please restart application to finalize setup", true);
+            }
+        }
 
         int menuFragment = getIntent().getIntExtra("menuFragment", -1);
         if(menuFragment != -1) {
@@ -564,7 +588,6 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         } else if (!permissionCheck.isAllPermitted(PermissionCheck.NH_VNC_PERMISSIONS)) {
             permissionCheck.checkPermissions(PermissionCheck.NH_VNC_PERMISSIONS, PermissionCheck.NH_VNC_PERMISSIONS_RQCODE);
         }
-
         return true;
     }
 
