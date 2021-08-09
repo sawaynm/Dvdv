@@ -31,7 +31,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -77,9 +77,9 @@ public class CustomCommandsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        CustomCommandsViewModel customCommandsViewModel = ViewModelProviders.of(this).get(CustomCommandsViewModel.class);
+        CustomCommandsViewModel customCommandsViewModel = new ViewModelProvider(this).get(CustomCommandsViewModel.class);
         customCommandsViewModel.init(context);
-        customCommandsViewModel.getLiveDataCustomCommandsModelList().observe(this, customCommandsModelList -> customCommandsRecyclerViewAdapter.notifyDataSetChanged());
+        customCommandsViewModel.getLiveDataCustomCommandsModelList().observe(getViewLifecycleOwner(), customCommandsModelList -> customCommandsRecyclerViewAdapter.notifyDataSetChanged());
 
         customCommandsRecyclerViewAdapter = new CustomCommandsRecyclerViewAdapter(context, customCommandsViewModel.getLiveDataCustomCommandsModelList().getValue());
         RecyclerView recyclerView = view.findViewById(R.id.f_customcommands_recyclerview);
