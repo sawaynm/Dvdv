@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -96,10 +97,13 @@ public class HidFragment extends Fragment {
 
     public void onPrepareOptionsMenu(Menu menu) {
         int pageNum = mViewPager.getCurrentItem();
+        final MenuItem sourceButton = menu.findItem(R.id.source_button);
+        //WearOS optimisation
+        boolean iswatch = getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
         if (pageNum == 0) {
-            menu.findItem(R.id.source_button).setVisible(true);
+            if(iswatch) sourceButton.setVisible(false); else sourceButton.setVisible(true);
         } else {
-            menu.findItem(R.id.source_button).setVisible(false);
+            sourceButton.setVisible(false);
         }
         activity.invalidateOptionsMenu();
     }

@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -19,6 +20,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -67,6 +69,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private NavigationView navigationView;
+    private NavigationView navigationViewWear;
     private CharSequence mTitle = "NetHunter";
     private final Stack<String> titles = new Stack<>();
     private SharedPreferences prefs;
@@ -79,6 +82,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     public static Boolean isBackPressEnabled = true;
     private int desiredFragment = -1;
     public CopyBootFilesAsyncTask copyBootFilesAsyncTask;
+    public static MenuItem customCMDitem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -342,11 +346,25 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         }
 
         mDrawerLayout = findViewById(R.id.drawer_layout);
-
         navigationView = findViewById(R.id.navigation_view);
+        //WearOS optimisation
+        boolean iswatch = getBaseContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
+        if(iswatch){
+            navigationView.getMenu().getItem(5).setVisible(false);
+            navigationView.getMenu().getItem(6).setVisible(false);
+            navigationView.getMenu().getItem(10).setVisible(false);
+            navigationView.getMenu().getItem(11).setVisible(false);
+            navigationView.getMenu().getItem(12).setVisible(false);
+            navigationView.getMenu().getItem(14).setVisible(false);
+            navigationView.getMenu().getItem(15).setVisible(false);
+            navigationView.getMenu().getItem(16).setVisible(false);
+            navigationView.getMenu().getItem(17).setVisible(false);
+            navigationView.getMenu().getItem(18).setVisible(false);
+            navigationView.getMenu().getItem(19).setVisible(false);
+        }
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         @SuppressLint("InflateParams") LinearLayout navigationHeadView = (LinearLayout) inflater.inflate(R.layout.sidenav_header, null);
-        navigationView.addHeaderView(navigationHeadView);
+            navigationView.addHeaderView(navigationHeadView);
 
         FloatingActionButton readmeButton = navigationHeadView.findViewById(R.id.info_fab);
         readmeButton.setOnTouchListener((v, event) -> {
@@ -365,7 +383,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         buildInfo1.setText(String.format("Version: %s (%s)", BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE));
         buildInfo2.setText(String.format("Date: %s", buildTime));
 
-        if (navigationView != null) {
+       if (navigationView != null) {
             setupDrawerContent(navigationView);
         }
 
@@ -378,11 +396,11 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                 .beginTransaction()
                 .replace(R.id.container, NetHunterFragment.newInstance(R.id.nethunter_item))
                 .commit();
-
-        // and put the title in the queue for when you need to back through them
-        titles.push(navigationView.getMenu().getItem(0).getTitle().toString());
-        // disable all fragment first until it passes the compat check.
-        navigationView.getMenu().setGroupEnabled(R.id.chrootDependentGroup, false);
+            // and put the title in the queue for when you need to back through them
+            titles.push(navigationView.getMenu().getItem(0).getTitle().toString());
+            // disable all fragment first until it passes the compat check.
+            navigationView.getMenu().setGroupEnabled(R.id.chrootDependentGroup, false);
+       // }
         // if the nav bar hasn't been seen, let's show it
         if (!prefs.getBoolean("seenNav", false)) {
             mDrawerLayout.openDrawer(GravityCompat.START);
@@ -452,6 +470,31 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                     changeDrawer(itemId);
                     restoreActionBar();
                     return true;
+
+                });
+    }
+    private void setupDrawerContentWear(NavigationView navigationViewWear) {
+        navigationViewWear.setNavigationItemSelectedListener(
+                menuItem -> {
+                    // only change it if is not the same as the last one
+                    if (lastSelectedMenuItem != menuItem) {
+                        //remove last
+                        if(lastSelectedMenuItem != null)
+                            lastSelectedMenuItem.setChecked(false);
+                        // update for the next
+                        lastSelectedMenuItem = menuItem;
+                    }
+                    //set checked
+                    menuItem.setChecked(true);
+                    mDrawerLayout.closeDrawers();
+                    mTitle = menuItem.getTitle();
+                    titles.push(mTitle.toString());
+
+                    int itemId = menuItem.getItemId();
+                    changeDrawer(itemId);
+                    restoreActionBar();
+                    return true;
+
                 });
     }
 
