@@ -15,6 +15,7 @@
         android:id="@+id/f_chrootmanager_viewholder">
 
         <LinearLayout
+            android:id="@+id/f_chrootmanager_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <TextView

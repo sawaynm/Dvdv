@@ -35,6 +35,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
+import static com.offsec.nethunter.R.id.f_nethunter_action_search;
+
 public class MacchangerFragment extends Fragment {
 
     private static final String TAG = "MacchangerFragment";

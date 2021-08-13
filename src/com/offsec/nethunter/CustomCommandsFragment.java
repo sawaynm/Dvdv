@@ -3,6 +3,8 @@ package com.offsec.nethunter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -15,6 +17,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.HorizontalScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -47,6 +50,7 @@ public class CustomCommandsFragment extends Fragment {
     private Button addButton;
     private Button deleteButton;
     private Button moveButton;
+    private TextView customBanner;
     private static int targetPositionId;
 
     public CustomCommandsFragment() {
@@ -90,10 +94,18 @@ public class CustomCommandsFragment extends Fragment {
         addButton = view.findViewById(R.id.f_customcommands_addItemButton);
         deleteButton = view.findViewById(R.id.f_customcommands_deleteItemButton);
         moveButton = view.findViewById(R.id.f_customcommands_moveItemButton);
+        customBanner = view.findViewById(R.id.f_customcommands_banner);
 
         onAddItemSetup();
         onDeleteItemSetup();
         onMoveItemSetup();
+
+        //WearOS optimisation
+        SharedPreferences sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+        Boolean iswatch = sharedpreferences.getBoolean("running_on_wearos", false);
+        if(iswatch) {
+            customBanner.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -101,7 +113,11 @@ public class CustomCommandsFragment extends Fragment {
         inflater.inflate(R.menu.custom_commands, menu);
         final MenuItem searchItem = menu.findItem(R.id.f_customcommands_action_search);
         final SearchView searchView = (SearchView) searchItem.getActionView();
-
+        //WearOS optimisation
+        boolean iswatch = getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
+        if(iswatch) {
+            searchItem.setVisible(false);
+        }
         searchView.setOnSearchClickListener(v -> menu.setGroupVisible(R.id.f_customcommands_menu_group1, false));
         searchView.setOnCloseListener(() -> {
             menu.setGroupVisible(R.id.f_customcommands_menu_group1, true);

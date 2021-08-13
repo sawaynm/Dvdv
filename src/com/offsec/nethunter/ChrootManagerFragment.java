@@ -7,6 +7,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
@@ -61,6 +62,7 @@ public class ChrootManagerFragment extends Fragment {
     private Button addMetaPkgButton;
     private Button removeChrootButton;
     private Button backupChrootButton;
+    private LinearLayout ChrootDesc;
     private SharedPreferences sharedPreferences;
     private ChrootManagerAsynctask chrootManagerAsynctask;
     private Intent backPressedintent = new Intent();
@@ -102,6 +104,7 @@ public class ChrootManagerFragment extends Fragment {
         addMetaPkgButton = rootView.findViewById(R.id.f_chrootmanager_addmetapkg_btn);
         removeChrootButton = rootView.findViewById(R.id.f_chrootmanager_removechroot_btn);
         backupChrootButton = rootView.findViewById(R.id.f_chrootmanager_backupchroot_btn);
+        ChrootDesc = rootView.findViewById(R.id.f_chrootmanager_desc);
         return rootView;
     }
 
@@ -123,6 +126,12 @@ public class ChrootManagerFragment extends Fragment {
         setRemoveChrootButton();
         setAddMetaPkgButton();
         setBackupChrootButton();
+        //WearOS optimisation
+        SharedPreferences sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+        Boolean iswatch = sharedpreferences.getBoolean("running_on_wearos", false);
+        if(iswatch) {
+            ChrootDesc.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -642,7 +651,9 @@ public class ChrootManagerFragment extends Fragment {
                 mountChrootButton.setVisibility(View.GONE);
                 unmountChrootButton.setVisibility(View.VISIBLE);
                 installChrootButton.setVisibility(View.GONE);
-                addMetaPkgButton.setVisibility(View.VISIBLE);
+                SharedPreferences sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+                Boolean iswatch = sharedpreferences.getBoolean("running_on_wearos", false);
+                if(iswatch) addMetaPkgButton.setVisibility(View.GONE); else addMetaPkgButton.setVisibility(View.VISIBLE);
                 removeChrootButton.setVisibility(View.GONE);
                 backupChrootButton.setVisibility(View.GONE);
                 break;

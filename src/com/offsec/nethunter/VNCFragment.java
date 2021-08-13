@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.DisplayMetrics;
@@ -133,6 +134,10 @@ public class VNCFragment extends Fragment {
             xwidth = Integer.toString(screen_width);
             xheight = Integer.toString(screen_height);
         }
+
+
+        Boolean iswatch = sharedpreferences.getBoolean("running_on_wearos", false);
+        if(iswatch)nh.showMessage(context, "WearOS detected");
 
         Button SetupVNCButton = rootView.findViewById(R.id.set_up_vnc);
         Button StartVNCButton = rootView.findViewById(R.id.start_vnc);
