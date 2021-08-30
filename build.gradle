@@ -51,7 +51,7 @@ android {
         minSdkVersion 17
         targetSdkVersion 29
         //noinspection HighAppVersionCode
-        versionCode 2021030100
+        versionCode 2021030200
         versionName "2021.3"
         multiDexEnabled true
     }
