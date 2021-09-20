@@ -3,6 +3,8 @@ package com.offsec.nethunter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -15,6 +17,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.HorizontalScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -48,6 +51,8 @@ public class KaliServicesFragment extends Fragment {
     private Button addButton;
     private Button deleteButton;
     private Button moveButton;
+    private TextView servicesDesc;
+    private HorizontalScrollView servicesButtons;
     private KaliServicesRecyclerViewAdapter kaliServicesRecyclerViewAdapter;
     private static int targetPositionId;
 
@@ -90,11 +95,21 @@ public class KaliServicesFragment extends Fragment {
         addButton = view.findViewById(R.id.f_kaliservices_addItemButton);
         deleteButton = view.findViewById(R.id.f_kaliservices_deleteItemButton);
         moveButton = view.findViewById(R.id.f_kaliservices_moveItemButton);
+        servicesDesc = view.findViewById(R.id.f_kaliservices_banner);
+        servicesButtons = view.findViewById(R.id.f_kaliservices_btn_scrollView);
 
         onRefreshItemSetup();
         onAddItemSetup();
         onDeleteItemSetup();
         onMoveItemSetup();
+
+        //WearOS optimisation
+        SharedPreferences sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+        Boolean iswatch = sharedpreferences.getBoolean("running_on_wearos", false);
+        if(iswatch) {
+            servicesDesc.setVisibility(View.GONE);
+            servicesButtons.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -102,6 +117,11 @@ public class KaliServicesFragment extends Fragment {
         inflater.inflate(R.menu.kaliservices, menu);
         final MenuItem searchItem = menu.findItem(R.id.f_kaliservices_action_search);
         final SearchView searchView = (SearchView) searchItem.getActionView();
+        //WearOS optimisation
+        boolean iswatch = getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
+        if(iswatch) {
+            searchItem.setVisible(false);
+        }
 
         searchView.setOnSearchClickListener(v -> menu.setGroupVisible(R.id.f_kaliservices_menu_group1, false));
         searchView.setOnCloseListener(() -> {

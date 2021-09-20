@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -19,6 +20,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -67,6 +69,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private NavigationView navigationView;
+    private NavigationView navigationViewWear;
     private CharSequence mTitle = "NetHunter";
     private final Stack<String> titles = new Stack<>();
     private SharedPreferences prefs;
@@ -78,6 +81,8 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     private BroadcastReceiver nethunterReceiver;
     public static Boolean isBackPressEnabled = true;
     private int desiredFragment = -1;
+    public CopyBootFilesAsyncTask copyBootFilesAsyncTask;
+    public static MenuItem customCMDitem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +108,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
 
         // Start copying the app files to the corresponding path.
         ProgressDialog progressDialog = new ProgressDialog(this);
-        CopyBootFilesAsyncTask copyBootFilesAsyncTask = new CopyBootFilesAsyncTask(getApplicationContext(), this, progressDialog);
+        copyBootFilesAsyncTask = new CopyBootFilesAsyncTask(getApplicationContext(), this, progressDialog);
         copyBootFilesAsyncTask.setListener(new CopyBootFilesAsyncTask.CopyBootFilesAsyncTaskListener() {
             @Override
             public void onAsyncTaskPrepare() {
@@ -148,7 +153,30 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                 }
             }
         });
-        copyBootFilesAsyncTask.execute();
+        // We must not attempt to copy files unless we have storage permissions
+        if (isAllRequiredPermissionsGranted()) {
+            copyBootFilesAsyncTask.execute();
+        } else {
+            // Crude way of waiting for the permissions to be granted before we continue
+            int t=0;
+            while (!permissionCheck.isAllPermitted(PermissionCheck.DEFAULT_PERMISSIONS)) {
+                try {
+                    Thread.sleep(1000);
+                    t++;
+                    Log.d(TAG, "Permissions missing. Waiting ..." + t);
+                } catch (InterruptedException e) {
+                    Log.d(TAG, "Permissions missing. Waiting ...");
+                }
+                if (t>=10) {
+                    break;
+                }
+            }
+            if (permissionCheck.isAllPermitted(PermissionCheck.DEFAULT_PERMISSIONS)) {
+                copyBootFilesAsyncTask.execute();
+            } else {
+                showWarningDialog("Permissions required", "Please restart application to finalize setup", true);
+            }
+        }
 
         int menuFragment = getIntent().getIntExtra("menuFragment", -1);
         if(menuFragment != -1) {
@@ -318,11 +346,25 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         }
 
         mDrawerLayout = findViewById(R.id.drawer_layout);
-
         navigationView = findViewById(R.id.navigation_view);
+        //WearOS optimisation
+        boolean iswatch = getBaseContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
+        if(iswatch){
+            navigationView.getMenu().getItem(5).setVisible(false);
+            navigationView.getMenu().getItem(6).setVisible(false);
+            navigationView.getMenu().getItem(10).setVisible(false);
+            navigationView.getMenu().getItem(11).setVisible(false);
+            navigationView.getMenu().getItem(12).setVisible(false);
+            navigationView.getMenu().getItem(14).setVisible(false);
+            navigationView.getMenu().getItem(15).setVisible(false);
+            navigationView.getMenu().getItem(16).setVisible(false);
+            navigationView.getMenu().getItem(17).setVisible(false);
+            navigationView.getMenu().getItem(18).setVisible(false);
+            navigationView.getMenu().getItem(19).setVisible(false);
+        }
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         @SuppressLint("InflateParams") LinearLayout navigationHeadView = (LinearLayout) inflater.inflate(R.layout.sidenav_header, null);
-        navigationView.addHeaderView(navigationHeadView);
+            navigationView.addHeaderView(navigationHeadView);
 
         FloatingActionButton readmeButton = navigationHeadView.findViewById(R.id.info_fab);
         readmeButton.setOnTouchListener((v, event) -> {
@@ -341,7 +383,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         buildInfo1.setText(String.format("Version: %s (%s)", BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE));
         buildInfo2.setText(String.format("Date: %s", buildTime));
 
-        if (navigationView != null) {
+       if (navigationView != null) {
             setupDrawerContent(navigationView);
         }
 
@@ -354,11 +396,11 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                 .beginTransaction()
                 .replace(R.id.container, NetHunterFragment.newInstance(R.id.nethunter_item))
                 .commit();
-
-        // and put the title in the queue for when you need to back through them
-        titles.push(navigationView.getMenu().getItem(0).getTitle().toString());
-        // disable all fragment first until it passes the compat check.
-        navigationView.getMenu().setGroupEnabled(R.id.chrootDependentGroup, false);
+            // and put the title in the queue for when you need to back through them
+            titles.push(navigationView.getMenu().getItem(0).getTitle().toString());
+            // disable all fragment first until it passes the compat check.
+            navigationView.getMenu().setGroupEnabled(R.id.chrootDependentGroup, false);
+       // }
         // if the nav bar hasn't been seen, let's show it
         if (!prefs.getBoolean("seenNav", false)) {
             mDrawerLayout.openDrawer(GravityCompat.START);
@@ -428,6 +470,31 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                     changeDrawer(itemId);
                     restoreActionBar();
                     return true;
+
+                });
+    }
+    private void setupDrawerContentWear(NavigationView navigationViewWear) {
+        navigationViewWear.setNavigationItemSelectedListener(
+                menuItem -> {
+                    // only change it if is not the same as the last one
+                    if (lastSelectedMenuItem != menuItem) {
+                        //remove last
+                        if(lastSelectedMenuItem != null)
+                            lastSelectedMenuItem.setChecked(false);
+                        // update for the next
+                        lastSelectedMenuItem = menuItem;
+                    }
+                    //set checked
+                    menuItem.setChecked(true);
+                    mDrawerLayout.closeDrawers();
+                    mTitle = menuItem.getTitle();
+                    titles.push(mTitle.toString());
+
+                    int itemId = menuItem.getItemId();
+                    changeDrawer(itemId);
+                    restoreActionBar();
+                    return true;
+
                 });
     }
 
@@ -564,7 +631,6 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         } else if (!permissionCheck.isAllPermitted(PermissionCheck.NH_VNC_PERMISSIONS)) {
             permissionCheck.checkPermissions(PermissionCheck.NH_VNC_PERMISSIONS, PermissionCheck.NH_VNC_PERMISSIONS_RQCODE);
         }
-
         return true;
     }
 

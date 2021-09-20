@@ -3,6 +3,7 @@ package com.offsec.nethunter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -89,6 +90,12 @@ public class BadusbFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.badusb, menu);
+        //WearOS optimisation
+        final MenuItem sourceItem = menu.findItem(R.id.source_button);
+        boolean iswatch = getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
+        if(iswatch) {
+            sourceItem.setVisible(false);
+        }
     }
 
     @Override
