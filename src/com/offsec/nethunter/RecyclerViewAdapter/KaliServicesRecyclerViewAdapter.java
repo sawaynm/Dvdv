@@ -3,6 +3,7 @@ package com.offsec.nethunter.RecyclerViewAdapter;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -15,6 +16,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -238,6 +240,12 @@ public class KaliServicesRecyclerViewAdapter extends RecyclerView.Adapter<KaliSe
 			runOnChrootStartCheckbox = view.findViewById(R.id.f_kaliservices_recyclerview_runonchrootstart_checkbox);
 			mSwitch = view.findViewById(R.id.f_kaliservices_recyclerview_switch_toggle);
 			statustextView = view.findViewById(R.id.f_kaliservices_recyclerview_serviceresult_tv);
+			//WearOS optimisation
+			SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+			Boolean iswatch = sharedpreferences.getBoolean("running_on_wearos", false);
+			if(iswatch) {
+				runOnChrootStartCheckbox.setVisibility(View.GONE);
+			}
 		}
 	}
 }

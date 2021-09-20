@@ -5,7 +5,10 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,6 +20,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -40,7 +44,11 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import static com.offsec.nethunter.R.id.container;
 import static com.offsec.nethunter.R.id.f_nethunter_action_search;
+import static com.offsec.nethunter.R.id.f_nethunter_recyclerview;
+import static com.offsec.nethunter.R.id.nethunter_item;
+import static com.offsec.nethunter.R.id.viewSource;
 
 
 public class NetHunterFragment extends Fragment {
@@ -82,6 +90,7 @@ public class NetHunterFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         NethunterViewModel nethunterViewModel = ViewModelProviders.of(this).get(NethunterViewModel.class);
         nethunterViewModel.init(context);
+        SharedPreferences sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
 
         nethunterViewModel.getLiveDataNethunterModelList().observe(getViewLifecycleOwner(), nethunterModelList -> {
             nethunterRecyclerViewAdapter.notifyDataSetChanged();
@@ -102,6 +111,16 @@ public class NetHunterFragment extends Fragment {
         onAddItemSetup();
         onDeleteItemSetup();
         onMoveItemSetup();
+
+        //WearOS optimisation
+        TextView NHDesc = view.findViewById(R.id.f_nethunter_banner2);
+        LinearLayout NHButtons = view.findViewById(R.id.f_nethunter_linearlayoutBtn);
+        boolean iswatch = getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
+        sharedpreferences.edit().putBoolean("running_on_wearos", iswatch).apply();
+        if(iswatch) {
+            NHDesc.setVisibility(View.GONE);
+            NHButtons.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -109,6 +128,11 @@ public class NetHunterFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.nethunter, menu);
         final MenuItem searchItem = menu.findItem(f_nethunter_action_search);
+        //WearOS optimisation
+        boolean iswatch = getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
+        if(iswatch) {
+            searchItem.setVisible(false);
+        }
         final SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setOnSearchClickListener(v -> menu.setGroupVisible(R.id.f_nethunter_menu_group1, false));
         searchView.setOnCloseListener(() -> {
