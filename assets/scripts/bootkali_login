@@ -31,4 +31,4 @@ if [ ! -x $MNT$CHROOT_EXEC ]; then
 fi
 
 clear
-$BUSYBOX chroot $MNT $CHROOT_EXEC -E PATH=$PATH su
+$BUSYBOX chroot $MNT $CHROOT_EXEC -E PATH=$PATH su -l
