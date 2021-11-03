@@ -30,7 +30,7 @@
              android:title="@string/drawertitlevncmanager" />
         <item
             android:id="@+id/usbarmory_item"
-            android:icon="@drawable/ic_action_keyboard"
+            android:icon="@drawable/ic_usb"
             android:title="@string/drawertitleusbarmory" />
          <item
              android:id="@+id/hid_item"
@@ -42,7 +42,7 @@
              android:title="@string/drawertitleduckhunter" />
          <item
              android:id="@+id/badusb_item"
-             android:icon="@drawable/ic_action_usb"
+             android:icon="@drawable/ic_baseline_call_split_24"
              android:title="@string/drawertitlebadusb" />
          <item
              android:id="@+id/mana_item"
