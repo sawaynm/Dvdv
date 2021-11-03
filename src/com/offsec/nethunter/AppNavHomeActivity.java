@@ -532,7 +532,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                             if (new File("/config/usb_gadget/g1").exists()) {
                                 changeFragment(fragmentManager, USBArmoryFragment.newInstance(itemId));
                             } else {
-                                showWarningDialog("", "Your kernel does not support USB ConfigFS!", false);
+                                showWarningDialog("", "USB Arsenal (ConfigFS) is only supported by kernels above 4.x. Please note that HID, RNDIS, and Mass Storage should be automatically enabled on older devices with NetHunter patches.", false);
                             }
                             break;
                         case R.id.badusb_item:
