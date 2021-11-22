@@ -276,7 +276,11 @@ public class SETFragment extends Fragment {
                 PhishSubject.setText(PhishName.getText() + " sent you a Direct Message on Twitter!");
             }
 
-            if (!phish_link.equals(""))  exe.RunAsRoot(new String[]{"sed -i 's/https\\:\\/\\/www.offensive-security.com/" + phish_link + "/g' " + template_path});
+            if (!phish_link.equals("")) {
+                if (phish_link.contains("&")) phish_link = exe.RunAsRootOutput("sed 's/\\&/\\\\\\&/g' <<< \"" + phish_link + "\"");
+                phish_link = exe.RunAsRootOutput("sed 's|\\/|\\\\\\/|g' <<< \"" + phish_link + "\"");
+                exe.RunAsRoot(new String[]{"sed -i 's/https\\:\\/\\/www.offensive-security.com/" + phish_link + "/g' " + template_path});
+            }
             if (!phish_name.equals("")) exe.RunAsRoot(new String[]{"sed -i 's/Offensive Security/" + phish_name + "/g' " + template_path});
             if (!phish_pic.equals("")) {
                 if (phish_pic.contains("&")) phish_pic = exe.RunAsRootOutput("sed 's/\\&/\\\\\\&/g' <<< \"" + phish_pic + "\"");
