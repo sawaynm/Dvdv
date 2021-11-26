@@ -279,9 +279,9 @@ public class SETFragment extends Fragment {
             if (!phish_link.equals("")) {
                 if (phish_link.contains("&")) phish_link = exe.RunAsRootOutput("sed 's/\\&/\\\\\\&/g' <<< \"" + phish_link + "\"");
                 phish_link = exe.RunAsRootOutput("sed 's|\\/|\\\\\\/|g' <<< \"" + phish_link + "\"");
-                exe.RunAsRoot(new String[]{"sed -i 's/https\\:\\/\\/www.offensive-security.com/" + phish_link + "/g' " + template_path});
+                exe.RunAsRoot(new String[]{"sed -i 's/https\\:\\/\\/www.google.com/" + phish_link + "/g' " + template_path});
             }
-            if (!phish_name.equals("")) exe.RunAsRoot(new String[]{"sed -i 's/Offensive Security/" + phish_name + "/g' " + template_path});
+            if (!phish_name.equals("")) exe.RunAsRoot(new String[]{"sed -i 's/E Corp/" + phish_name + "/g' " + template_path});
             if (!phish_pic.equals("")) {
                 if (phish_pic.contains("&")) phish_pic = exe.RunAsRootOutput("sed 's/\\&/\\\\\\&/g' <<< \"" + phish_pic + "\"");
                 exe.RunAsRoot(new String[]{"sed -i \"s|id=\\\"set\\\".*|id=\\\"set\\\" src=\\\"" + phish_pic + "\\\" width=\\\"72\\\">|\" " + template_path});
