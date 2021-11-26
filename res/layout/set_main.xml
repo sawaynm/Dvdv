@@ -66,7 +66,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint="https://offensive-security.com"
+                    android:hint="https://google.com"
                     android:gravity="center"
                     android:id="@+id/set_link" />
 
@@ -90,8 +90,8 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint="Offensive Security"
-                    android:text="Offensive Security"
+                    android:hint="E Corp"
+                    android:text="E Corp"
                     android:gravity="center"
                     android:id="@+id/set_name" />
 
@@ -142,7 +142,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:inputType="text"
-                    android:text="https://yt3.ggpht.com/ytc/AKedOLRLPpaRNdcdGPY_YrTePl5eBHKDTvaaaSZOPWSn=s88-c-k-c0x00ffffff-no-rj" />
+                    android:text="https://images.squarespace-cdn.com/content/v1/571a9b3cd51cd4f1ca1c03b5/1466795502628-9RGHINLEYWT4KUJE4CGI/Evil_Corp_logo.png" />
 
             </LinearLayout>
 
