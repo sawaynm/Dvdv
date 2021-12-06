@@ -355,12 +355,13 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
             navigationView.getMenu().getItem(10).setVisible(false);
             navigationView.getMenu().getItem(11).setVisible(false);
             navigationView.getMenu().getItem(12).setVisible(false);
-            navigationView.getMenu().getItem(14).setVisible(false);
+            navigationView.getMenu().getItem(13).setVisible(false);
             navigationView.getMenu().getItem(15).setVisible(false);
             navigationView.getMenu().getItem(16).setVisible(false);
             navigationView.getMenu().getItem(17).setVisible(false);
             navigationView.getMenu().getItem(18).setVisible(false);
             navigationView.getMenu().getItem(19).setVisible(false);
+            navigationView.getMenu().getItem(20).setVisible(false);
         }
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         @SuppressLint("InflateParams") LinearLayout navigationHeadView = (LinearLayout) inflater.inflate(R.layout.sidenav_header, null);
@@ -532,7 +533,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                             if (new File("/config/usb_gadget/g1").exists()) {
                                 changeFragment(fragmentManager, USBArmoryFragment.newInstance(itemId));
                             } else {
-                                showWarningDialog("", "Your kernel does not support USB ConfigFS!", false);
+                                showWarningDialog("", "USB Arsenal (ConfigFS) is only supported by kernels above 4.x. Please note that HID, RNDIS, and Mass Storage should be automatically enabled on older devices with NetHunter patches.", false);
                             }
                             break;
                         case R.id.badusb_item:
@@ -577,6 +578,9 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                             break;
                         case R.id.settings_item:
                             changeFragment(fragmentManager, SettingsFragment.newInstance(itemId));
+                            break;
+                        case R.id.set_item:
+                            changeFragment(fragmentManager, SETFragment.newInstance(itemId));
                             break;
                     }
     }
