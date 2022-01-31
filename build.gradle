@@ -15,7 +15,8 @@ repositories {
     maven {
         url "https://maven.google.com"
     }
-    maven { url "https://jitpack.io" }
+    //Snowfall
+    //maven { url "https://jitpack.io" }
     google()
 }
 
@@ -30,7 +31,8 @@ dependencies {
     implementation 'joda-time:joda-time:2.10.13'
     implementation 'com.google.guava:guava:29.0-jre'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    implementation 'com.github.jetradarmobile:android-snowfall:1.2.1'
+    //Snowfall
+    //implementation 'com.github.jetradarmobile:android-snowfall:1.2.1'
 }
 
 android {
@@ -53,7 +55,7 @@ android {
         minSdkVersion 17
         targetSdkVersion 29
         //noinspection HighAppVersionCode
-        versionCode 2021040500
+        versionCode 2021040600
         versionName "2021.4"
         multiDexEnabled true
     }
