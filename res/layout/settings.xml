@@ -382,12 +382,6 @@
               android:text="Backup"
               android:textColor="#ffffffff" />
 
-            <View
-                android:id="@+id/divider6"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="?android:attr/listDivider" />
-
             <LinearLayout
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
@@ -472,12 +466,6 @@
 
         </LinearLayout>
 
-            <View
-                android:id="@+id/divider8"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="?android:attr/listDivider" />
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -515,6 +503,69 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="10dp"
                 android:text="Use as default system busybox"
+                android:textColor="#ffffffff" />
+
+            <View
+                android:id="@+id/divider10"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="CURRENT TERMINAL STYLE"
+                    android:padding="4dp"
+                    android:layout_weight="1"/>
+
+                <TextView
+                    android:id="@+id/prompt_type"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Loading.."
+                    android:paddingTop="10dp"
+                    android:padding="4dp"
+                    android:layout_weight="3"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView11"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:padding="4dp"
+                    android:layout_weight="1"
+                    android:text="SELECT NEW STYLE:" />
+
+                <Spinner
+                    android:id="@+id/prompt_spinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:dropDownWidth="match_parent"
+                    android:saveEnabled="false"
+                    android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/apply_prompt"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:text="Set zsh style"
                 android:textColor="#ffffffff" />
 
       </LinearLayout>
