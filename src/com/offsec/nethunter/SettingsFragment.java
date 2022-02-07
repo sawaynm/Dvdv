@@ -63,6 +63,7 @@ public class SettingsFragment extends Fragment {
     private Activity activity;
     private static final String ARG_SECTION_NUMBER = "section_number";
     private String selected_animation;
+    private String selected_prompt;
     NhPaths nh;
     private SharedPreferences sharedpreferences;
 
@@ -399,6 +400,37 @@ public class SettingsFragment extends Fragment {
                 exe.RunAsRoot(new String[]{"if [ \"$(getprop ro.build.system_root_image)\" == \"true\" ]; then export SYSTEM=/; else export SYSTEM=/system;fi;mount -o rw,remount $SYSTEM && rm /system/xbin/busybox;ln -s /system/xbin/busybox_nh /system/xbin/busybox"});
                 Toast.makeText(getActivity().getApplicationContext(), "Default system BusyBox has been changed", Toast.LENGTH_SHORT).show();
         });
+
+        //Terminal style
+        TextView TerminalStyle = rootView.findViewById(R.id.prompt_type);
+        String current_prompt = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd grep -m1 'PROMPT_ALTERNATIVE=' /root/.zshrc | cut -d = -f 2 | tail -1");
+        TerminalStyle.setText(current_prompt);
+
+        //Prompt spinner
+        Spinner PromptSpinner = rootView.findViewById(R.id.prompt_spinner);
+        String[] Prompts = new String[]{"oneline", "twoline", "backtrack"};
+        PromptSpinner.setAdapter(new ArrayAdapter<>(getContext(),
+                android.R.layout.simple_list_item_1, Prompts));
+
+        //Select prompt
+        PromptSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int pos, long id) {
+                selected_prompt = parentView.getItemAtPosition(pos).toString();
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+            }
+        });
+
+        //Apply prompt
+        final Button ApplyPromptButton = rootView.findViewById(R.id.apply_prompt);
+        ApplyPromptButton.setOnClickListener( v -> {
+            exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd sed -i '0,/.*PROMPT_ALTERNATIVE=.*/s//PROMPT_ALTERNATIVE=" + selected_prompt + "/' /root/.zshrc");
+            Toast.makeText(getActivity().getApplicationContext(), "Zsh terminal prompt style has been successfully changed", Toast.LENGTH_SHORT).show();
+            TerminalStyle.setText(selected_prompt);
+        });
+
         return rootView;
     }
 
