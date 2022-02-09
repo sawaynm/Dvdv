@@ -43,7 +43,8 @@ import androidx.fragment.app.Fragment;
 public class ChrootManagerFragment extends Fragment {
     public static final String TAG = "ChrootManager";
     private static final String ARG_SECTION_NUMBER = "section_number";
-    private static final String IMAGE_SERVER = "images.kali.org";
+    private static final String IMAGE_SERVER = "kali.download";
+    private static final String IMAGE_DIRECTORY = "/nethunter-images/current/rootfs/";
     private static String ARCH = "";
     private static String MINORFULL = "";
     private TextView mountStatsTextView;
@@ -474,7 +475,7 @@ public class ChrootManagerFragment extends Fragment {
                 }
             }
         });
-        chrootManagerAsynctask.execute(resultViewerLoggerTextView, IMAGE_SERVER, "/nethunter/" + targetDownloadFileName, downloadDir.getAbsolutePath() + "/" + targetDownloadFileName);
+        chrootManagerAsynctask.execute(resultViewerLoggerTextView, IMAGE_SERVER, IMAGE_DIRECTORY + targetDownloadFileName, downloadDir.getAbsolutePath() + "/" + targetDownloadFileName);
     }
 
     private void setAddMetaPkgButton() {
