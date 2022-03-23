@@ -9,10 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -92,8 +88,7 @@
                 android:id="@+id/resetinterface"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Reset interface"
-                android:visibility="gone"/>
+                android:text="Reset interface"/>
 
             </LinearLayout>
 
@@ -278,8 +273,6 @@
                 android:visibility="gone"/>
 
         </LinearLayout>
-
-    </LinearLayout>
 
 </ScrollView>
 

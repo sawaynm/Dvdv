@@ -97,7 +97,7 @@ public class WPSFragment extends Fragment {
         resetifaceButton.setOnClickListener(view -> {
             if (iswatch) exe.RunAsRoot(new String[]{"settings put system clockwork_wifi_setting off; sleep 1 && settings put system clockwork_wifi_setting on"});
             else exe.RunAsRoot(new String[]{"svc wifi disable; sleep 1 && svc wifi enable"});
-                });
+        });
 
         //Select target network
         WPSList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()  {
