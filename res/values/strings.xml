@@ -226,7 +226,7 @@
     <string name="set_description">Social Engineering Toolkit email template builder by yesimxev. Please note you need to have a working Gmail or email relay configuration for SET in order to use these templates. It is recommended not to have account picture if you use Gmail.</string>
 
     <!-- WPS -->
-    <string name="wps_description">OneShot performs WPS PIN and Pixie Dust attack without having to switch to monitor mode. Note that scanning on WearOS sometimes fail.</string>
+    <string name="wps_description">OneShot performs WPS PIN and Pixie Dust attack without having to switch to monitor mode. Note that if scan is empty, you might need to reset your interface.</string>
 
     <!-- Settings -->
     <string name="settings_description">Select your desired boot animation here. Please note that some older phones prefer 90% the size of original screen resolution, so it can run smoothly. In that case, tick convert, then set image resolution and final resolution together.</string>
