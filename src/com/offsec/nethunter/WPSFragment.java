@@ -236,7 +236,7 @@ public class WPSFragment extends Fragment {
                 WPSList.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, arrayList));
                 WPSList.setVisibility(View.VISIBLE);
             });
-            String outputScanLog = exe.RunAsRootOutput("bootkali custom_cmd python3 /sdcard/nh_files/modules/oneshot.py -i wlan0 -s | grep -E '[0-9])' | awk '{print $2\";\"$3}'");
+            String outputScanLog = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd python3 /sdcard/nh_files/modules/oneshot.py -i wlan0 -s | grep -E '[0-9])' | awk '{print $2\";\"$3}'");
             getActivity().runOnUiThread(() -> {
                 final String[] arrayList = outputScanLog.split("\n");
                 ArrayAdapter targetsadapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, arrayList);
