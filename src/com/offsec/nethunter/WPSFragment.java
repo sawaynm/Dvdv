@@ -78,10 +78,11 @@ public class WPSFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.wps, container, false);
 
-        //WearOS
+        //Reset interface for a fresh scan
         SharedPreferences sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
         iswatch = sharedpreferences.getBoolean("running_on_wearos", false);
-        if (iswatch) exe.RunAsRoot(new String[]{"settings put system clockwork_wifi_setting off && settings put system clockwork_wifi_setting on"});
+        if (iswatch) exe.RunAsRoot(new String[]{"settings put system clockwork_wifi_setting off; sleep 1 && settings put system clockwork_wifi_setting on"});
+        else exe.RunAsRoot(new String[]{"svc wifi disable; sleep 1 && svc wifi enable"});
 
         //WIFI Scanner
         Button scanButton = rootView.findViewById(R.id.scanwps);
@@ -91,12 +92,12 @@ public class WPSFragment extends Fragment {
         ArrayAdapter WPSadapter = new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, arrayList);
         WPSList.setAdapter(WPSadapter);
 
-        //Reset interface on WearOS, thanks to "Auto" enabling
+        //Reset interface on WearOS, thanks to "Auto" enabling, might also needed on phones
         Button resetifaceButton = rootView.findViewById(R.id.resetinterface);
-        resetifaceButton.setVisibility(View.VISIBLE);
         resetifaceButton.setOnClickListener(view -> {
-            if (iswatch) exe.RunAsRoot(new String[]{"settings put system clockwork_wifi_setting off && settings put system clockwork_wifi_setting on"});
-                });
+            if (iswatch) exe.RunAsRoot(new String[]{"settings put system clockwork_wifi_setting off; sleep 1 && settings put system clockwork_wifi_setting on"});
+            else exe.RunAsRoot(new String[]{"svc wifi disable; sleep 1 && svc wifi enable"});
+        });
 
         //Select target network
         WPSList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()  {
@@ -235,7 +236,7 @@ public class WPSFragment extends Fragment {
                 WPSList.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, arrayList));
                 WPSList.setVisibility(View.VISIBLE);
             });
-            String outputScanLog = exe.RunAsRootOutput("bootkali custom_cmd python3 /sdcard/nh_files/modules/oneshot.py -i wlan0 -s | grep -E '[0-9])' | awk '{print $2\";\"$3}'");
+            String outputScanLog = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd python3 /sdcard/nh_files/modules/oneshot.py -i wlan0 -s | grep -E '[0-9])' | awk '{print $2\";\"$3}'");
             getActivity().runOnUiThread(() -> {
                 final String[] arrayList = outputScanLog.split("\n");
                 ArrayAdapter targetsadapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, arrayList);
