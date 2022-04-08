@@ -66,6 +66,7 @@ public class SettingsFragment extends Fragment {
     private String selected_prompt;
     NhPaths nh;
     private SharedPreferences sharedpreferences;
+    private String selected_status = "";
 
     public SettingsFragment() {
     }
@@ -429,6 +430,36 @@ public class SettingsFragment extends Fragment {
             exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd sed -i '0,/.*PROMPT_ALTERNATIVE=.*/s//PROMPT_ALTERNATIVE=" + selected_prompt + "/' /root/.zshrc");
             Toast.makeText(getActivity().getApplicationContext(), "Zsh terminal prompt style has been successfully changed", Toast.LENGTH_SHORT).show();
             TerminalStyle.setText(selected_prompt);
+        });
+
+        //SElinux status
+        TextView SELinux = rootView.findViewById(R.id.selinux_status);
+        String current_status = exe.RunAsRootOutput("getenforce");
+        SELinux.setText(current_status);
+
+        //SElinux spinner
+        Spinner SELinuxSpinner = rootView.findViewById(R.id.selinux_spinner);
+        String[] Statuses = new String[]{"permissive", "enforcing"};
+        SELinuxSpinner.setAdapter(new ArrayAdapter<>(getContext(),
+                android.R.layout.simple_list_item_1, Statuses));
+
+        //Select new status
+        SELinuxSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int pos, long id) {
+                selected_status = parentView.getItemAtPosition(pos).toString();
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+            }
+        });
+
+        //Apply
+        final Button ApplySElinuxButton = rootView.findViewById(R.id.apply_selinux);
+        ApplySElinuxButton.setOnClickListener( v -> {
+            exe.RunAsRoot(new String[]{"setenforce " + selected_status});
+            Toast.makeText(getActivity().getApplicationContext(), "SELinux status has been successfully changed", Toast.LENGTH_SHORT).show();
+            SELinux.setText(selected_status);
         });
 
         return rootView;

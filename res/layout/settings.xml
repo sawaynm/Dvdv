@@ -568,6 +568,69 @@
                 android:text="Set zsh style"
                 android:textColor="#ffffffff" />
 
+            <View
+                android:id="@+id/divider6"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="SELINUX STATUS"
+                    android:padding="4dp"
+                    android:layout_weight="1"/>
+
+                <TextView
+                    android:id="@+id/selinux_status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Loading.."
+                    android:paddingTop="10dp"
+                    android:padding="4dp"
+                    android:layout_weight="3"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView12"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:padding="4dp"
+                    android:layout_weight="1"
+                    android:text="CHANGE STATUS:" />
+
+                <Spinner
+                    android:id="@+id/selinux_spinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:dropDownWidth="match_parent"
+                    android:saveEnabled="false"
+                    android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/apply_selinux"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:text="APPLY"
+                android:textColor="#ffffffff" />
+
       </LinearLayout>
 
   </ScrollView>
