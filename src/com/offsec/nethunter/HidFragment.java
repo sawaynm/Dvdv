@@ -47,6 +47,7 @@ public class HidFragment extends Fragment {
     private Context context;
     private Activity activity;
     private static final String ARG_SECTION_NUMBER = "section_number";
+    private ShellExecuter exe = new ShellExecuter();
 
     public static HidFragment newInstance(int sectionNumber) {
         HidFragment fragment = new HidFragment();
@@ -115,7 +116,13 @@ public class HidFragment extends Fragment {
                 if (isHIDenable) {
                     start();
                 } else {
-                    NhPaths.showMessage_long(context,"HID interfaces are not enabled or something wrong with the permission of /dev/hidg*, make sure they are enabled and permissions are granted as 666");
+                    if (new File("/config/usb_gadget/g1").exists())
+                        NhPaths.showMessage_long(context,"HID interfaces are not enabled! Please enable in USB Arsenal.");
+                    else if (new File("/dev/hidg0").exists()) {
+                        NhPaths.showMessage_long(context, "Fixing HID interface permissions..");
+                        exe.RunAsRoot(new String[]{"chmod 666 /dev/hidg*"});
+                    }
+                    else NhPaths.showMessage_long(context,"HID interfaces are not patched or enabled, please check your kernel configuration.");
                 }
                 return true;
             case R.id.stop_service:
