@@ -189,12 +189,12 @@ public class WPSFragment extends Fragment {
                 //WearOS iface control is weird, hence reset is needed
                 if (iswatch)
                     AsyncTask.execute(() -> {
-                        getActivity().runOnUiThread(() -> {
-                            exe.RunAsRoot(new String[]{"sleep 12 && settings put system clockwork_wifi_setting off; sleep 2 && ifconfig wlan0 up"});
+                        requireActivity().runOnUiThread(() -> {
+                            exe.RunAsRoot(new String[]{"sleep 12 && settings put system clockwork_wifi_setting off; sleep 2 && ip link set wlan0 up"});
                         });
                     });
             }
-            else Toast.makeText(getActivity().getApplicationContext(), "No target selected!", Toast.LENGTH_SHORT).show();
+            else Toast.makeText(requireActivity().getApplicationContext(), "No target selected!", Toast.LENGTH_SHORT).show();
         });
 
         return rootView;
@@ -223,21 +223,21 @@ public class WPSFragment extends Fragment {
             intent.putExtra("com.offsec.nhterm.iInitialCommand", command);
             startActivity(intent);
         } catch (Exception e) {
-            nh.showMessage(context, getString(R.string.toast_install_terminal));
+            NhPaths.showMessage(context, getString(R.string.toast_install_terminal));
 
         }
     }
 
     private void scanWifi() {
         AsyncTask.execute(() -> {
-            getActivity().runOnUiThread(() -> {
+            requireActivity().runOnUiThread(() -> {
                 arrayList.clear();
                 arrayList.add("Scanning...");
                 WPSList.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, arrayList));
                 WPSList.setVisibility(View.VISIBLE);
             });
             String outputScanLog = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd python3 /sdcard/nh_files/modules/oneshot.py -i wlan0 -s | grep -E '[0-9])' | awk '{print $2\";\"$3}'");
-            getActivity().runOnUiThread(() -> {
+            requireActivity().runOnUiThread(() -> {
                 final String[] arrayList = outputScanLog.split("\n");
                 ArrayAdapter targetsadapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, arrayList);
                 if (outputScanLog.equals("")) {
