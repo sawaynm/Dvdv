@@ -3,15 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.offsec.nethunter">
 
+    <queries>
+        <package android:name="com.offsec.nhterm" />
+    </queries>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <uses-permission android:name="android.permission.BLUETOOTH_PRIVILEGED"
-        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.BLUETOOTH_PRIVILEGED" tools:ignore="ProtectedPermissions" />
+    <permission-group android:name="android.permission-group.SYSTEM_TOOLS" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage" />
     <uses-permission android:name="com.offsec.nhterm.permission.RUN_SCRIPT" />
     <uses-permission android:name="com.offsec.nhterm.permission.RUN_SCRIPT_SU" />
     <uses-permission android:name="com.offsec.nhterm.permission.RUN_SCRIPT_NH" />
@@ -35,11 +38,9 @@
         android:xlargeScreens="true" />
 
     <application
-        android:allowBackup="false"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:resizeableActivity="true"
-        android:supportsPictureInPicture="false"
         android:theme="@style/Theme.Nethunter"
         android:windowSoftInputMode="adjustResize"
         android:requestLegacyExternalStorage="true"
@@ -49,7 +50,8 @@
             android:configChanges="orientation|keyboardHidden|screenSize|keyboard"
             android:label="@string/app_name"
             android:launchMode="singleTop"
-            android:theme="@style/Theme.Nethunter">
+            android:theme="@style/Theme.Nethunter"
+            android:exported="true">
             <intent-filter android:label="@string/app_nav_home_label">
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -126,7 +128,7 @@
             android:name=".gps.LocationUpdateService"
             android:foregroundServiceType="location"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="false" />
     </application>
 
 </manifest>

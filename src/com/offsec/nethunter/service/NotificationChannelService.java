@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.IBinder;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.app.TaskStackBuilder;
@@ -51,6 +52,7 @@ public class NotificationChannelService extends IntentService {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         if (intent != null){
@@ -61,7 +63,7 @@ public class NotificationChannelService extends IntentService {
                 resultIntent = new Intent();
                 stackBuilder = TaskStackBuilder.create(this);
                 stackBuilder.addNextIntentWithParentStack(resultIntent);
-                resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+                resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
                 switch (intent.getAction()){
                     case REMINDMOUNTCHROOT:
                         builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
