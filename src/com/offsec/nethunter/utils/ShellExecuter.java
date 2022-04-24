@@ -26,6 +26,7 @@ public class ShellExecuter {
 
     private SimpleDateFormat timeStamp = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
     private final static String TAG = "ShellExecuter";
+    private final static String ENV_PATH = "PATH=$PATH:" + NhPaths.APP_SCRIPTS_PATH + ":" + NhPaths.APP_SCRIPTS_BIN_PATH + ":" + NhPaths.MAGISK_ADB_PATH;
 
     public ShellExecuter() {
 
@@ -69,6 +70,7 @@ public class ShellExecuter {
         try {
             Process process = Runtime.getRuntime().exec("su -mm");
             DataOutputStream os = new DataOutputStream(process.getOutputStream());
+            os.writeBytes(ENV_PATH + '\n');
             for (String tmpmd : command) {
                 os.writeBytes(tmpmd + '\n');
             }
@@ -93,6 +95,7 @@ public class ShellExecuter {
             InputStream stderr = process.getErrorStream();
             InputStream stdout = process.getInputStream();
 
+            stdin.write((ENV_PATH + '\n').getBytes());
             stdin.write((command + '\n').getBytes());
             stdin.write(("exit\n").getBytes());
             stdin.flush();
@@ -132,6 +135,7 @@ public class ShellExecuter {
             InputStream stderr = process.getErrorStream();
             InputStream stdout = process.getInputStream();
 
+            stdin.write((ENV_PATH + '\n').getBytes());
             stdin.write((command + '\n').getBytes());
             stdin.write(("exit\n").getBytes());
             stdin.flush();
@@ -167,6 +171,7 @@ public class ShellExecuter {
             OutputStream stdin = process.getOutputStream();
             InputStream stderr = process.getErrorStream();
             InputStream stdout = process.getInputStream();
+            stdin.write((ENV_PATH + '\n').getBytes());
             stdin.write((command + '\n').getBytes());
             stdin.write(("exit\n").getBytes());
             stdin.flush();
@@ -205,6 +210,7 @@ public class ShellExecuter {
         try {
             Process process = Runtime.getRuntime().exec("su -mm");
             OutputStream stdin = process.getOutputStream();
+            stdin.write((ENV_PATH + '\n').getBytes());
             stdin.write((command + '\n').getBytes());
             stdin.write(("exit\n").getBytes());
             stdin.flush();

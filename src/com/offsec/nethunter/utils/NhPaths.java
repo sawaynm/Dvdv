@@ -35,6 +35,7 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
     public static String APP_SD_SQLBACKUP_PATH;
     public static String APP_SD_FILES_IMG_PATH;
     public static String BUSYBOX;
+    public static String MAGISK_ADB_PATH;
     public static String MAGISK_DB_PATH;
     public static int GPS_PORT;
 
@@ -59,6 +60,7 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
         CHROOT_SD_PATH                  = "/sdcard";
         CHROOT_SYMLINK_PATH             = NH_SYSTEM_PATH + "/kalifs";
         BUSYBOX                         = getBusyboxPath();
+        MAGISK_ADB_PATH                 = "/data/adb/magisk";
         MAGISK_DB_PATH                  = "/data/adb/magisk.db";
 
         // This isn't really a path, but this is a convenient place to stick a config variable...
@@ -91,7 +93,9 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
         String[] BB_PATHS = {
                 "/system/xbin/busybox_nh",
                 "/system/bin/busybox_nh",
-                APP_SCRIPTS_BIN_PATH + "/busybox_nh"
+                APP_SCRIPTS_BIN_PATH + "/busybox_nh",
+                "/data/adb/magisk/busybox"
+
         };
         for (String BB_PATH : BB_PATHS) {
             File busybox = new File(BB_PATH);
