@@ -172,7 +172,7 @@ public class CustomCommandsFragment extends Fragment {
                 break;
             case R.id.f_customcommands_menu_restoreDB:
                 titleTextView.setText("Full path of the db file from where you want to restore:");
-                storedpathEditText.setText(NhPaths.APP_SD_SQLBACKUP_PATH + "/FragmentCustomCommands");
+                storedpathEditText.setText(NhPaths.APP_SD_SQLBACKUP_PATH + "/CustomCommands");
                 AlertDialog.Builder adbRestore = new AlertDialog.Builder(activity);
                 adbRestore.setView(promptView);
                 adbRestore.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
