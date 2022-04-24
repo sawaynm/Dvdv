@@ -149,7 +149,7 @@ public class CustomCommandsFragment extends Fragment {
         switch (item.getItemId()){
             case R.id.f_customcommands_menu_backupDB:
                 titleTextView.setText("Full path to where you want to save the database:");
-                storedpathEditText.setText(NhPaths.APP_SD_SQLBACKUP_PATH + "/FragmentCustomCommands");
+                storedpathEditText.setText(NhPaths.APP_SD_SQLBACKUP_PATH + "/CustomCommands");
                 AlertDialog.Builder adbBackup = new AlertDialog.Builder(activity);
                 adbBackup.setView(promptView);
                 adbBackup.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());

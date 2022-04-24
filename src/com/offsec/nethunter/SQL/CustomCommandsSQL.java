@@ -1,17 +1,20 @@
 package com.offsec.nethunter.SQL;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Build;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 
-import androidx.multidex.BuildConfig;
+import androidx.annotation.RequiresApi;
 
+import com.offsec.nethunter.BuildConfig;
 import com.offsec.nethunter.models.CustomCommandsModel;
 import com.offsec.nethunter.utils.NhPaths;
 
@@ -28,23 +31,20 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
     private static final String TABLE_NAME = DATABASE_NAME;
     private static final ArrayList<String> COLUMNS = new ArrayList<>();
     private static final String[][] customcommandsData = {
-            {"1", "Enable HID + MTP + ADB for Windows",
-                    "su -c setprop sys.usb.config win,mtp,hid,adb;exit",
-                    "android", "interactive", "0"},
-            {"2", "Update Kali Metapackages",
-                    "apt update && apt-get -y upgrade",
+            {"1", "Update Kali Metapackages",
+                    "echo -ne \"\\033]0;Updating Kali\\007\" && apt update && apt-get -y upgrade",
                     "kali", "interactive", "0"},
-            {"3", "Launch Wifite",
-                    "wifite",
+            {"2", "Launch Wifite",
+                    "echo -ne \"\\033]0;Wifite\\007\" && clear;wifite",
                     "kali", "interactive", "0"},
-            {"4", "Start wlan0 in monitor mode",
-                    "su -c \"ip link set wlan0 down; echo 4 > /sys/module/wlan/parameters/con_mode;ip link set wlan0 up\";exit",
+            {"3", "Start wlan0 in monitor mode",
+                    "echo -ne \"\\033]0;Wlan0 Monitor Mode\\007\" && su -c \"ip link set wlan0 down;if [ -f /sys/module/wlan/parameters/con_mode ]; then echo 4 > /sys/module/wlan/parameters/con_mode; else echo 'Your wireless driver is not QCACLD';fi;ip link set wlan0 up\";sleep 2 && exit",
                     "android", "interactive", "0"},
-            {"5", "Stop wlan0 monitor mode",
-                    "su -c \"ip link set wlan0 down; echo 0 > /sys/module/wlan/parameters/con_mode;ip link set wlan0 up; svc wifi enable\";exit",
+            {"4", "Stop wlan0 monitor mode",
+                    "echo -ne \"\\033]0;Stopping Wlan0 Mon Mode\\007\" && su -c \"ip link set wlan0 down;if [ grep /sys/module/wlan/parameters/con_mode = '4';then echo 0 > /sys/module/wlan/parameters/con_mode;ip link set wlan0 up; svc wifi enable;else echo 'Monitor mode was not enabled!'\" ;sleep 2 && exit",
                     "android", "interactive", "0"},
-            {"6", "Start wlan1 in monitor mode",
-                    "ip link set wlan1 down && iw wlan1 set monitor control && ip link set wlan1 up;exit",
+            {"5", "Start wlan1 in monitor mode",
+                    "echo -ne \"\\033]0;Wlan1 monitor mode\\007\" && ip link set wlan1 down && iw wlan1 set monitor control && ip link set wlan1 up;sleep 2 && exit",
                     "kali", "interactive", "0"}
     };
 
@@ -98,6 +98,7 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
 
     }
 
+    @SuppressLint("Range")
     public ArrayList<CustomCommandsModel> bindData(ArrayList<CustomCommandsModel> customCommandsModelArrayList) {
         SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " ORDER BY " + COLUMNS.get(0) + ";", null);
@@ -195,19 +196,37 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
     public String backupData(String storedDBpath) {
         try {
             String currentDBPath = Environment.getDataDirectory() + "/data/" + BuildConfig.APPLICATION_ID + "/databases/" + getDatabaseName();
-            if (Environment.getExternalStorageDirectory().canWrite()) {
-                File currentDB = new File(currentDBPath);
-                File backupDB = new File(storedDBpath);
-                if (currentDB.exists()) {
-                    FileChannel src = new FileInputStream(currentDB).getChannel();
-                    FileChannel dst = new FileOutputStream(backupDB).getChannel();
-                    dst.transferFrom(src, 0, src.size());
-                    src.close();
-                    dst.close();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+               if (Environment.isExternalStorageManager() && Environment.getExternalStorageDirectory().canWrite()) {
+                   File currentDB = new File(currentDBPath);
+                   File backupDB = new File(storedDBpath);
+                   if (currentDB.exists()) {
+                        FileChannel src = new FileInputStream(currentDB).getChannel();
+                        FileChannel dst = new FileOutputStream(backupDB).getChannel();
+                        dst.transferFrom(src, 0, src.size());
+                        src.close();
+                        dst.close();
+                        }
+                    Log.e(TAG, "Failed to backup '" + currentDBPath + "' to '" + storedDBpath + "' due to insufficient permission.");
+                    }
+                } else {
+                    if (Environment.getExternalStorageDirectory().canWrite()) {
+                        File currentDB = new File(currentDBPath);
+                        File backupDB = new File(storedDBpath);
+                        if (currentDB.exists()) {
+                            FileChannel src = new FileInputStream(currentDB).getChannel();
+                            FileChannel dst = new FileOutputStream(backupDB).getChannel();
+                            dst.transferFrom(src, 0, src.size());
+                            src.close();
+                            dst.close();
+                        }
+                    } else {
+                    Log.e(TAG, "Failed to backup '" + currentDBPath + "' to '" + storedDBpath + "' due to insufficient permission.");
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
+            Log.e(TAG, e.toString());
             return e.toString();
         }
         return null;
