@@ -2916,7 +2916,7 @@ function translate_combo_key(){
 ## Parse the duckyscript line by line and look for the first word to see if it is a ducky command or just shell command.
 function command_interpreter(){
     local TMP_CMD=$1
-    local TMP_CONTENT=$2
+    local TMP_CONTENT="$2"
     local TMP_HEX_CHAR
 
     if echo "$TMP_CMD" | $BUSYBOX grep -q -E "^[A-Z]+$"; then

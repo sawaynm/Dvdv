@@ -19,7 +19,9 @@ import android.view.ViewGroup;
 import com.offsec.nethunter.AsyncTask.DuckHuntAsyncTask;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.SharePrefTag;
+import com.offsec.nethunter.utils.ShellExecuter;
 
+import java.io.File;
 import java.util.HashMap;
 
 import androidx.annotation.NonNull;
@@ -47,6 +49,7 @@ public class DuckHunterFragment extends Fragment {
     private boolean isReceiverRegistered;
     private boolean shouldconvert = true;
     private DuckHuntBroadcastReceiver duckHuntBroadcastReceiver = new DuckHuntBroadcastReceiver();
+    private ShellExecuter exe = new ShellExecuter();
 
     public static DuckHunterFragment newInstance(int sectionNumber) {
         DuckHunterFragment fragment = new DuckHunterFragment();
@@ -142,7 +145,13 @@ public class DuckHunterFragment extends Fragment {
                     @Override
                     public void onAsyncTaskFinished(Object result) {
                         if (!(boolean)result){
-                            NhPaths.showMessage_long(context, "HID interfaces are not enabled or something wrong with the permission of /dev/hidg*, make sure they are enabled and permissions are granted as 666");
+                                if (new File("/config/usb_gadget/g1").exists())
+                                    NhPaths.showMessage_long(context,"HID interfaces are not enabled! Please enable in USB Arsenal.");
+                                else if (new File("/dev/hidg0").exists()) {
+                                    NhPaths.showMessage_long(context, "Fixing HID interface permissions..");
+                                    exe.RunAsRoot(new String[]{"chmod 666 /dev/hidg*"});
+                                }
+                                else NhPaths.showMessage_long(context,"HID interfaces are not patched or enabled, please check your kernel configuration.");
                         }
                     }
                 });
