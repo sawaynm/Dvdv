@@ -351,18 +351,19 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         boolean iswatch = getBaseContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
         if(iswatch){
             navigationView.getMenu().getItem(5).setVisible(false);
-            navigationView.getMenu().getItem(6).setVisible(false);
             navigationView.getMenu().getItem(10).setVisible(false);
-            navigationView.getMenu().getItem(11).setVisible(false);
             navigationView.getMenu().getItem(12).setVisible(false);
             navigationView.getMenu().getItem(13).setVisible(false);
-            navigationView.getMenu().getItem(15).setVisible(false);
+            navigationView.getMenu().getItem(14).setVisible(false);
             navigationView.getMenu().getItem(16).setVisible(false);
             navigationView.getMenu().getItem(17).setVisible(false);
             navigationView.getMenu().getItem(18).setVisible(false);
             navigationView.getMenu().getItem(19).setVisible(false);
             navigationView.getMenu().getItem(20).setVisible(false);
+            navigationView.getMenu().getItem(21).setVisible(false);
         }
+        if (!new File("/config/usb_gadget/g1").exists())
+            navigationView.getMenu().getItem(6).setVisible(false);
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         @SuppressLint("InflateParams") LinearLayout navigationHeadView = (LinearLayout) inflater.inflate(R.layout.sidenav_header, null);
             navigationView.addHeaderView(navigationHeadView);
@@ -541,6 +542,9 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                             break;
                         case R.id.mana_item:
                             changeFragment(fragmentManager, ManaFragment.newInstance(itemId));
+                            break;
+                        case R.id.wps_item:
+                            changeFragment(fragmentManager, WPSFragment.newInstance(itemId));
                             break;
                         case R.id.bt_item:
                             changeFragment(fragmentManager, BTFragment.newInstance(itemId));
