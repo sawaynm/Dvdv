@@ -209,9 +209,19 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         if (requestCode == PermissionCheck.DEFAULT_PERMISSION_RQCODE || requestCode == PermissionCheck.NH_TERM_PERMISSIONS_RQCODE){
             for (int grantResult:grantResults){
                 if (grantResult != 0){
-                    if (getApplicationContext().getPackageManager().getLaunchIntentForPackage("com.offsec.nhterm") == null) {
-                        showWarningDialog("NetHunter app cannot be run properly", "NetHunter Terminal is not installed yet, please install from the store!", true);
-                        return;
+                    if (requestCode == PermissionCheck.NH_TERM_PERMISSIONS_RQCODE) {
+                        boolean available = true;
+                        try {
+                            getPackageManager().getPackageInfo("com.offsec.nhterm", 0);
+                            Log.d(TAG, "onRequestPermissionsResult: com.offsec.nhterm is found.");
+                        } catch (PackageManager.NameNotFoundException e) {
+                            Log.e(TAG, "onRequestPermissionsResult: com.offsec.nhterm not found.");
+                            available = false;
+                        }
+                        if (!available) {
+                            showWarningDialog("NetHunter app cannot be run properly", "NetHunter Terminal is not installed yet, please install from the store!", true);
+                            return;
+                        }
                     }
                     showWarningDialog("NetHunter app cannot be run properly", "Please grant all the permission requests from outside the app or restart the app to grant the rest of permissions again.", true);
                     return;
