@@ -21,6 +21,7 @@ import android.os.StrictMode;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -263,6 +264,7 @@ public class LocationUpdateService extends Service implements
     }
 
     private boolean locationUpdatesStarted = false;
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public void startLocationUpdates() {
         if(locationUpdatesStarted)
             return;
@@ -304,7 +306,7 @@ public class LocationUpdateService extends Service implements
         resultIntent.putExtra("menuFragment", R.id.gps_item);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addNextIntentWithParentStack(resultIntent);
-        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                 .setAutoCancel(false)
@@ -370,6 +372,7 @@ public class LocationUpdateService extends Service implements
         }
     };
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private void updateNotification() {
         Date now = new Date();
         long age = (now.getTime() - lastLocationTime.getTime()) / 1000;
@@ -399,7 +402,7 @@ public class LocationUpdateService extends Service implements
         resultIntent.putExtra("menuFragment", R.id.gps_item);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addNextIntentWithParentStack(resultIntent);
-        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.gps_notification);
         contentView.setTextViewText(R.id.gps_notification_latitude, String.format("%1.5f", lastLocationLatitude));
