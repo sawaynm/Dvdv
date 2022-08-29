@@ -136,6 +136,12 @@ f_mount_fs_to_kali() {
         $BUSYBOX mount -o bind /system $MNT/system && bklog "[+] mounted /system"
     fi
 
+    ######### SET BINDERFS ########
+    if [ ! "$($BUSYBOX mountpoint $MNT/dev/binderfs 2> /dev/null | grep 'is a')" ]; then
+        [ ! -d $MNT/dev/binderfs ] && mkdir -p $MNT/dev/binderfs
+        $BUSYBOX mount -r -o bind /dev/binderfs $MNT/dev/binderfs && bklog "[+] mounted /dev/binderfs"
+    fi
+
     ######### SET INTERNAL SDCARD ########
     f_mount_sdcard
 
