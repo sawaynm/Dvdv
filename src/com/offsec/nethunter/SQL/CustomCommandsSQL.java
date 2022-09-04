@@ -29,19 +29,19 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
     private static final ArrayList<String> COLUMNS = new ArrayList<>();
     private static final String[][] customcommandsData = {
             {"1", "Update Kali Metapackages",
-                    "echo -ne \"\\033]0;Updating Kali\\007\" && apt update && apt-get -y upgrade",
+                    "echo -ne \"\\033]0;Updating Kali\\007\" && clear;apt update && apt-get -y upgrade",
                     "kali", "interactive", "0"},
             {"2", "Launch Wifite",
                     "echo -ne \"\\033]0;Wifite\\007\" && clear;wifite",
                     "kali", "interactive", "0"},
             {"3", "Start wlan0 in monitor mode",
-                    "echo -ne \"\\033]0;Wlan0 Monitor Mode\\007\" && su -c \"if [ -f /sys/module/wlan/parameters/con_mode ]; then echo 4 > /sys/module/wlan/parameters/con_mode;ip link set wlan0 down;ip link set wlan0 up;else echo 'Your wireless driver is not QCACLD';fi\";sleep 2 && exit",
+                    "echo -ne \"\\033]0;Wlan0 Monitor Mode\\007\" && su -c \"echo 4 > /sys/module/wlan/parameters/con_mode;ip link set wlan0 down;ip link set wlan0 up\";sleep 2 && exit",
                     "android", "interactive", "0"},
             {"4", "Stop wlan0 monitor mode",
-                    "echo -ne \"\\033]0;Stopping Wlan0 Mon Mode\\007\" && su -c \"if [ grep /sys/module/wlan/parameters/con_mode = '4';ip link set wlan0 down;then echo 0 > /sys/module/wlan/parameters/con_mode;ip link set wlan0 up; svc wifi enable;else echo 'Monitor mode was not enabled!'fi;\";sleep 2 && exit",
+                    "echo -ne \"\\033]0;Stopping Wlan0 Mon Mode\\007\" && su -c \"ip link set wlan0 down; echo 0 > /sys/module/wlan/parameters/con_mode;ip link set wlan0 up; svc wifi enable\";sleep 2 && exit",
                     "android", "interactive", "0"},
             {"5", "Start wlan1 in monitor mode",
-                    "echo -ne \"\\033]0;Wlan1 monitor mode\\007\" && ip link set wlan1 down && iw wlan1 set monitor control && ip link set wlan1 up;sleep 2 && exit",
+                    "echo -ne \"\\033]0;Wlan1 monitor mode\\007\" && clear;ip link set wlan1 down && iw wlan1 set monitor control && ip link set wlan1 up;sleep 2 && exit",
                     "kali", "interactive", "0"}
     };
 
