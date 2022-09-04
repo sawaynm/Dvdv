@@ -184,6 +184,7 @@ public class WPSFragment extends Fragment {
             customPIN = CustomPIN.getText().toString();
             delayTIME = DelayTime.getText().toString();
             if (!selected_network.equals("")) {
+                exe.RunAsRoot(new String[]{"settings put system clockwork_wifi_setting on"});
                 intentClickListener_NH("python3 /sdcard/nh_files/modules/oneshot.py -b " + selected_network +
                         " -i " + selected_interface + pixieCMD + pixieforceCMD + bruteCMD + customPINCMD + customPIN + delayCMD + delayTIME + pbcCMD);
                 //WearOS iface control is weird, hence reset is needed
