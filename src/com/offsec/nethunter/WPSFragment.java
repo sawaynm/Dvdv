@@ -78,11 +78,11 @@ public class WPSFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.wps, container, false);
 
-        //Reset interface for a fresh scan
+        //Start interface
         SharedPreferences sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
         iswatch = sharedpreferences.getBoolean("running_on_wearos", false);
-        if (iswatch) exe.RunAsRoot(new String[]{"settings put system clockwork_wifi_setting off; sleep 1 && settings put system clockwork_wifi_setting on"});
-        else exe.RunAsRoot(new String[]{"svc wifi disable; sleep 1 && svc wifi enable"});
+        if (iswatch) exe.RunAsRoot(new String[]{"settings put system clockwork_wifi_setting on"});
+        else exe.RunAsRoot(new String[]{"svc wifi enable"});
 
         //WIFI Scanner
         Button scanButton = rootView.findViewById(R.id.scanwps);
@@ -184,6 +184,7 @@ public class WPSFragment extends Fragment {
             customPIN = CustomPIN.getText().toString();
             delayTIME = DelayTime.getText().toString();
             if (!selected_network.equals("")) {
+                exe.RunAsRoot(new String[]{"settings put system clockwork_wifi_setting on"});
                 intentClickListener_NH("python3 /sdcard/nh_files/modules/oneshot.py -b " + selected_network +
                         " -i " + selected_interface + pixieCMD + pixieforceCMD + bruteCMD + customPINCMD + customPIN + delayCMD + delayTIME + pbcCMD);
                 //WearOS iface control is weird, hence reset is needed
