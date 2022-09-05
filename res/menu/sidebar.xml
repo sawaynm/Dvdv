@@ -10,6 +10,10 @@
             android:id="@+id/createchroot_item"
             android:icon="@drawable/ic_action_android"
             android:title="@string/drawertitlecreatechroot" />
+        <item
+            android:id="@+id/settings_item"
+            android:icon="@drawable/ic_action_settings_applications"
+            android:title="@string/drawertitlesettings" />
     </group>
     <group android:id="@+id/chrootDependentGroup">
          <item
@@ -88,9 +92,5 @@
             android:id="@+id/deauth_item"
             android:icon="@drawable/ic_action_network_wifi"
             android:title="@string/drawertitledeauth" />
-        <item
-            android:id="@+id/settings_item"
-            android:icon="@drawable/ic_action_settings_applications"
-            android:title="@string/drawertitlesettings" />
      </group>
 </menu>
