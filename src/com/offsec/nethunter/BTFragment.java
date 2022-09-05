@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -22,12 +23,10 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -131,18 +130,27 @@ public class BTFragment extends Fragment {
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
                 intentClickListener_NH("echo -ne \"\\033]0;BT Arsenal Setup\\007\" && clear;if [[ -f /usr/bin/hciconfig && -f /usr/bin/l2ping && " +
                         "-f /usr/bin/fang && -f /usr/bin/blueranger &&-f /usr/bin/bluelog && -f /usr/bin/sdptool && -f /usr/bin/spooftooph && -f /usr/bin/sox && -f /usr/include/bluetooth/bluetooth.h ]];then echo 'All packages are installed!'; else " +
-                        "apt-get update && apt-get install bluetooth bluez bluez-tools bluez-obexd libbluetooth3 sox spooftooph " +
-                        "libbluetooth-dev redfang bluelog blueranger -y;fi; if [[ -f /usr/bin/carwhisperer && -f /usr/bin/rfcomm_scan ]];then echo 'All scripts are installed!'; else " +
+                        "apt-get update && apt-get install bluetooth bluez bluez-tools bluez-obexd libbluetooth3 sox spooftooph libglib2.0*-dev libsystemd-dev " +
+                        "libbluetooth-dev redfang bluelog blueranger -y;fi;" +
+                        "if [[ -f /usr/bin/carwhisperer && -f /usr/bin/rfcomm_scan ]];then echo 'All scripts are installed!'; else " +
                         "git clone https://github.com/yesimxev/carwhisperer-0.2 /root/carwhisperer;" +
                         "cd /root/carwhisperer;make && make install;git clone https://github.com/yesimxev/bt_audit /root/bt_audit;cd /root/bt_audit/src;make;" +
-                        "cp rfcomm_scan /usr/bin/;fi; echo 'Everything is installed! Closing in 3secs..'; sleep 3 && exit ");
+                        "cp rfcomm_scan /usr/bin/;fi;" +
+                        "if [[ -f /usr/lib/libgbinder.so ]]; then echo 'Libgbinder is installed!'; else git clone https://github.com/yesimxev/libgbinder /root/libgbinder;" +
+                        "cd /root/libgbinder;make && make install-dev;fi;" +
+                        "if [[ -f /usr/lib/libglibutil.so ]]; then echo 'Libglibutil is installed!'; else git clone https://github.com/yesimxev/libglibutil /root/libglibutil;" +
+                        "cd /root/libglibutil;make && make install-dev;fi;" +
+                        "if [[ -f /usr/sbin/bluebinder ]]; then echo 'Bluebinder is installed!'; else git clone https://github.com/yesimxev/bluebinder /root/bluebinder;" +
+                        "cd /root/bluebinder;make && make install;fi; echo 'Everything is installed! Closing in 3secs..'; sleep 3 && exit ");
                 sharedpreferences.edit().putBoolean("setup_done", true).apply();
     }
 
     public void RunUpdate() {
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
         intentClickListener_NH("echo -ne \"\\033]0;BT Arsenal Update\\007\" && clear;apt-get update && apt-get install bluetooth bluez bluez-tools bluez-obexd libbluetooth3 sox spooftooph " +
-                "libbluetooth-dev redfang bluelog blueranger -y;if [[ -f /usr/bin/carwhisperer && -f /usr/bin/rfcomm_scan ]];then cd /root/carwhisperer/;git pull && make && make install;cd /root/bt_audit; git pull; cd src && make;" +
+                "libbluetooth-dev redfang bluelog blueranger libglib2.0*-dev libsystemd-dev -y;if [[ -f /usr/bin/carwhisperer && -f /usr/bin/rfcomm_scan && -f /root/bluebinder && -f /root/libgbinder && -f /root/libglibutil ]];" +
+                "then cd /root/carwhisperer/;git pull && make && make install;cd /root/bluebinder/;git pull && make && make install;cd /root/libgbinder/;git pull && make && " +
+                "make install-dev;cd /root/libglibutil/;git pull && make && make install-dev;cd /root/bt_audit; git pull; cd src && make;" +
                 "cp rfcomm_scan /usr/bin/;fi; echo 'Done! Closing in 3secs..'; sleep 3 && exit ");
         sharedpreferences.edit().putBoolean("setup_done", true).apply();
     }
@@ -199,6 +207,7 @@ public class BTFragment extends Fragment {
         private NhPaths nh;
         final ShellExecuter exe = new ShellExecuter();
         private String selected_iface;
+        private Boolean iswatch;
         String selected_addr;
         String selected_class;
         String selected_name;
@@ -221,10 +230,15 @@ public class BTFragment extends Fragment {
             if (!setupdone.equals(true))
                 SetupDialog();
 
-            final TextView DBUSstatus = rootView.findViewById(R.id.DBUSstatus);
-            final TextView BTstatus = rootView.findViewById(R.id.BTstatus);
-            final TextView HCIstatus = rootView.findViewById(R.id.HCIstatus);
             final Spinner ifaces = rootView.findViewById(R.id.hci_interface);
+
+            //Bluebinder or bt_smd
+            final TextView Binderstatus = rootView.findViewById(R.id.BinderStatus);
+            final TextView Binder = rootView.findViewById(R.id.bluebinder);
+            File bt_smd = new File("/sys/module/hci_smd/parameters/hcismd_set");
+            if (bt_smd.exists()) {
+                Binder.setText("Bluetooth SMD");
+            }
 
             //Bluetooth interfaces
             final String[] outputHCI = {""};
@@ -266,47 +280,98 @@ public class BTFragment extends Fragment {
                 }
             });
 
-            final Switch dbusSwitch = rootView.findViewById(R.id.dbus_switch);
-            final Switch btSwitch = rootView.findViewById(R.id.bt_switch);
-            final Switch hciSwitch = rootView.findViewById(R.id.hci_switch);
+            //Internal bluetooth support
+            final Button bluebinderButton = rootView.findViewById(R.id.bluebinder_button);
+            final Button dbusButton = rootView.findViewById(R.id.dbus_button);
+            final Button btButton = rootView.findViewById(R.id.bt_button);
+            final Button hciButton = rootView.findViewById(R.id.hci_button);
+            File hwbinder = new File("/dev/hwbinder");
+            File vhci = new File("/dev/vhci");
 
-            dbusSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        if (isChecked) {
-                            exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service dbus start"});
-                            DBUSstatus.setText("Running");
-                        } else {
-                            exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service dbus stop"});
-                            DBUSstatus.setText("Stopped");
-                        }
-                }
-            });
-            btSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    String dbus_statusCMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service dbus status | grep dbus");
-                    if (dbus_statusCMD.equals("dbus is running.")) {
-                        if (isChecked) {
-                            exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service bluetooth start"});
-                            BTstatus.setText("Running");
-                        } else {
-                            exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service bluetooth stop"});
-                            BTstatus.setText("Stopped");
-                        }
+            bluebinderButton.setOnClickListener( v -> {
+                if (bluebinderButton.getText().equals("Start")) {
+                    if (!bt_smd.exists() && !hwbinder.exists() && !vhci.exists()) {
+                        final AlertDialog.Builder confirmbuilder = new AlertDialog.Builder(getActivity());
+                        confirmbuilder.setTitle("Internal bluetooth support disabled");
+                        confirmbuilder.setMessage("Your device does not support hwbinder, vhci, or bt_smd. Make sure your kernel config has the recommended drivers enabled in order to use internal bluetooth.");
+                        confirmbuilder.setPositiveButton("Sure", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                bluebinderButton.setEnabled(false);
+                                bluebinderButton.setTextColor(Color.parseColor("#40FFFFFF"));
+                                dialogInterface.cancel();
+                            }
+                        });
+                        confirmbuilder.setNegativeButton("Ignore", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.cancel();
+                            }
+                        });
+                        final AlertDialog alert = confirmbuilder.create();
+                        alert.show();
                     } else {
-                        Toast.makeText(getActivity().getApplicationContext(), "Enable dbus service first!", Toast.LENGTH_SHORT).show();
-                        btSwitch.setChecked(false);
+                        if (bt_smd.exists()) {
+                            exe.RunAsRoot(new String[]{"svc bluetooth enable"});
+                            exe.RunAsRoot(new String[]{"echo 1 > " + bt_smd});
+                        }
+                        else {
+                            exe.RunAsRoot(new String[]{"svc bluetooth disable"});
+                            intentClickListener_NH("echo -ne \"\\033]0;Bluebinder\\007\" && clear;bluebinder || bluebinder;exit");
+                            Toast.makeText(getActivity().getApplicationContext(), "Starting bluebinder.. Please refresh in NetHunter app to check the status", Toast.LENGTH_LONG).show();
+                        }
+                        refresh(rootView);
                     }
+                } else if (bluebinderButton.getText().equals("Stop")) {
+                    if (bt_smd.exists()) {
+                        exe.RunAsRoot(new String[]{"echo 0 > " + bt_smd});
+                        bluebinderButton.setText("Start");
+                    }
+                    else {
+                        exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd pkill bluebinder"});
+                        exe.RunAsRoot(new String[]{"svc bluetooth enable"});
+                    }
+                    refresh(rootView);
                 }
             });
-            hciSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if (isChecked) {
+
+            //Services
+            dbusButton.setOnClickListener( v -> {
+                if (dbusButton.getText().equals("Start")) {
+                    exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service dbus start"});
+                    refresh(rootView);
+                } else if (dbusButton.getText().equals("Stop")) {
+                    exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service dbus stop"});
+                    refresh(rootView);
+                }
+            });
+
+            btButton.setOnClickListener( v -> {
+                String dbus_statusCMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service dbus status | grep dbus");
+                if (dbus_statusCMD.equals("dbus is running.")) {
+                    if (btButton.getText().equals("Start")) {
+                        exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service bluetooth start"});
+                        refresh(rootView);
+                    } else if (btButton.getText().equals("Stop")) {
+                        exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service bluetooth stop"});
+                        refresh(rootView);
+                    }
+                } else {
+                    Toast.makeText(getActivity().getApplicationContext(), "Enable dbus service first!", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            hciButton.setOnClickListener( v -> {
+                if (hciButton.getText().equals("Start")) {
+                    if (selected_iface.equals("None")) {
+                        Toast.makeText(getActivity().getApplicationContext(), "No interface, please refresh or check connections!", Toast.LENGTH_SHORT).show();
+                    } else {
                         exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig " + selected_iface + " up noscan"});
-                        HCIstatus.setText("Up");
-                    } else {
-                        exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig " + selected_iface + " down"});
-                        HCIstatus.setText("Down");
+                        refresh(rootView);
                     }
+                } else if (hciButton.getText().equals("Stop")) {
+                    exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig " + selected_iface + " down"});
+                    refresh(rootView);
                 }
             });
 
@@ -382,45 +447,20 @@ public class BTFragment extends Fragment {
 
         private void refresh(View BTFragment) {
 
+            final TextView Binderstatus = BTFragment.findViewById(R.id.BinderStatus);
             final TextView DBUSstatus = BTFragment.findViewById(R.id.DBUSstatus);
             final TextView BTstatus = BTFragment.findViewById(R.id.BTstatus);
             final TextView HCIstatus = BTFragment.findViewById(R.id.HCIstatus);
-            final Switch dbusSwitch = BTFragment.findViewById(R.id.dbus_switch);
-            final Switch btSwitch = BTFragment.findViewById(R.id.bt_switch);
-            final Switch hciSwitch = BTFragment.findViewById(R.id.hci_switch);
+            final Button bluebinderButton = BTFragment.findViewById(R.id.bluebinder_button);
+            final Button dbusButton = BTFragment.findViewById(R.id.dbus_button);
+            final Button btButton = BTFragment.findViewById(R.id.bt_button);
+            final Button hciButton = BTFragment.findViewById(R.id.hci_button);
             final Spinner ifaces = BTFragment.findViewById(R.id.hci_interface);
             SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
 
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    String dbus_statusCMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service dbus status | grep dbus");
-                    if (dbus_statusCMD.equals("dbus is running.")) {
-                        DBUSstatus.setText("Running");
-                        dbusSwitch.setChecked(true);
-                    }
-                    else {
-                        DBUSstatus.setText("Stopped");
-                        dbusSwitch.setChecked(false);
-                    }
-                    String bt_statusCMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service bluetooth status | grep bluetooth");
-                    if (bt_statusCMD.equals("bluetooth is running.")) {
-                        BTstatus.setText("Running");
-                        btSwitch.setChecked(true);
-                    }
-                    else {
-                        BTstatus.setText("Stopped");
-                        btSwitch.setChecked(false);
-                    }
-                    String hci_statusCMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig "+ selected_iface + " | grep 'UP RUNNING' | cut -f2 -d$'\\t'");
-                    if (hci_statusCMD.equals("UP RUNNING ")) {
-                        HCIstatus.setText("Up");
-                        hciSwitch.setChecked(true);
-                    }
-                    else {
-                        HCIstatus.setText("Down");
-                        hciSwitch.setChecked(false);
-                    }
                     String outputHCI = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig | grep hci | cut -d: -f1");
                     final ArrayList<String> hciIfaces = new ArrayList<>();
                     if (outputHCI.equals("")) {
@@ -431,6 +471,54 @@ public class BTFragment extends Fragment {
                         ifaces.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, ifacesArray));
                         Integer lastiface = sharedpreferences.getInt("selected_iface", 0);
                         ifaces.setSelection(lastiface);
+                    }
+                    String binder_statusCMD = exe.RunAsRootOutput("pidof bluebinder");
+                    File bt_smd = new File("/sys/module/hci_smd/parameters/hcismd_set");
+                    if (!bt_smd.exists()) {
+                        if (binder_statusCMD.equals("")) {
+                            Binderstatus.setText("Stopped");
+                            bluebinderButton.setText("Start");
+                        }
+                        else {
+                            Binderstatus.setText("Running");
+                            bluebinderButton.setText("Stop");
+                        }
+                    } else {
+                        //outputHCI = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig | grep hci | cut -d: -f1");
+                        if (outputHCI.contains("hci0")) {
+                            Binderstatus.setText("Enabled");
+                            bluebinderButton.setText("Stop");
+                        } else {
+                            Binderstatus.setText("Disabled");
+                            bluebinderButton.setText("Start");
+                        }
+                    }
+                    String dbus_statusCMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service dbus status | grep dbus");
+                    if (dbus_statusCMD.equals("dbus is running.")) {
+                        DBUSstatus.setText("Running");
+                        dbusButton.setText("Stop");
+                    }
+                    else {
+                        DBUSstatus.setText("Stopped");
+                        dbusButton.setText("Start");
+                    }
+                    String bt_statusCMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service bluetooth status | grep bluetooth");
+                    if (bt_statusCMD.equals("bluetooth is running.")) {
+                        BTstatus.setText("Running");
+                        btButton.setText("Stop");
+                    }
+                    else {
+                        BTstatus.setText("Stopped");
+                        btButton.setText("Start");
+                    }
+                    String hci_statusCMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig "+ selected_iface + " | grep 'UP RUNNING' | cut -f2 -d$'\\t'");
+                    if (hci_statusCMD.equals("UP RUNNING ")) {
+                        HCIstatus.setText("Up");
+                        hciButton.setText("Stop");
+                    }
+                    else {
+                        HCIstatus.setText("Down");
+                        hciButton.setText("Start");
                     }
                 }
             });
