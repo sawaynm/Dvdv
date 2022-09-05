@@ -22,7 +22,13 @@
                 android:gravity="center"
                 android:padding="4dp" />
 
-        <LinearLayout
+            <View
+                android:id="@+id/divider1"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider" />
+
+            <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -80,18 +86,19 @@
                 android:gravity="center_horizontal">
 
                 <TextView
-                    android:id="@+id/textView11"
+                    android:id="@+id/bluebinder"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="10dp"
-                    android:text="Dbus Service:"
                     android:layout_weight="1"
+                    android:text="Bluebinder:"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    app:layout_constraintEnd_toStartOf="@+id/guideline_1"
-                    />
+                    android:layout_marginBottom="11dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline_1"/>
 
                 <TextView
-                    android:id="@+id/DBUSstatus"
+                    android:id="@+id/BinderStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
@@ -110,12 +117,68 @@
                     android:layout_marginTop="16dp"
                     android:orientation="vertical"
                     app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintGuide_begin="181dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <Button
+                    android:id="@+id/bluebinder_button"
+                    android:text="Start"
+                    android:textColor="#ffffffff"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:gravity="center_horizontal">
+
+                <TextView
+                    android:id="@+id/textView11"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:text="Dbus Service:"
+                    android:layout_weight="1"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:layout_marginBottom="11dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline_2"
+                    />
+
+                <TextView
+                    android:id="@+id/DBUSstatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginBottom="11dp"
+                    android:layout_weight="1"
+                    android:hint="Loading.."
+                    android:maxLength="50"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/guideline_2" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintGuide_percent="0.5013193"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <Switch
-                    android:id="@+id/dbus_switch"
+                <Button
+                    android:id="@+id/dbus_button"
+                    android:text="Start"
+                    android:textColor="#ffffffff"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:layout_constraintEnd_toEndOf="parent" />
@@ -137,7 +200,9 @@
                     android:text="Bluetooth Service:"
                     android:layout_weight="1"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    app:layout_constraintEnd_toStartOf="@+id/guideline_2"
+                    android:layout_marginBottom="11dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline_3"
                     />
 
                 <TextView
@@ -151,16 +216,18 @@
                     android:maxLength="50"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/guideline_2" />
+                    app:layout_constraintStart_toEndOf="@+id/guideline_3" />
 
-                <Switch
-                    android:id="@+id/bt_switch"
+                <Button
+                    android:id="@+id/bt_button"
+                    android:text="Start"
+                    android:textColor="#ffffffff"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:layout_constraintEnd_toEndOf="parent" />
 
                 <androidx.constraintlayout.widget.Guideline
-                    android:id="@+id/guideline_2"
+                    android:id="@+id/guideline_3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
@@ -187,7 +254,9 @@
                     android:text="Interface:"
                     android:layout_weight="1"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    app:layout_constraintEnd_toStartOf="@+id/guideline_3"
+                    android:layout_marginBottom="11dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline_4"
                     />
 
                 <TextView
@@ -201,16 +270,18 @@
                     android:maxLength="50"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/guideline_3" />
+                    app:layout_constraintStart_toEndOf="@+id/guideline_4" />
 
-                <Switch
-                    android:id="@+id/hci_switch"
+                <Button
+                    android:id="@+id/hci_button"
+                    android:text="Start"
+                    android:textColor="#ffffffff"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:layout_constraintEnd_toEndOf="parent" />
 
                 <androidx.constraintlayout.widget.Guideline
-                    android:id="@+id/guideline_3"
+                    android:id="@+id/guideline_4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
