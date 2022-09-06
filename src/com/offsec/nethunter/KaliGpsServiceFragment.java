@@ -10,9 +10,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.offsec.nethunter.gps.KaliGPSUpdates;
 import com.offsec.nethunter.gps.LocationUpdateService;
@@ -39,6 +42,10 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
     private Switch switch_gps_provider = null;
     private Switch switch_gpsd = null;
     private Button button_launch_app = null;
+    private String rtlsdr = "";
+    private String rtlamr = "";
+    private String rtladsb = "";
+    private String mousejack = "";
 
     public KaliGpsServiceFragment() {
     }
@@ -78,6 +85,14 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
         switch_gps_provider = view.findViewById(R.id.switch_gps_provider);
         switch_gpsd = view.findViewById(R.id.switch_gpsd);
         button_launch_app = view.findViewById(R.id.gps_button_launch_app);
+        ShellExecuter exe = new ShellExecuter();
+        EditText wlan_interface = view.findViewById(R.id.wlan_interface);
+        EditText bt_interface = view.findViewById(R.id.bt_interface);
+        CheckBox sdrcheckbox = view.findViewById(R.id.rtlsdr);
+        CheckBox sdramrcheckbox = view.findViewById(R.id.rtlamr);
+        CheckBox sdradsbcheckbox = view.findViewById(R.id.rtladsb);
+        CheckBox mousejackcheckbox = view.findViewById(R.id.mousejack);
+
         // TODO: make this text dynamic so we can launch other apps besides Kismet
         button_launch_app.setText("Launch Kismet in NH Terminal");
         if(!wantHelpView)
@@ -132,6 +147,34 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
                     switch_gpsd.setChecked(true);
                     startChrootGpsd();
                 }
+                //WLAN iinterface
+                String wlaniface = wlan_interface.getText().toString() ;
+                if (!wlaniface.equals("")) wlaniface = "source=" + wlaniface + "\n";
+
+                //BT interface
+                String btiface = bt_interface.getText().toString();
+                if (!btiface.equals("")) btiface = "source=" + btiface + "\n";
+
+                //SDR sensors interface
+                if (sdrcheckbox.isChecked()) rtlsdr = "source=rtl433-0\n";
+                else rtlsdr = "";
+
+                //SDR AMR interface
+                if (sdramrcheckbox.isChecked()) rtlamr = "source=rtlamr\n";
+                else rtlamr = "";
+
+                //SDR ADSB interface
+                if (sdradsbcheckbox.isChecked()) rtladsb = "source=rtladsb\n";
+                else rtladsb = "";
+
+                //Mousejack interface
+                if (mousejackcheckbox.isChecked()) mousejack = "source=mousejack:name=nRF,channel_hoprate=100/sec\n";
+                else mousejack = "";
+
+                String conf = "log_template=%p/%n\nlog_prefix=/captures/kismet/\n" + wlaniface + btiface + rtlsdr + rtlamr + rtladsb + mousejack;
+                exe.RunAsRoot(new String[]{"echo \"" + conf + "\" > " + NhPaths.SD_PATH + "/kismet_site.conf"});
+                exe.RunAsRoot(new String[]{"bootkali custom_cmd mv /sdcard/kismet_site.conf /etc/kismet/"});
+                Toast.makeText(getActivity().getApplicationContext(), "Starting Kismet.. Web UI will be available at localhost:2501\"", Toast.LENGTH_LONG).show();
                 wantKismet = true;
                 gpsTextView.append("Kismet will launch after next position received.  Waiting...\n");
             }
