@@ -214,7 +214,7 @@
     </string-array>
 
     <!-- KeX -->
-    <string name="kex_description">Welcome to the Kali NetHunter Desktop Experience.\nYou can start multiple sessions as different users, add, save, and restore your own custom resolutions, start KeX at boot, and even output KeX to HDMI.</string>
+    <string name="kex_description">Welcome to the Kali NetHunter Desktop Experience.\nYou can start multiple sessions as different users, add, save, and restore your own custom resolutions, start KeX at boot, and even output KeX to HDMI. Audio is now available, please use Simple Protocol Player to stream through KeX.</string>
 
     <!-- BT Attacks -->
     <string name="bt_description">Recon, spoof, listen to, or inject audio to various devices. Internal bluetooth support is now available for devices with RFCOMM, UART H4, VHCI and BINDER_IPC enabled in kernel, or devices with bt_smd driver. Carwshisperer is not supported by internal bluetooth (VHCI or bt_smd) yet.</string>

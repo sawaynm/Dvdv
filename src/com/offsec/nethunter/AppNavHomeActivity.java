@@ -375,7 +375,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         }
         //Disable USB arsenal for devices without ConfigFS support
         if (!new File("/config/usb_gadget/g1").exists())
-            navigationView.getMenu().getItem(6).setVisible(false);
+            navigationView.getMenu().getItem(7).setVisible(false);
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         @SuppressLint("InflateParams") LinearLayout navigationHeadView = (LinearLayout) inflater.inflate(R.layout.sidenav_header, null);
             navigationView.addHeaderView(navigationHeadView);
@@ -648,8 +648,6 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         } else if (!permissionCheck.isAllPermitted(PermissionCheck.NH_TERM_PERMISSIONS)) {
             permissionCheck.checkPermissions(PermissionCheck.NH_TERM_PERMISSIONS, PermissionCheck.NH_TERM_PERMISSIONS_RQCODE);
             return false;
-        } else if (!permissionCheck.isAllPermitted(PermissionCheck.NH_VNC_PERMISSIONS)) {
-            permissionCheck.checkPermissions(PermissionCheck.NH_VNC_PERMISSIONS, PermissionCheck.NH_VNC_PERMISSIONS_RQCODE);
         }
         return true;
     }
