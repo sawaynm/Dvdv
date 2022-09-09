@@ -302,7 +302,7 @@ public class BTFragment extends Fragment {
                                 dialogInterface.cancel();
                             }
                         });
-                        confirmbuilder.setNegativeButton("Ignore", new DialogInterface.OnClickListener() {
+                        confirmbuilder.setNegativeButton("Try anyway", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 dialogInterface.cancel();
@@ -312,20 +312,27 @@ public class BTFragment extends Fragment {
                         alert.show();
                     } else {
                         if (bt_smd.exists()) {
-                            exe.RunAsRoot(new String[]{"svc bluetooth enable"});
+                            exe.RunAsRoot(new String[]{"svc bluetooth disable"});
+                            exe.RunAsRoot(new String[]{"echo 0 > " + bt_smd});
                             exe.RunAsRoot(new String[]{"echo 1 > " + bt_smd});
+                            exe.RunAsRoot(new String[]{"svc bluetooth enable"});
                         }
                         else {
-                            exe.RunAsRoot(new String[]{"svc bluetooth disable"});
-                            intentClickListener_NH("echo -ne \"\\033]0;Bluebinder\\007\" && clear;bluebinder || bluebinder;exit");
-                            Toast.makeText(getActivity().getApplicationContext(), "Starting bluebinder.. Please refresh in NetHunter app to check the status", Toast.LENGTH_LONG).show();
+                            File bluebinder = new File(nh.CHROOT_PATH() + "/usr/sbin/bluebinder");
+                            if (bluebinder.exists()) {
+                                exe.RunAsRoot(new String[]{"svc bluetooth disable"});
+                                intentClickListener_NH("echo -ne \"\\033]0;Bluebinder\\007\" && clear;bluebinder || bluebinder;exit");
+                                Toast.makeText(getActivity().getApplicationContext(), "Starting bluebinder.. Please refresh in NetHunter app to check the status", Toast.LENGTH_LONG).show();
+                            } else {
+                                Toast.makeText(getActivity().getApplicationContext(), "Bluebinder is not installed. Launching setup..", Toast.LENGTH_SHORT).show();
+                                RunSetup();
+                            }
                         }
                         refresh(rootView);
                     }
                 } else if (bluebinderButton.getText().equals("Stop")) {
                     if (bt_smd.exists()) {
                         exe.RunAsRoot(new String[]{"echo 0 > " + bt_smd});
-                        bluebinderButton.setText("Start");
                     }
                     else {
                         exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd pkill bluebinder"});

@@ -346,11 +346,9 @@ public class VNCFragment extends Fragment {
                 if (StartAudioButton.getText().equals("Enable audio")) {
                     exe.RunAsRoot(new String[]{"bootkali custom_cmd audio start && audio start"});
                     refreshVNC(rootView);
-                    //StartAudioButton.setText("Disable audio");
                 } else {
                     exe.RunAsRoot(new String[]{"bootkali custom_cmd audio stop"});
                     refreshVNC(rootView);
-                    //StartAudioButton.setText("Enable audio");
                 }
             } else {
                 Toast.makeText(getActivity().getApplicationContext(), "Installing missing audio script in chroot..", Toast.LENGTH_SHORT).show();
@@ -494,7 +492,7 @@ public class VNCFragment extends Fragment {
         }
         else {
             KeXstatus.setText("RUNNING");
-            kex_userCmd = exe.RunAsRootOutput(BUSYBOX_NH + " ps aux | grep Xtigervnc | grep Xauthority | " + BUSYBOX_NH + " awk '{gsub(/home/,\"\")} {gsub(/\\//,\"\")} {gsub(/.Xauthority/,\"\")} {print $23 $5}'");
+            kex_userCmd = exe.RunAsRootOutput("bootkali custom_cmd ps -ef | grep vnc | grep Xauthority | awk '{gsub(/home/,\"\")} {gsub(/\\//,\"\")} {gsub(/.Xauthority/,\"\")} {print $1 $9}'");
             KeXuser.setText(kex_userCmd);
             //Users
             File passwd = new File(nh.CHROOT_PATH() + "/etc/passwd");
