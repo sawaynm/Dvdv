@@ -344,10 +344,10 @@ public class VNCFragment extends Fragment {
             File audio = new File(NhPaths.CHROOT_PATH() + "/usr/bin/audio");
             if (audio.exists()) {
                 if (StartAudioButton.getText().equals("Enable audio")) {
-                    exe.RunAsRoot(new String[]{"bootkali custom_cmd audio start && audio start"});
+                    exe.RunAsRoot(new String[]{nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd audio start && audio start"});
                     refreshVNC(rootView);
                 } else {
-                    exe.RunAsRoot(new String[]{"bootkali custom_cmd audio stop"});
+                    exe.RunAsRoot(new String[]{nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd audio stop"});
                     refreshVNC(rootView);
                 }
             } else {
@@ -492,7 +492,7 @@ public class VNCFragment extends Fragment {
         }
         else {
             KeXstatus.setText("RUNNING");
-            kex_userCmd = exe.RunAsRootOutput("bootkali custom_cmd ps -ef | grep vnc | grep Xauthority | awk '{gsub(/home/,\"\")} {gsub(/\\//,\"\")} {gsub(/.Xauthority/,\"\")} {print $1 $9}'");
+            kex_userCmd = exe.RunAsRootOutput(nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd ps -ef | grep vnc | grep Xauthority | awk '{gsub(/home/,\"\")} {gsub(/\\//,\"\")} {gsub(/.Xauthority/,\"\")} {print $1 $9}'");
             KeXuser.setText(kex_userCmd);
             //Users
             File passwd = new File(nh.CHROOT_PATH() + "/etc/passwd");

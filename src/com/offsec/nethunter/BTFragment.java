@@ -491,7 +491,6 @@ public class BTFragment extends Fragment {
                             bluebinderButton.setText("Stop");
                         }
                     } else {
-                        //outputHCI = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig | grep hci | cut -d: -f1");
                         if (outputHCI.contains("hci0")) {
                             Binderstatus.setText("Enabled");
                             bluebinderButton.setText("Stop");
