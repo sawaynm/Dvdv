@@ -78,11 +78,9 @@ public class WPSFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.wps, container, false);
 
-        //Start interface
+        //Detecting watch
         SharedPreferences sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
         iswatch = sharedpreferences.getBoolean("running_on_wearos", false);
-        if (iswatch) exe.RunAsRoot(new String[]{"settings put system clockwork_wifi_setting on"});
-        else exe.RunAsRoot(new String[]{"svc wifi enable"});
 
         //WIFI Scanner
         Button scanButton = rootView.findViewById(R.id.scanwps);
@@ -184,7 +182,9 @@ public class WPSFragment extends Fragment {
             customPIN = CustomPIN.getText().toString();
             delayTIME = DelayTime.getText().toString();
             if (!selected_network.equals("")) {
-                exe.RunAsRoot(new String[]{"settings put system clockwork_wifi_setting on"});
+                if (iswatch) {
+                    exe.RunAsRoot(new String[]{"settings put system clockwork_wifi_setting on"});
+                } else exe.RunAsRoot(new String[]{"svc wifi enable"});
                 intentClickListener_NH("python3 /sdcard/nh_files/modules/oneshot.py -b " + selected_network +
                         " -i " + selected_interface + pixieCMD + pixieforceCMD + bruteCMD + customPINCMD + customPIN + delayCMD + delayTIME + pbcCMD);
                 //WearOS iface control is weird, hence reset is needed
@@ -232,6 +232,12 @@ public class WPSFragment extends Fragment {
     private void scanWifi() {
         AsyncTask.execute(() -> {
             getActivity().runOnUiThread(() -> {
+                //Disabling bluetooth so wifi will be definitely available for scanning
+                if (iswatch) {
+                    Toast.makeText(getActivity().getApplicationContext(), "Disabling bluetooth, so wireless scan will be available", Toast.LENGTH_SHORT).show();
+                    exe.RunAsRoot(new String[]{"svc bluetooth disable;settings put system clockwork_wifi_setting on"});
+                }
+                else exe.RunAsRoot(new String[]{"svc wifi enable"});
                 arrayList.clear();
                 arrayList.add("Scanning...");
                 WPSList.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, arrayList));
@@ -253,6 +259,10 @@ public class WPSFragment extends Fragment {
                     WPSList.setAdapter(targetsadapter);
                     }
             });
+            if (iswatch) {
+                Toast.makeText(getActivity().getApplicationContext(), "Scan done, enabling bluetooth..", Toast.LENGTH_SHORT).show();
+                exe.RunAsRoot(new String[]{"svc bluetooth enable"});
+            }
         });
     }
 }
