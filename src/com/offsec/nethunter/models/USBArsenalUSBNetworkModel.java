@@ -3,14 +3,14 @@ package com.offsec.nethunter.models;
 /*
     CustomCommands Model class, each model object represent the data of each recyclerview item.
  */
-public class USBArmoryUSBNetworkModel {
+public class USBArsenalUSBNetworkModel {
     private String upstream_iface;
     private String usb_iface;
     private String ip_address_for_target;
     private String ip_gateway;
     private String ip_subnetmask;
 
-    public USBArmoryUSBNetworkModel(String upstream_iface, String usb_iface, String ip_address_for_target, String ip_gateway, String ip_subnetmask) {
+    public USBArsenalUSBNetworkModel(String upstream_iface, String usb_iface, String ip_address_for_target, String ip_gateway, String ip_subnetmask) {
         this.upstream_iface = upstream_iface;
         this.usb_iface = usb_iface;
         this.ip_address_for_target = ip_address_for_target;
@@ -18,7 +18,7 @@ public class USBArmoryUSBNetworkModel {
         this.ip_subnetmask = ip_subnetmask;
     }
 
-    public USBArmoryUSBNetworkModel() {
+    public USBArsenalUSBNetworkModel() {
 
     }
 

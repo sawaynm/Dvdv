@@ -48,7 +48,7 @@ SYMLINK_FUNC_NAME="${FUNCS_NAME_PREFIX}${FUNCS_NAME_ORDER}"
 ################################
 
 function print_usage(){
-    bklog "[!] Usage: usbarmory -t <Target OS> -f <USB Functions> -v <idVendor value> -p <idProduct value> [mPs]"
+    bklog "[!] Usage: usbarsenal -t <Target OS> -f <USB Functions> -v <idVendor value> -p <idProduct value> [mPs]"
     bklog "[!] Available target OS: [win|lnx|mac]; win => Windows; lnx => Linux; mac => Mac OS"
     bklog "[!] Available configfs functions: [reset] or [adb,hid,mass_storage,rndis,acm,ecm]"
     bklog "[!] reset => enable adb only."
@@ -56,9 +56,9 @@ function print_usage(){
     bklog "[!] mass_storage => enable mass storage only."
     bklog "[!] rndis => enable RNDIS only, usually target on Windows or Linux."
     bklog "[!] acm,ecm => enable network card simulation on Mac OS when these two are enabled together.\n"
-    bklog "[!] e.g. \"usbarmory -t win -f reset -v '0x18d1' -p '0x4ee7'\""
-    bklog "[!] e.g. \"usbarmory -t win -f adb,hid,mass_storage,rndis -v '0x18d1' -p '0x4a4a'\""
-    bklog "[!] e.g. \"usbarmory -t mac -f adb,hid,mass_storage,acm,ecm -v '0x18d1' -p '0x4b4b'\""
+    bklog "[!] e.g. \"usbarsenal -t win -f reset -v '0x18d1' -p '0x4ee7'\""
+    bklog "[!] e.g. \"usbarsenal -t win -f adb,hid,mass_storage,rndis -v '0x18d1' -p '0x4a4a'\""
+    bklog "[!] e.g. \"usbarsenal -t mac -f adb,hid,mass_storage,acm,ecm -v '0x18d1' -p '0x4b4b'\""
 }
 
 function clear_funcs(){

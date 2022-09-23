@@ -9,12 +9,12 @@ import android.os.Process;
 
 import androidx.annotation.NonNull;
 
-import com.offsec.nethunter.SQL.USBArmorySQL;
-import com.offsec.nethunter.models.USBArmoryUSBSwitchModel;
+import com.offsec.nethunter.SQL.USBArsenalSQL;
+import com.offsec.nethunter.models.USBArsenalUSBSwitchModel;
 import com.offsec.nethunter.utils.ShellExecuter;
 
 
-public class USBArmoryHandlerThread extends HandlerThread {
+public class USBArsenalHandlerThread extends HandlerThread {
 
     private Handler handler;
     public static final int IS_INIT_EXIST = 1;
@@ -26,12 +26,12 @@ public class USBArmoryHandlerThread extends HandlerThread {
     public static final int UNMOUNT_IMAGE = 7;
     public static final int GET_USBSWITCH_SQL_DATA = 8;
     public static final int GET_USBNETWORK_SQL_DATA = 9;
-    private USBArmoryListener listener;
+    private USBArsenalListener listener;
     private Object resultObject = new Object();
     private ShellExecuter exe = new ShellExecuter();
 
-    public USBArmoryHandlerThread() {
-        super("USBArmoryHandlerThread", Process.THREAD_PRIORITY_DEFAULT);
+    public USBArsenalHandlerThread() {
+        super("USBArsenalHandlerThread", Process.THREAD_PRIORITY_DEFAULT);
     }
 
     @SuppressLint("HandlerLeak")
@@ -64,12 +64,12 @@ public class USBArmoryHandlerThread extends HandlerThread {
                         resultObject = exe.RunAsRootReturnValue(msg.obj.toString());
                         break;
                     case GET_USBSWITCH_SQL_DATA:
-                        resultObject = USBArmorySQL.getInstance((Context) msg.obj)
+                        resultObject = USBArsenalSQL.getInstance((Context) msg.obj)
                                 .getUSBSwitchColumnData(msg.getData().getString("targetOSName"),
                                         msg.getData().getString("functionName"));
                         break;
                     case GET_USBNETWORK_SQL_DATA:
-                        resultObject = USBArmorySQL.getInstance((Context) msg.obj).getUSBNetworkColumnData(msg.arg1);
+                        resultObject = USBArsenalSQL.getInstance((Context) msg.obj).getUSBNetworkColumnData(msg.arg1);
                         break;
                 }
                 if (listener != null) {
@@ -83,11 +83,11 @@ public class USBArmoryHandlerThread extends HandlerThread {
         return handler;
     }
 
-    public void setOnShellExecuterFinishedListener(USBArmoryListener listener) {
+    public void setOnShellExecuterFinishedListener(USBArsenalListener listener) {
         this.listener = listener;
     }
 
-    public interface USBArmoryListener {
+    public interface USBArsenalListener {
         void onShellExecuterFinished(Object resultObject, int actionCode);
     }
 }

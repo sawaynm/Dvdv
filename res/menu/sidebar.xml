@@ -33,9 +33,9 @@
              android:icon="@drawable/ic_action_home"
              android:title="@string/drawertitlevncmanager" />
         <item
-            android:id="@+id/usbarmory_item"
+            android:id="@+id/usbarsenal_item"
             android:icon="@drawable/ic_usb"
-            android:title="@string/drawertitleusbarmory" />
+            android:title="@string/drawertitleusbarsenal" />
          <item
              android:id="@+id/hid_item"
              android:icon="@drawable/ic_action_keyboard"

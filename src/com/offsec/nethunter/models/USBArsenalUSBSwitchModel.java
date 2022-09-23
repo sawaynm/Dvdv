@@ -3,14 +3,14 @@ package com.offsec.nethunter.models;
 /*
     CustomCommands Model class, each model object represent the data of each recyclerview item.
  */
-public class USBArmoryUSBSwitchModel {
+public class USBArsenalUSBSwitchModel {
     private String idVendor;
     private String idProduct;
     private String manufacturer;
     private String product;
     private String serialnumber;
 
-    public USBArmoryUSBSwitchModel(String idVendor, String idProduct, String manufacturer, String product, String serialnumber) {
+    public USBArsenalUSBSwitchModel(String idVendor, String idProduct, String manufacturer, String product, String serialnumber) {
         this.idVendor = idVendor;
         this.idProduct = idProduct;
         this.manufacturer = manufacturer;
@@ -18,7 +18,7 @@ public class USBArmoryUSBSwitchModel {
         this.serialnumber = serialnumber;
     }
 
-    public USBArmoryUSBSwitchModel() {
+    public USBArsenalUSBSwitchModel() {
 
     }
 
