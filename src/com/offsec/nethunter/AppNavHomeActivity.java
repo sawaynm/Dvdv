@@ -30,7 +30,7 @@ import com.offsec.nethunter.AsyncTask.CopyBootFilesAsyncTask;
 import com.offsec.nethunter.SQL.CustomCommandsSQL;
 import com.offsec.nethunter.SQL.KaliServicesSQL;
 import com.offsec.nethunter.SQL.NethunterSQL;
-import com.offsec.nethunter.SQL.USBArmorySQL;
+import com.offsec.nethunter.SQL.USBArsenalSQL;
 import com.offsec.nethunter.gps.KaliGPSUpdates;
 import com.offsec.nethunter.gps.LocationUpdateService;
 import com.offsec.nethunter.service.CompatCheckService;
@@ -126,7 +126,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                 NethunterSQL.getInstance(getApplicationContext());
                 KaliServicesSQL.getInstance(getApplicationContext());
                 CustomCommandsSQL.getInstance(getApplicationContext());
-                USBArmorySQL.getInstance(getApplicationContext());
+                USBArsenalSQL.getInstance(getApplicationContext());
 
                 // Setup the default SharePreference value.
                 setDefaultSharePreference();
@@ -542,9 +542,9 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                         case R.id.duckhunter_item:
                             changeFragment(fragmentManager, DuckHunterFragment.newInstance(itemId));
                             break;
-                        case R.id.usbarmory_item:
+                        case R.id.usbarsenal_item:
                             if (new File("/config/usb_gadget/g1").exists()) {
-                                changeFragment(fragmentManager, USBArmoryFragment.newInstance(itemId));
+                                changeFragment(fragmentManager, USBArsenalFragment.newInstance(itemId));
                             } else {
                                 showWarningDialog("", "USB Arsenal (ConfigFS) is only supported by kernels above 4.x. Please note that HID, RNDIS, and Mass Storage should be automatically enabled on older devices with NetHunter patches.", false);
                             }
