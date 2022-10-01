@@ -335,7 +335,7 @@ public class BTFragment extends Fragment {
                         exe.RunAsRoot(new String[]{"echo 0 > " + bt_smd});
                     }
                     else {
-                        exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd pkill bluebinder"});
+                        exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd pkill bluebinder;exit"});
                         exe.RunAsRoot(new String[]{"svc bluetooth enable"});
                     }
                     refresh(rootView);
