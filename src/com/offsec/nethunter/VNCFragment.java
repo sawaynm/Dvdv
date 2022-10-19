@@ -352,7 +352,7 @@ public class VNCFragment extends Fragment {
                 }
             } else {
                 Toast.makeText(getActivity().getApplicationContext(), "Installing missing audio script in chroot..", Toast.LENGTH_SHORT).show();
-                intentClickListener_NH("echo -ne \"\\033]0;Kali NetHunter Utils\\007\" && clear;apt-get update && apt-get install kali-nethunter-utils;sleep 2 && exit"); // since is a kali command we can send it as is
+                intentClickListener_NH("echo -ne \"\\033]0;Kali NetHunter Utils\\007\" && clear;apt-get update && apt-get install nethunter-utils;sleep 2 && exit"); // since is a kali command we can send it as is
             }
         });
         addClickListener(SetupVNCButton, v -> {
