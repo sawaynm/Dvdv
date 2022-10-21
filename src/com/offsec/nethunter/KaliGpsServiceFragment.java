@@ -160,11 +160,11 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
                 else rtlsdr = "";
 
                 //SDR AMR interface
-                if (sdramrcheckbox.isChecked()) rtlamr = "source=rtlamr\n";
+                if (sdramrcheckbox.isChecked()) rtlamr = "source=rtlamr-0\n";
                 else rtlamr = "";
 
                 //SDR ADSB interface
-                if (sdradsbcheckbox.isChecked()) rtladsb = "source=rtladsb\n";
+                if (sdradsbcheckbox.isChecked()) rtladsb = "source=rtladsb-0\n";
                 else rtladsb = "";
 
                 //Mousejack interface
