@@ -171,7 +171,7 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
                 if (mousejackcheckbox.isChecked()) mousejack = "source=mousejack:name=nRF,channel_hoprate=100/sec\n";
                 else mousejack = "";
 
-                String conf = "log_template=%p/%n\nlog_prefix=/captures/kismet/\n" + wlaniface + btiface + rtlsdr + rtlamr + rtladsb + mousejack;
+                String conf = "log_template=%p/%n\nlog_prefix=/captures/kismet/\ngps=gpsd:host=localhost,port=2947\n" + wlaniface + btiface + rtlsdr + rtlamr + rtladsb + mousejack;
                 exe.RunAsRoot(new String[]{"echo \"" + conf + "\" > " + NhPaths.SD_PATH + "/kismet_site.conf"});
                 exe.RunAsRoot(new String[]{"bootkali custom_cmd mv /sdcard/kismet_site.conf /etc/kismet/"});
                 Toast.makeText(getActivity().getApplicationContext(), "Starting Kismet.. Web UI will be available at localhost:2501\"", Toast.LENGTH_LONG).show();
