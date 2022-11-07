@@ -344,7 +344,7 @@ public class VNCFragment extends Fragment {
             File audio = new File(NhPaths.CHROOT_PATH() + "/usr/bin/audio");
             if (audio.exists()) {
                 if (StartAudioButton.getText().equals("Enable audio")) {
-                    exe.RunAsRoot(new String[]{nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd audio start && audio start"});
+                    exe.RunAsRoot(new String[]{nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd audio start"});
                     refreshVNC(rootView);
                 } else {
                     exe.RunAsRoot(new String[]{nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd audio stop"});
