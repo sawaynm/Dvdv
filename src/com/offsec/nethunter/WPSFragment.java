@@ -22,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.offsec.nethunter.bridge.Bridge;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
 
@@ -45,7 +46,7 @@ public class WPSFragment extends Fragment {
     private LinearLayout WPSPinLayout;
     private LinearLayout DelayLayout;
     private Context context;
-    private Activity activity;
+    private static Activity activity;
     private NhPaths nh;
     private final ShellExecuter exe = new ShellExecuter();
     private String selected_network;
@@ -185,7 +186,7 @@ public class WPSFragment extends Fragment {
                 if (iswatch) {
                     exe.RunAsRoot(new String[]{"settings put system clockwork_wifi_setting on"});
                 } else exe.RunAsRoot(new String[]{"svc wifi enable"});
-                intentClickListener_NH("python3 /sdcard/nh_files/modules/oneshot.py -b " + selected_network +
+                run_cmd("python3 /sdcard/nh_files/modules/oneshot.py -b " + selected_network +
                         " -i " + selected_interface + pixieCMD + pixieforceCMD + bruteCMD + customPINCMD + customPIN + delayCMD + delayTIME + pbcCMD);
                 //WearOS iface control is weird, hence reset is needed
                 if (iswatch)
@@ -214,19 +215,6 @@ public class WPSFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-    }
-
-    final void intentClickListener_NH(final String command) {
-        try {
-            Intent intent =
-                    new Intent("com.offsec.nhterm.RUN_SCRIPT_NH");
-            intent.addCategory(Intent.CATEGORY_DEFAULT);
-            intent.putExtra("com.offsec.nhterm.iInitialCommand", command);
-            startActivity(intent);
-        } catch (Exception e) {
-            nh.showMessage(context, getString(R.string.toast_install_terminal));
-
-        }
     }
 
     private void scanWifi() {
@@ -264,5 +252,14 @@ public class WPSFragment extends Fragment {
                 exe.RunAsRoot(new String[]{"svc bluetooth enable"});
             }
         });
+    }
+
+    ////
+    // Bridge side functions
+    ////
+
+    public static void run_cmd(String cmd) {
+        Intent intent = Bridge.createExecuteIntent("/data/data/com.offsec.nhterm/files/usr/bin/kali", cmd);
+        activity.startActivity(intent);
     }
 }

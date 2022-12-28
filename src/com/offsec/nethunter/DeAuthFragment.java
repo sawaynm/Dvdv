@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
+import com.offsec.nethunter.bridge.Bridge;
 import com.offsec.nethunter.utils.BootKali;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
@@ -26,7 +27,7 @@ import androidx.fragment.app.Fragment;
     public class DeAuthFragment  extends Fragment {
     private final ShellExecuter exe = new ShellExecuter();
     private Context context;
-    private Activity activity;
+    private static Activity activity;
     private static final String ARG_SECTION_NUMBER = "section_number";
 
     public static DeAuthFragment newInstance(int sectionNumber) {
@@ -52,7 +53,6 @@ import androidx.fragment.app.Fragment;
         final EditText wlan = rootView.findViewById(R.id.wlan_interface);
         final EditText term = rootView.findViewById(R.id.TerminalOutputDeAuth);
         final Button start = rootView.findViewById(R.id.StartDeAuth);
-        final EditText pkt = rootView.findViewById(R.id.time);
         final EditText channel = rootView.findViewById(R.id.channel);
         final CheckBox whitelist = rootView.findViewById(R.id.deauth_whitelist);
         final CheckBox white_me = rootView.findViewById(R.id.deauth_me);
@@ -70,7 +70,7 @@ import androidx.fragment.app.Fragment;
                 else{
                     whitelist_command = "";
                 }
-                intentClickListener_NH("echo Press Crtl+C to stop! && mdk3 " + wlan.getText() + "mon d " + whitelist_command + "-c " + channel.getText());
+                run_cmd("echo Press Crtl+C to stop! && mdk3 " + wlan.getText() + "mon d " + whitelist_command + "-c " + channel.getText());
             }
             catch (InterruptedException e) {
                 e.printStackTrace();
@@ -144,22 +144,18 @@ import androidx.fragment.app.Fragment;
         return super.onOptionsItemSelected(item);
     }
 
-    private void intentClickListener_NH(final String command) {
-        try {
-            Intent intent =
-                    new Intent("com.offsec.nhterm.RUN_SCRIPT_NH");
-            intent.addCategory(Intent.CATEGORY_DEFAULT);
-            intent.putExtra("com.offsec.nhterm.iInitialCommand", command);
-            startActivity(intent);
-        } catch (Exception e) {
-            NhPaths.showMessage(context, getString(R.string.toast_install_terminal));
-
-        }
-    }
-
     public String getmac(final String wlan){
         final String mac;
         mac = exe.RunAsRootOutput("cat /sys/class/net/"+ wlan +  "/address");
         return mac;
     }
+
+        ////
+        // Bridge side functions
+        ////
+
+        public static void run_cmd(String cmd) {
+            Intent intent = Bridge.createExecuteIntent("/data/data/com.offsec.nhterm/files/usr/bin/kali", cmd);
+            activity.startActivity(intent);
+        }
 }

@@ -20,6 +20,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.offsec.nethunter.bridge.Bridge;
 import com.offsec.nethunter.databinding.MitmfGeneralBinding;
 import com.offsec.nethunter.databinding.MitmfInjectBinding;
 import com.offsec.nethunter.databinding.MitmfResponderBinding;
@@ -62,7 +63,7 @@ public class MITMfFragment extends Fragment {
 
 
     private Context context;
-    private Activity activity;
+    private static Activity activity;
     private static final String ARG_SECTION_NUMBER = "section_number";
 
     public static MITMfFragment newInstance(int sectionNumber) {
@@ -127,7 +128,7 @@ public class MITMfFragment extends Fragment {
             provider.getCommands(sb);
         }
 
-        intentClickListener_NH("mitmf " + sb.toString());
+        run_cmd("mitmf " + sb.toString());
         NhPaths.showMessage(context, "MITMf Started!");
     }
 
@@ -500,16 +501,12 @@ public class MITMfFragment extends Fragment {
     }
 
 
-    private void intentClickListener_NH(final String command) {
-        try {
-            Intent intent =
-                    new Intent("com.offsec.nhterm.RUN_SCRIPT_NH");
-            intent.addCategory(Intent.CATEGORY_DEFAULT);
+    ////
+    // Bridge side functions
+    ////
 
-            intent.putExtra("com.offsec.nhterm.iInitialCommand", command);
-            startActivity(intent);
-        } catch (Exception e) {
-            NhPaths.showMessage(context, getString(R.string.toast_install_terminal));
-        }
+    public static void run_cmd(String cmd) {
+        Intent intent = Bridge.createExecuteIntent("/data/data/com.offsec.nhterm/files/usr/bin/kali", cmd);
+        activity.startActivity(intent);
     }
 }

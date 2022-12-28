@@ -1,5 +1,7 @@
 package com.offsec.nethunter;
 
+import static com.offsec.nethunter.bridge.Runner.activity;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,6 +18,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.offsec.nethunter.bridge.Bridge;
+import com.offsec.nethunter.bridge.Runner;
 import com.offsec.nethunter.utils.NhPaths;
 
 import java.util.Locale;
@@ -257,12 +261,12 @@ public class MPCFragment extends Fragment {
         // Buttons
         addClickListener(R.id.mpc_GenerateSDCARD, v -> {
             Log.d("thecmd", "cd /sdcard/; msfpc " + getCmd(rootView));
-            intentClickListener_NH("cd /sdcard/; msfpc " + getCmd(rootView)); // since is a kali command we can send it as is
+            run_cmd("cd /sdcard/; msfpc " + getCmd(rootView)); // since is a kali command we can send it as is
         }, rootView);
 
         addClickListener(R.id.mpc_GenerateHTTP, v -> {
             Log.d("thecmd", "cd /var/www/html; msfpc " + getCmd(rootView));
-            intentClickListener_NH("cd /var/www/html; msfpc " + getCmd(rootView)); // since is a kali command we can send it as is
+            run_cmd("cd /var/www/html; msfpc " + getCmd(rootView)); // since is a kali command we can send it as is
         }, rootView);
 
         return rootView;
@@ -278,17 +282,12 @@ public class MPCFragment extends Fragment {
         rootView.findViewById(buttonId).setOnClickListener(onClickListener);
     }
 
-    private void intentClickListener_NH(final String command) {
-        try {
-            Intent intent =
-                    new Intent("com.offsec.nhterm.RUN_SCRIPT_NH");
-            intent.addCategory(Intent.CATEGORY_DEFAULT);
+    ////
+    // Bridge side functions
+    ////
 
-            intent.putExtra("com.offsec.nhterm.iInitialCommand", command);
-            startActivity(intent);
-        } catch (Exception e) {
-            NhPaths.showMessage(context, getString(R.string.toast_install_terminal));
-        }
+    public static void run_cmd(String cmd) {
+        Intent intent = Bridge.createExecuteIntent("/data/data/com.offsec.nhterm/files/usr/bin/kali", cmd);
+        activity.startActivity(intent);
     }
-
 }

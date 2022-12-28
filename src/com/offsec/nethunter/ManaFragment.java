@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
+import com.offsec.nethunter.bridge.Bridge;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
 
@@ -51,7 +52,7 @@ public class ManaFragment extends Fragment {
     private static final String ARG_SECTION_NUMBER = "section_number";
     private String configFilePath;
     private Context context;
-    private Activity activity;
+    private static Activity activity;
 
     public static ManaFragment newInstance(int sectionNumber) {
         ManaFragment fragment = new ManaFragment();
@@ -138,46 +139,46 @@ public class ManaFragment extends Fragment {
                 case 0:
                     NhPaths.showMessage(context, "Starting MANA NAT FULL");
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        intentClickListener_NH(NhPaths.makeTermTitle("MANA-FULL") + "/usr/share/mana-toolkit/run-mana/start-nat-full-lollipop.sh");
+                        run_cmd(NhPaths.makeTermTitle("MANA-FULL") + "/usr/share/mana-toolkit/run-mana/start-nat-full-lollipop.sh");
                     } else {
-                        intentClickListener_NH(NhPaths.makeTermTitle("MANA-FULL") + "/usr/share/mana-toolkit/run-mana/start-nat-full-kitkat.sh");
+                        run_cmd(NhPaths.makeTermTitle("MANA-FULL") + "/usr/share/mana-toolkit/run-mana/start-nat-full-kitkat.sh");
                     }
                     break;
                 case 1:
                     NhPaths.showMessage(context, "Starting MANA NAT SIMPLE");
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        intentClickListener_NH(NhPaths.makeTermTitle("MANA-SIMPLE") + "/usr/share/mana-toolkit/run-mana/start-nat-simple-lollipop.sh");
+                        run_cmd(NhPaths.makeTermTitle("MANA-SIMPLE") + "/usr/share/mana-toolkit/run-mana/start-nat-simple-lollipop.sh");
                     } else {
-                        intentClickListener_NH(NhPaths.makeTermTitle("MANA-SIMPLE") + "/usr/share/mana-toolkit/run-mana/start-nat-simple-kitkat.sh");
+                        run_cmd(NhPaths.makeTermTitle("MANA-SIMPLE") + "/usr/share/mana-toolkit/run-mana/start-nat-simple-kitkat.sh");
                     }
                     break;
                 case 2:
                     NhPaths.showMessage(context, "Starting MANA Bettercap");
-                    intentClickListener_NH(NhPaths.makeTermTitle("MANA-BETTERCAP") + "/usr/bin/start-nat-transproxy-lollipop.sh");
+                    run_cmd(NhPaths.makeTermTitle("MANA-BETTERCAP") + "/usr/bin/start-nat-transproxy-lollipop.sh");
                     break;
                 case 3:
                     NhPaths.showMessage(context, "Starting MANA NAT SIMPLE && BDF");
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        intentClickListener_NH(NhPaths.makeTermTitle("MANA-BDF") + "/usr/share/mana-toolkit/run-mana/start-nat-simple-bdf-lollipop.sh");
+                        run_cmd(NhPaths.makeTermTitle("MANA-BDF") + "/usr/share/mana-toolkit/run-mana/start-nat-simple-bdf-lollipop.sh");
                     } else {
-                        intentClickListener_NH(NhPaths.makeTermTitle("MANA-BDF") + "/usr/share/mana-toolkit/run-mana/start-nat-simple-bdf-kitkat.sh");
+                        run_cmd(NhPaths.makeTermTitle("MANA-BDF") + "/usr/share/mana-toolkit/run-mana/start-nat-simple-bdf-kitkat.sh");
                     }
                     // we wait ~10 secs before launching msf
                     new android.os.Handler().postDelayed(
                             new Runnable() {
                                 public void run() {
                                     NhPaths.showMessage(context, "Starting MSF with BDF resource.rc");
-                                    intentClickListener_NH(NhPaths.makeTermTitle("MSF") + "msfconsole -q -r /usr/share/bdfproxy/bdfproxy_msf_resource.rc");
+                                    run_cmd(NhPaths.makeTermTitle("MSF") + "msfconsole -q -r /usr/share/bdfproxy/bdfproxy_msf_resource.rc");
                                 }
                             }, 10000);
                     break;
                 case 4:
                     NhPaths.showMessage(context, "Starting HOSTAPD-WPE");
-                    intentClickListener_NH(NhPaths.makeTermTitle("HOSTAPD-WPE") + "ifconfig wlan1 up && /usr/sbin/hostapd-wpe /sdcard/nh_files/configs/hostapd-wpe.conf");
+                    run_cmd(NhPaths.makeTermTitle("HOSTAPD-WPE") + "ifconfig wlan1 up && /usr/sbin/hostapd-wpe /sdcard/nh_files/configs/hostapd-wpe.conf");
                     break;
                 case 5:
                     NhPaths.showMessage(context, "Starting HOSTAPD-WPE with Karma");
-                    intentClickListener_NH(NhPaths.makeTermTitle("HOSTAPD-WPE-KARMA") + "ifconfig wlan1 up && /usr/sbin/hostapd-wpe -k /sdcard/nh_files/configs/hostapd-wpe.conf");
+                    run_cmd(NhPaths.makeTermTitle("HOSTAPD-WPE-KARMA") + "ifconfig wlan1 up && /usr/sbin/hostapd-wpe -k /sdcard/nh_files/configs/hostapd-wpe.conf");
                     break;
                 default:
                     NhPaths.showMessage(context, "Invalid script!");
@@ -194,7 +195,7 @@ public class ManaFragment extends Fragment {
 
     public void Firstrun() {
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-        intentClickListener_NH("echo -ne \"\\033]0;Mana first setup\\007\"" +
+        run_cmd("echo -ne \"\\033]0;Mana first setup\\007\"" +
                 "apt update && apt install mana-toolkit hostapd hostapd-wpe");
         sharedpreferences.edit().putBoolean("setup_done", true).apply();
     }
@@ -842,15 +843,12 @@ public class ManaFragment extends Fragment {
         }
     }
 
-    private void intentClickListener_NH(final String command) {
-        try {
-            Intent intent =
-                    new Intent("com.offsec.nhterm.RUN_SCRIPT_NH");
-            intent.addCategory(Intent.CATEGORY_DEFAULT);
-            intent.putExtra("com.offsec.nhterm.iInitialCommand", command);
-            startActivity(intent);
-        } catch (Exception e) {
-            NhPaths.showMessage(context, getString(R.string.toast_install_terminal));
-        }
+    ////
+    // Bridge side functions
+    ////
+
+    public static void run_cmd(String cmd) {
+        Intent intent = Bridge.createExecuteIntent("/data/data/com.offsec.nhterm/files/usr/bin/kali", cmd);
+        activity.startActivity(intent);
     }
 }
