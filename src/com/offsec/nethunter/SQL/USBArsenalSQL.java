@@ -9,8 +9,8 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.offsec.nethunter.BuildConfig;
-import com.offsec.nethunter.models.USBArmoryUSBNetworkModel;
-import com.offsec.nethunter.models.USBArmoryUSBSwitchModel;
+import com.offsec.nethunter.models.USBArsenalUSBNetworkModel;
+import com.offsec.nethunter.models.USBArsenalUSBSwitchModel;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,24 +18,24 @@ import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 
-public class USBArmorySQL extends SQLiteOpenHelper {
-    private static USBArmorySQL instance;
-    private static final String DATABASE_NAME = "USBArmoryFragment";
-    private static final String TAG = "USBArmorySQLSQL";
+public class USBArsenalSQL extends SQLiteOpenHelper {
+    private static USBArsenalSQL instance;
+    private static final String DATABASE_NAME = "USBArsenalFragment";
+    private static final String TAG = "USBArsenalSQLSQL";
     private static final String USBSWITCH_TABLE_NAME = "USBSwitch";
     private static final String USBNETWORK_TABLE_NAME = "USBNetwork";
     private static ArrayList<String> COLUMNS_USBSWITCH = new ArrayList<>();
     private static ArrayList<String> COLUMNS_USBNETWORK = new ArrayList<>();
     private boolean isDBValid;
 
-    public synchronized static USBArmorySQL getInstance(Context context){
+    public synchronized static USBArsenalSQL getInstance(Context context){
         if (instance == null) {
-            instance = new USBArmorySQL(context.getApplicationContext());
+            instance = new USBArsenalSQL(context.getApplicationContext());
         }
         return instance;
     }
 
-    private USBArmorySQL(Context context) {
+    private USBArsenalSQL(Context context) {
         super(context, DATABASE_NAME, null, 1);
         // Add your default column here;
         COLUMNS_USBSWITCH.add("target");
@@ -146,34 +146,34 @@ public class USBArmorySQL extends SQLiteOpenHelper {
 
     }
 
-    public USBArmoryUSBSwitchModel getUSBSwitchColumnData(String targetOSName, String functionName){
-        USBArmoryUSBSwitchModel usbArmoryUSBSwitchModel = new USBArmoryUSBSwitchModel();
+    public USBArsenalUSBSwitchModel getUSBSwitchColumnData(String targetOSName, String functionName){
+        USBArsenalUSBSwitchModel usbArsenalUSBSwitchModel = new USBArsenalUSBSwitchModel();
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + USBSWITCH_TABLE_NAME + " WHERE " + COLUMNS_USBSWITCH.get(0) + "='" + targetOSName + "'" + " AND " + COLUMNS_USBSWITCH.get(1) + "='" + functionName + "';", null);
         if (cursor.moveToFirst()) {
-            usbArmoryUSBSwitchModel.setidVendor(cursor.getString(cursor.getColumnIndex(COLUMNS_USBSWITCH.get(2))));
-            usbArmoryUSBSwitchModel.setidProduct(cursor.getString(cursor.getColumnIndex(COLUMNS_USBSWITCH.get(3))));
-            usbArmoryUSBSwitchModel.setmanufacturer(cursor.getString(cursor.getColumnIndex(COLUMNS_USBSWITCH.get(4))));
-            usbArmoryUSBSwitchModel.setproduct(cursor.getString(cursor.getColumnIndex(COLUMNS_USBSWITCH.get(5))));
-            usbArmoryUSBSwitchModel.setserialnumber(cursor.getString(cursor.getColumnIndex(COLUMNS_USBSWITCH.get(6))));
+            usbArsenalUSBSwitchModel.setidVendor(cursor.getString(cursor.getColumnIndex(COLUMNS_USBSWITCH.get(2))));
+            usbArsenalUSBSwitchModel.setidProduct(cursor.getString(cursor.getColumnIndex(COLUMNS_USBSWITCH.get(3))));
+            usbArsenalUSBSwitchModel.setmanufacturer(cursor.getString(cursor.getColumnIndex(COLUMNS_USBSWITCH.get(4))));
+            usbArsenalUSBSwitchModel.setproduct(cursor.getString(cursor.getColumnIndex(COLUMNS_USBSWITCH.get(5))));
+            usbArsenalUSBSwitchModel.setserialnumber(cursor.getString(cursor.getColumnIndex(COLUMNS_USBSWITCH.get(6))));
         }
         cursor.close();
-        return usbArmoryUSBSwitchModel;
+        return usbArsenalUSBSwitchModel;
     }
 
-    public USBArmoryUSBNetworkModel getUSBNetworkColumnData(int attackModePosition){
-        USBArmoryUSBNetworkModel usbArmoryUSBNetworkModel = new USBArmoryUSBNetworkModel();
+    public USBArsenalUSBNetworkModel getUSBNetworkColumnData(int attackModePosition){
+        USBArsenalUSBNetworkModel usbArsenalUSBNetworkModel = new USBArsenalUSBNetworkModel();
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + USBNETWORK_TABLE_NAME + " WHERE " + COLUMNS_USBNETWORK.get(0) + "='" + attackModePosition + "';", null);
         if (cursor.moveToFirst()) {
-            usbArmoryUSBNetworkModel.setupstream_iface(cursor.getString(cursor.getColumnIndex(COLUMNS_USBNETWORK.get(1))));
-            usbArmoryUSBNetworkModel.setusb_iface(cursor.getString(cursor.getColumnIndex(COLUMNS_USBNETWORK.get(2))));
-            usbArmoryUSBNetworkModel.setip_address_for_target(cursor.getString(cursor.getColumnIndex(COLUMNS_USBNETWORK.get(3))));
-            usbArmoryUSBNetworkModel.setip_gateway(cursor.getString(cursor.getColumnIndex(COLUMNS_USBNETWORK.get(4))));
-            usbArmoryUSBNetworkModel.setip_subnetmask(cursor.getString(cursor.getColumnIndex(COLUMNS_USBNETWORK.get(5))));
+            usbArsenalUSBNetworkModel.setupstream_iface(cursor.getString(cursor.getColumnIndex(COLUMNS_USBNETWORK.get(1))));
+            usbArsenalUSBNetworkModel.setusb_iface(cursor.getString(cursor.getColumnIndex(COLUMNS_USBNETWORK.get(2))));
+            usbArsenalUSBNetworkModel.setip_address_for_target(cursor.getString(cursor.getColumnIndex(COLUMNS_USBNETWORK.get(3))));
+            usbArsenalUSBNetworkModel.setip_gateway(cursor.getString(cursor.getColumnIndex(COLUMNS_USBNETWORK.get(4))));
+            usbArsenalUSBNetworkModel.setip_subnetmask(cursor.getString(cursor.getColumnIndex(COLUMNS_USBNETWORK.get(5))));
         }
         cursor.close();
-        return usbArmoryUSBNetworkModel;
+        return usbArsenalUSBNetworkModel;
     }
 
     public boolean setUSBSwitchColumnData(String functionName, int targetColumnIndex, String targetOSName, String content){
@@ -189,15 +189,15 @@ public class USBArmorySQL extends SQLiteOpenHelper {
         return true;
     }
 
-    public boolean setUSBNetworkColumnData(int usbNetworkAttackModePosition, USBArmoryUSBNetworkModel usbArmoryUSBNetworkModel){
+    public boolean setUSBNetworkColumnData(int usbNetworkAttackModePosition, USBArsenalUSBNetworkModel usbArsenalUSBNetworkModel){
         try {
             SQLiteDatabase db = this.getWritableDatabase();
             db.execSQL("UPDATE " + USBNETWORK_TABLE_NAME + " SET " +
-                    COLUMNS_USBNETWORK.get(1) + " = '" + usbArmoryUSBNetworkModel.getupstream_iface() + "'," +
-                    COLUMNS_USBNETWORK.get(2) + " = '" + usbArmoryUSBNetworkModel.getusb_iface() + "'," +
-                    COLUMNS_USBNETWORK.get(3) + " = '" + usbArmoryUSBNetworkModel.getip_address_for_target() + "'," +
-                    COLUMNS_USBNETWORK.get(4) + " = '" + usbArmoryUSBNetworkModel.getip_gateway() + "'," +
-                    COLUMNS_USBNETWORK.get(5) + " = '" + usbArmoryUSBNetworkModel.getip_subnetmask() + "'" +
+                    COLUMNS_USBNETWORK.get(1) + " = '" + usbArsenalUSBNetworkModel.getupstream_iface() + "'," +
+                    COLUMNS_USBNETWORK.get(2) + " = '" + usbArsenalUSBNetworkModel.getusb_iface() + "'," +
+                    COLUMNS_USBNETWORK.get(3) + " = '" + usbArsenalUSBNetworkModel.getip_address_for_target() + "'," +
+                    COLUMNS_USBNETWORK.get(4) + " = '" + usbArsenalUSBNetworkModel.getip_gateway() + "'," +
+                    COLUMNS_USBNETWORK.get(5) + " = '" + usbArsenalUSBNetworkModel.getip_subnetmask() + "'" +
                     " WHERE " + COLUMNS_USBNETWORK.get(0) + " = '" + usbNetworkAttackModePosition + "';");
         } catch (Exception e) {
             e.printStackTrace();
