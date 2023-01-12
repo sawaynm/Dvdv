@@ -16,7 +16,7 @@ repositories {
         url "https://maven.google.com"
     }
     //Snowfall
-    maven { url "https://jitpack.io" }
+    //maven { url "https://jitpack.io" }
     google()
 }
 
@@ -32,7 +32,7 @@ dependencies {
     implementation 'com.google.guava:guava:29.0-jre'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     //Snowfall
-    implementation 'com.github.jetradarmobile:android-snowfall:1.2.1'
+    //implementation 'com.github.jetradarmobile:android-snowfall:1.2.1'
 }
 
 android {
