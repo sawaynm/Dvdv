@@ -135,10 +135,7 @@ public class VNCFragment extends Fragment {
             xheight = Integer.toString(screen_height);
         }
 
-
-        Boolean iswatch = sharedpreferences.getBoolean("running_on_wearos", false);
-        if(iswatch)nh.showMessage(context, "WearOS detected");
-
+        Button StartAudioButton = rootView.findViewById(R.id.vnc_audio);
         Button SetupVNCButton = rootView.findViewById(R.id.set_up_vnc);
         Button StartVNCButton = rootView.findViewById(R.id.start_vnc);
         Button StopVNCButton = rootView.findViewById(R.id.stop_vnc);
@@ -256,10 +253,10 @@ public class VNCFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int pos, long id) {
                 selected_vncres = parentView.getItemAtPosition(pos).toString();
-                if (!selected_vncres.equals("Auto")) {
-                    selected_vncresCMD = "-geometry " + selected_vncres + " ";
+                if (selected_vncres.equals("Auto") || selected_vncres.equals("")) {
+                    selected_vncresCMD = "";
                 }
-                else if (selected_vncres.equals("Auto") || selected_vncres.equals("")) selected_vncresCMD = "";
+                else selected_vncresCMD = "-geometry " + selected_vncres + " ";
             }
             @Override
             public void onNothingSelected(AdapterView<?> parentView) {
@@ -269,7 +266,7 @@ public class VNCFragment extends Fragment {
         //Immersion switch
         final Switch immersionSwitch = rootView.findViewById(R.id.immersionSwitch);
         final String immersion = exe.RunAsRootOutput("settings get global policy_control");
-        if (immersion.equals("null*") || immersion.equals(""))
+        if (immersion.equals("null*"))
             immersionSwitch.setChecked(false);
         else
             immersionSwitch.setChecked(true);
@@ -342,8 +339,24 @@ public class VNCFragment extends Fragment {
         });
         refreshVNC(rootView);
 
+        //KeX Audio
+        addClickListener(StartAudioButton, v -> {
+            File audio = new File(NhPaths.CHROOT_PATH() + "/usr/bin/audio");
+            if (audio.exists()) {
+                if (StartAudioButton.getText().equals("Enable audio")) {
+                    exe.RunAsRoot(new String[]{nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd audio start"});
+                    refreshVNC(rootView);
+                } else {
+                    exe.RunAsRoot(new String[]{nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd audio stop"});
+                    refreshVNC(rootView);
+                }
+            } else {
+                Toast.makeText(getActivity().getApplicationContext(), "Installing missing audio script in chroot..", Toast.LENGTH_SHORT).show();
+                intentClickListener_NH("echo -ne \"\\033]0;Kali NetHunter Utils\\007\" && clear;apt-get update && apt-get install nethunter-utils;sleep 2 && exit"); // since is a kali command we can send it as is
+            }
+        });
         addClickListener(SetupVNCButton, v -> {
-            intentClickListener_NH("echo -ne \"\\033]0;Setting up Server\\007\" && chmod +x ~" + selected_user + "/.vnc/xstartup && clear;echo $'\n'\"Please enter your new VNC server password\"$'\n' && sudo -u " + selected_user + " vncpasswd && sleep 2 && exit"); // since is a kali command we can send it as is
+            intentClickListener_NH("echo -ne \"\\033]0;Setting up Server\\007\" && clear;chmod +x ~/.vnc/xstartup && clear;echo $'\n'\"Please enter your new VNC server password\"$'\n' && sudo -u " + selected_user + " vncpasswd && sleep 2 && exit"); // since is a kali command we can send it as is
         });
         addClickListener(StartVNCButton, v -> {
             if(selected_user.equals("root")) {
@@ -358,9 +371,9 @@ public class VNCFragment extends Fragment {
             } else {
                 String arch_path = exe.RunAsRootOutput("ls " + nh.CHROOT_PATH() + "/usr/lib/ | grep linux-gnu");
                 if(selected_user.equals("root")) {
-                        intentClickListener_NH("echo -ne \"\\033]0;Starting Server\\007\" && clear;HOME=/root;USER=root;sudo -u root LD_PRELOAD=/usr/lib/" + arch_path + "/libgcc_s.so.1 nohup vncserver :" + selected_display + " " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 </dev/null;echo \"Server started! Closing terminal..\" && sleep 2 && exit");
+                        intentClickListener_NH("echo -ne \"\\033]0;Starting Server\\007\" && clear;if HOME=/root;USER=root;sudo -u root LD_PRELOAD=/usr/lib/" + arch_path + "/libgcc_s.so.1 nohup vncserver :" + selected_display + " " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 </dev/null;then echo \"Server started! Closing terminal..\";else echo -ne \"\\033[0;31mServer already started! \\n\";fi && sleep 2 && exit");
                     } else {
-                        intentClickListener_NH("echo -ne \"\\033]0;Starting Server\\007\" && clear;HOME=/home/" + selected_user + ";USER=" + selected_user + ";sudo -u " + selected_user + " LD_PRELOAD=/usr/lib/" + arch_path + "/libgcc_s.so.1 nohup vncserver :" + selected_display + " " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 </dev/null;echo \"Server started! Closing terminal..\" && sleep 2 && exit");
+                        intentClickListener_NH("echo -ne \"\\033]0;Starting Server\\007\" && clear;if HOME=/home/" + selected_user + ";USER=" + selected_user + ";sudo -u " + selected_user + " LD_PRELOAD=/usr/lib/" + arch_path + "/libgcc_s.so.1 nohup vncserver :" + selected_display + " " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 </dev/null;then echo \"Server started! Closing terminal..\";else echo -ne \"\\033[0;31mServer already started! \\n\";fi && sleep 2 && exit");
                     }
                 Log.d(TAG, localhostonly);
             }
@@ -385,7 +398,7 @@ public class VNCFragment extends Fragment {
             }
         });
         addClickListener(AddUserButton, v -> {
-            intentClickListener_NH("echo -ne \"\\033]0;New User\\007\" && clear;read -p \"Please enter your new username\"$'\n' USER && adduser --firstuid " + MIN_UID + " --lastuid " + MAX_UID + " $USER; groupmod -g $(id -u $USER) $USER; usermod -aG sudo $USER; usermod -aG inet $USER; usermod -aG sockets $USER; echo \"Please refresh your KeX manager, closing in 2 secs\" && sleep 2 && exit");
+            intentClickListener_NH("echo -ne \"\\033]0;New User\\007\" && clear;if [[ $SHELL == *zsh ]];then read \"?Please enter your new username\"$'\n' USER;elif [[ $SHELL == *bash ]];then read -p \"Please enter your new username\"$'\n' USER;fi && adduser --firstuid " + MIN_UID + " --lastuid " + MAX_UID + " $USER; groupmod -g $(id -u $USER) $USER; usermod -aG sudo $USER; usermod -aG inet $USER; usermod -aG sockets $USER; echo \"Please refresh your KeX manager, closing in 2 secs\" && sleep 2 && exit");
         });
         addClickListener(DelUserButton, v -> {
             if (selected_user.contains("root")) {
@@ -467,6 +480,9 @@ public class VNCFragment extends Fragment {
     private void refreshVNC(View VNCFragment) {
         final TextView KeXstatus = VNCFragment.findViewById(R.id.KeXstatus);
         final TextView KeXuser = VNCFragment.findViewById(R.id.KeXuser);
+        final Button StartAudioButton = VNCFragment.findViewById(R.id.vnc_audio);
+
+        //Server Status
         ShellExecuter exe = new ShellExecuter();
         String kex_userCmd = "";
         String kex_statusCmd = exe.RunAsRootOutput("pidof Xtigervnc");
@@ -476,9 +492,11 @@ public class VNCFragment extends Fragment {
         }
         else {
             KeXstatus.setText("RUNNING");
-            kex_userCmd = exe.RunAsRootOutput(BUSYBOX_NH + " ps -w | grep Xtigervnc | grep Xauthority | " + BUSYBOX_NH + " awk '{gsub(/home/,\"\")} {gsub(/\\//,\"\")} {gsub(/.Xauthority/,\"\")} {print $11 $6}'");
+            kex_userCmd = exe.RunAsRootOutput(nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd ps -ef | grep vnc | grep Xauthority | awk '{gsub(/home/,\"\")} {gsub(/\\//,\"\")} {gsub(/.Xauthority/,\"\")} {print $1 $9}'");
             KeXuser.setText(kex_userCmd);
         }
+
+        //Users
         File passwd = new File(nh.CHROOT_PATH() + "/etc/passwd");
         String commandUSR = ("echo root && " + BUSYBOX_NH + " awk -F':' -v \"min=" + MIN_UID + "\" -v \"max=" + MAX_UID + "\" '{ if ( $3 >= min && $3 <= max ) print $0}' " + passwd + " | " + BUSYBOX_NH + " cut -d: -f1");
         String outputUSR = exe.RunAsRootOutput(commandUSR);
@@ -494,6 +512,11 @@ public class VNCFragment extends Fragment {
         prevusr = sharedpreferences.getString("user", "");
         posu = usersadapter.getPosition(prevusr);
         users.setSelection(posu);
+
+        //Audio button
+        String audio = exe.RunAsRootOutput("pidof pulseaudio");
+        if (audio.equals("")) StartAudioButton.setText("Enable audio");
+        else StartAudioButton.setText("Disable audio");
     }
 
     private void openResolutionDialog() {
@@ -620,7 +643,7 @@ public class VNCFragment extends Fragment {
             startActivity(intent);
         } catch (Exception e) {
             Log.d("errorLaunching", e.toString());
-            nh.showMessage(context, "NetHunter VNC not found!");
+            nh.showMessage(context, "NetHunter KeX not found!");
         }
     }
 

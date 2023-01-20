@@ -37,24 +37,24 @@
         <item>background</item>
     </string-array>
 
-    <!-- USB Armory -->
-    <string name="drawertitleusbarmory">USB Arsenal</string>
-    <string name="usbarmory_hint1_imagemounter">*Place all your .img or .iso files in "/sdcard/nh_files/diskimage/"</string>
-    <string name="usbarmory_current_usb_state">Current USB state: </string>
-    <string name="usbarmory_description">The USB Arsenal is awesome</string>
-    <string name="usbarmory_header">USB Function Selector</string>
-    <string name="usbarmory_enabledfunctions">USB functions currently enabled:</string>
-    <string name="usbarmory_nofunctionsenabled">No USB function is currently enabled</string>
-    <string name="usbarmory_imagemounter_header">Image Mounter</string>
-    <string name="usbarmory_imagemounter_description">Image Mounter can be used only if the USB function \"mass_storage\" has been enabled</string>
-    <string name="usbarmory_networktethering_header">USB Network Tethering</string>
-    <string name="usbarmory_networktethering_description">USB NetWork Tethering can be used only if the USB function \"rndis\" or \"acmecm\" has been enabled</string>
-    <string-array name="usbarmory_target_platform">
+    <!-- USB Arsenal -->
+    <string name="drawertitleusbarsenal">USB Arsenal</string>
+    <string name="usbarsenal_hint1_imagemounter">*Place all your .img or .iso files in "/sdcard/nh_files/diskimage/"</string>
+    <string name="usbarsenal_current_usb_state">Current USB state: </string>
+    <string name="usbarsenal_description">The USB Arsenal is awesome</string>
+    <string name="usbarsenal_header">USB Function Selector</string>
+    <string name="usbarsenal_enabledfunctions">USB functions currently enabled:</string>
+    <string name="usbarsenal_nofunctionsenabled">No USB function is currently enabled</string>
+    <string name="usbarsenal_imagemounter_header">Image Mounter</string>
+    <string name="usbarsenal_imagemounter_description">Image Mounter can be used only if the USB function \"mass_storage\" has been enabled</string>
+    <string name="usbarsenal_networktethering_header">USB Network Tethering</string>
+    <string name="usbarsenal_networktethering_description">USB NetWork Tethering can be used only if the USB function \"rndis\" or \"acmecm\" has been enabled</string>
+    <string-array name="usbarsenal_target_platform">
         <item>Windows</item>
         <item>Linux</item>
         <item>Mac OS</item>
     </string-array>
-    <string-array name="usbarmory_usb_states_win_lin">
+    <string-array name="usbarsenal_usb_states_win_lin">
         <item>reset</item>
         <item>hid</item>
         <item>mass_storage</item>
@@ -64,7 +64,7 @@
         <item>rndis,mass_storage</item>
         <item>rndis,hid,mass_storage</item>
     </string-array>
-    <string-array name="usbarmory_usb_states_mac">
+    <string-array name="usbarsenal_usb_states_mac">
         <item>reset</item>
         <item>hid</item>
         <item>mass_storage</item>
@@ -74,11 +74,11 @@
         <item>acm,ecm,mass_storage</item>
         <item>acm,ecm,hid,mass_storage</item>
     </string-array>
-    <string-array name="usbarmory_usb_adb">
+    <string-array name="usbarsenal_usb_adb">
         <item>Enable</item>
         <item>Disable</item>
     </string-array>
-    <string-array name="usbarmory_usb_network_attack_mode">
+    <string-array name="usbarsenal_usb_network_attack_mode">
         <item>Network Tethering Only</item>
     </string-array>
 
@@ -214,11 +214,11 @@
     </string-array>
 
     <!-- KeX -->
-    <string name="kex_description">Welcome to the Kali NetHunter Desktop Experience.\nYou can start multiple sessions as different users, add, save, and restore your own custom resolutions, start KeX at boot, and even output KeX to HDMI.</string>
+    <string name="kex_description">Welcome to the Kali NetHunter Desktop Experience.\nYou can start multiple sessions as different users, add, save, and restore your own custom resolutions, start KeX at boot, and even output KeX to HDMI. Audio is now available, please use Simple Protocol Player app from NetHunter store to stream through KeX.</string>
 
     <!-- BT Attacks -->
-    <string name="bt_description">Experimental version of Bluetooth Arsenal by yesimxev. Recon, spoof, listen to, or inject audio to various devices. Note that RFcomm needs to be enabled in your kernel for some of the attacks. Also, some devices might not support BT service.</string>
-    <string name="bt_carwhisperer">Carwhisperer script from the wayback. Listen to, or inject audio to various devices like speakers, headsets, watches or even cars. Note that target needs to be disconnected from original source. Live stream will have some delay. The sampling has to be 8kHz as we\'re injecting into SCO protocol.</string>
+    <string name="bt_description">Recon, spoof, listen to, or inject audio to various devices. Internal bluetooth support is now available for devices with RFCOMM, UART H4, VHCI and BINDER_IPC enabled in kernel, or devices with bt_smd driver. Carwshisperer is not supported by internal bluetooth (VHCI or bt_smd) yet.</string>
+    <string name="bt_carwhisperer">Carwhisperer script from the way back. Listen to, or inject audio to various devices like speakers, headsets, watches or even cars. Note that target needs to be disconnected from original source. Live stream will have some delay. The sampling has to be 8kHz as we\'re injecting into SCO protocol.</string>
     <string name="bt_spoof">Spoof your BT adapters.\nWill play essential role in upcoming attacks.</string>
     <string name="bt_tools">Brute force BT device addresses, ping, and discover their services.</string>
 
@@ -496,7 +496,7 @@
     <string name="switch_gps_provider">Android GPS Provider</string>
     <string name="switch_gpsd">gpsd in chroot</string>
     <string name="gps_button_launch_app">Launch %s in NH Terminal</string>
-    <string name="gps_description">Converts your GPS to NMEA then provides to Kali chroot.  Perfect for wardriving with Kismet or just a generic GPS server for Kali.</string>
+    <string name="gps_description">Converts your GPS to NMEA then provides to Kali chroot. Perfect for wardriving with Kismet or just a generic GPS server for Kali. Select your desired datasources. Make sure your wireless interface is in monitor mode before starting Kismet. Internal wireless interfaces can also be used thanks to the monitor mode by QCACLD-3.0 driver.</string>
     <string name="gps_help">You may need to give Nethunter permissions to GPS. Go to Settings > Apps > Nethunter > Permissions.</string>
     <string name="loading_wait">Loading wait…</string>
     <string name="loading_file">Loading…  FILE: %s</string>

@@ -340,7 +340,8 @@ public class SettingsFragment extends Fragment {
 
         //Uninstall
         final Button UninstallButton = rootView.findViewById(R.id.uninstall_nh);
-        File NhSystemApp = new File("/system/app/NetHunter/NetHunter.apk");addClickListener(UninstallButton, v -> {
+        File NhSystemApp = new File("/system/app/NetHunter/NetHunter.apk");
+        addClickListener(UninstallButton, v -> {
         if (NhSystemApp.length() == 0) {
             Toast.makeText(getActivity().getApplicationContext(), "NetHunter was not flashed as system app! Please remove it from Android settings.", Toast.LENGTH_LONG).show();
         } else {
