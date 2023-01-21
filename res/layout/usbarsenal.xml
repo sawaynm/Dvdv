@@ -10,7 +10,7 @@
 
         <!-- USB interface switch -->
         <LinearLayout
-            android:id="@+id/f_usbarmory_ll_usbswitch"
+            android:id="@+id/f_usbarsenal_ll_usbswitch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -30,7 +30,7 @@
                     android:layout_marginRight="16dp"
                     android:layout_marginBottom="4dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:text="@string/usbarmory_header"
+                    android:text="@string/usbarsenal_header"
                     android:textColor="@android:color/background_light"
                     android:textSize="20sp" />
             </LinearLayout>
@@ -52,13 +52,13 @@
                         android:layout_weight="0.4"
                         android:textSize="18sp" />
                     <Spinner
-                        android:id="@+id/f_usbarmory_spr_targetplatform"
+                        android:id="@+id/f_usbarsenal_spr_targetplatform"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:baselineAligned="false"
                         android:textSize="18sp"
                         android:layout_weight="0.6"
-                        android:entries="@array/usbarmory_target_platform"/>
+                        android:entries="@array/usbarsenal_target_platform"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -73,12 +73,12 @@
                         android:layout_weight="0.4"
                         android:textSize="18sp" />
                     <Spinner
-                        android:id="@+id/f_usbarmory_spr_usbfunctions"
+                        android:id="@+id/f_usbarsenal_spr_usbfunctions"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textSize="18sp"
                         android:layout_weight="0.6"
-                        android:entries="@array/usbarmory_usb_states_win_lin"/>
+                        android:entries="@array/usbarsenal_usb_states_win_lin"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -93,12 +93,12 @@
                         android:layout_weight="0.4"
                         android:textSize="18sp" />
                     <Spinner
-                        android:id="@+id/f_usbarmory_spr_adb"
+                        android:id="@+id/f_usbarsenal_spr_adb"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textSize="18sp"
                         android:layout_weight="0.6"
-                        android:entries="@array/usbarmory_usb_adb"/>
+                        android:entries="@array/usbarsenal_usb_adb"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -112,7 +112,7 @@
                         android:layout_weight="0.4"
                         android:textSize="18sp" />
                     <EditText
-                        android:id="@+id/f_usbarmory_et_idvendor"
+                        android:id="@+id/f_usbarsenal_et_idvendor"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textSize="18sp"
@@ -130,7 +130,7 @@
                         android:layout_weight="0.4"
                         android:textSize="18sp" />
                     <EditText
-                        android:id="@+id/f_usbarmory_et_idproduct"
+                        android:id="@+id/f_usbarsenal_et_idproduct"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textSize="18sp"
@@ -149,7 +149,7 @@
                         android:layout_weight="0.4"
                         android:textSize="18sp" />
                     <EditText
-                        android:id="@+id/f_usbarmory_et_manufacturer"
+                        android:id="@+id/f_usbarsenal_et_manufacturer"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textSize="18sp"
@@ -168,7 +168,7 @@
                         android:layout_weight="0.4"
                         android:textSize="18sp" />
                     <EditText
-                        android:id="@+id/f_usbarmory_et_product"
+                        android:id="@+id/f_usbarsenal_et_product"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textSize="18sp"
@@ -186,7 +186,7 @@
                         android:layout_weight="0.4"
                         android:textSize="18sp" />
                     <EditText
-                        android:id="@+id/f_usbarmory_et_serialnumber"
+                        android:id="@+id/f_usbarsenal_et_serialnumber"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textSize="18sp"
@@ -195,13 +195,13 @@
                 </LinearLayout>
 
                 <Button
-                    android:id="@+id/f_usbarmory_btn_setusbinterface"
+                    android:id="@+id/f_usbarsenal_btn_setusbinterface"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Set USB Function"
                     style="?android:attr/buttonStyleSmall"/>
                 <Button
-                    android:id="@+id/f_usbarmory_btn_saveusbfuncswitch"
+                    android:id="@+id/f_usbarsenal_btn_saveusbfuncswitch"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginTop="4dp"
@@ -220,16 +220,16 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/usbarmory_enabledfunctions"
+                            android:text="@string/usbarsenal_enabledfunctions"
                             android:textSize="18sp" />
                         <TextView
-                            android:id="@+id/f_usbarmory_tv_current_usb_state"
+                            android:id="@+id/f_usbarsenal_tv_current_usb_state"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:textSize="18sp" />
                     </LinearLayout>
                     <ImageButton
-                        android:id="@+id/f_usbarmory_imgbtn_reloadUSBStatus"
+                        android:id="@+id/f_usbarsenal_imgbtn_reloadUSBStatus"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:adjustViewBounds="false"
@@ -243,13 +243,13 @@
 
         <!-- Image Mounter -->
         <LinearLayout
-            android:id="@+id/f_usbarmory_ll_imageMounter"
+            android:id="@+id/f_usbarsenal_ll_imageMounter"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <LinearLayout
-                android:id="@+id/f_usbarmory_ll_imageMounter_sub1"
+                android:id="@+id/f_usbarsenal_ll_imageMounter_sub1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -266,20 +266,20 @@
                     android:layout_marginRight="16dp"
                     android:layout_marginBottom="4dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:text="@string/usbarmory_imagemounter_header"
+                    android:text="@string/usbarsenal_imagemounter_header"
                     android:textColor="@android:color/background_light"
                     android:textSize="20sp" />
             </LinearLayout>
 
             <TextView
-                android:id="@+id/f_usbarmory_ll_tv_imagemounter_hint"
+                android:id="@+id/f_usbarsenal_ll_tv_imagemounter_hint"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:text="@string/usbarmory_imagemounter_description" />
+                android:text="@string/usbarsenal_imagemounter_description" />
 
             <LinearLayout
-                android:id="@+id/f_usbarmory_ll_imageMounter_sub2"
+                android:id="@+id/f_usbarsenal_ll_imageMounter_sub2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -289,7 +289,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="@string/usbarmory_hint1_imagemounter"/>
+                    android:text="@string/usbarsenal_hint1_imagemounter"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -298,7 +298,7 @@
                     android:textSize="16sp"
                     android:textStyle="bold" />
                 <Spinner
-                    android:id="@+id/f_usbarmory_spr_img_files"
+                    android:id="@+id/f_usbarsenal_spr_img_files"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
@@ -307,21 +307,21 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
                     <Button
-                        android:id="@+id/f_usbarmory_btn_mountImage"
+                        android:id="@+id/f_usbarsenal_btn_mountImage"
                         style="?android:attr/buttonStyleSmall"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.3"
                         android:text="Mount Image" />
                     <Button
-                        android:id="@+id/f_usbarmory_btn_unmountImage"
+                        android:id="@+id/f_usbarsenal_btn_unmountImage"
                         style="?android:attr/buttonStyleSmall"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.3"
                         android:text="Unmount Image" />
                     <CheckBox
-                        android:id="@+id/f_usbarmory_chkbox_ReadOrWrite"
+                        android:id="@+id/f_usbarsenal_chkbox_ReadOrWrite"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:text="Read Only"
@@ -345,14 +345,14 @@
                             android:text="Mounted Image:"
                             android:textSize="18sp" />
                         <TextView
-                            android:id="@+id/f_usbarmory_tv_mount_state"
+                            android:id="@+id/f_usbarsenal_tv_mount_state"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:textSize="18sp"
                             android:text="No image is mounted."/>
                     </LinearLayout>
                     <ImageButton
-                        android:id="@+id/f_usbarmory_imgbtn_reloadMountStatus"
+                        android:id="@+id/f_usbarsenal_imgbtn_reloadMountStatus"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:adjustViewBounds="false"
@@ -366,13 +366,13 @@
 
         <!-- USB Network Tethering -->
         <LinearLayout
-            android:id="@+id/f_usbarmory_ll_usbnetworktethering"
+            android:id="@+id/f_usbarsenal_ll_usbnetworktethering"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <LinearLayout
-                android:id="@+id/f_usbarmory_ll_usbnetworktethering_sub1"
+                android:id="@+id/f_usbarsenal_ll_usbnetworktethering_sub1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -389,20 +389,20 @@
                     android:layout_marginRight="16dp"
                     android:layout_marginBottom="4dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:text="@string/usbarmory_networktethering_header"
+                    android:text="@string/usbarsenal_networktethering_header"
                     android:textColor="@android:color/background_light"
                     android:textSize="20sp" />
             </LinearLayout>
 
             <TextView
-                android:id="@+id/f_usbarmory_ll_tv_usbnetworktethering_hint"
+                android:id="@+id/f_usbarsenal_ll_tv_usbnetworktethering_hint"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:text="@string/usbarmory_networktethering_description" />
+                android:text="@string/usbarsenal_networktethering_description" />
 
             <LinearLayout
-                android:id="@+id/f_usbarmory_ll_usbnetworktethering_sub2"
+                android:id="@+id/f_usbarsenal_ll_usbnetworktethering_sub2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
@@ -421,13 +421,13 @@
                         android:text="Attack Mode:"
                         android:textSize="18sp" />
                     <Spinner
-                        android:id="@+id/f_usbarmory_spr_networkattackmode"
+                        android:id="@+id/f_usbarsenal_spr_networkattackmode"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:baselineAligned="false"
                         android:textSize="18sp"
                         android:layout_weight="0.6"
-                        android:entries="@array/usbarmory_usb_network_attack_mode"/>
+                        android:entries="@array/usbarsenal_usb_network_attack_mode"/>
 
                 </LinearLayout>
 
@@ -442,7 +442,7 @@
                         android:text="Upstream Interface\n(e.g. wlan0, rmnet_data0):"
                         android:textSize="18sp" />
                     <EditText
-                        android:id="@+id/f_usbarmory_et_usbnetwork_upstreamiface"
+                        android:id="@+id/f_usbarsenal_et_usbnetwork_upstreamiface"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.4"
@@ -462,7 +462,7 @@
                         android:textSize="18sp" />
 
                     <EditText
-                        android:id="@+id/f_usbarmory_et_usbnetwork_usbfunc"
+                        android:id="@+id/f_usbarsenal_et_usbnetwork_usbfunc"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.4"
@@ -482,7 +482,7 @@
                         android:textSize="18sp" />
 
                     <EditText
-                        android:id="@+id/f_usbarmory_et_usbnetwork_targetip"
+                        android:id="@+id/f_usbarsenal_et_usbnetwork_targetip"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.4"
@@ -501,7 +501,7 @@
                         android:textSize="18sp" />
 
                     <EditText
-                        android:id="@+id/f_usbarmory_et_usbnetwork_gatewayip"
+                        android:id="@+id/f_usbarsenal_et_usbnetwork_gatewayip"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint=""
@@ -520,7 +520,7 @@
                         android:textSize="18sp" />
 
                     <EditText
-                        android:id="@+id/f_usbarmory_et_usbnetwork_ipsubnetmask"
+                        android:id="@+id/f_usbarsenal_et_usbnetwork_ipsubnetmask"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint=""
@@ -528,12 +528,12 @@
                 </LinearLayout>
 
                 <Button
-                    android:id="@+id/f_usbarmory_btn_runusbnetworktethering"
+                    android:id="@+id/f_usbarsenal_btn_runusbnetworktethering"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="RUN IN NETHUNTER TERMINAL"/>
                 <Button
-                    android:id="@+id/f_usbarmory_btn_saveusbnetworktethering"
+                    android:id="@+id/f_usbarsenal_btn_saveusbnetworktethering"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="SAVE CONFIG TO DATABASE"/>

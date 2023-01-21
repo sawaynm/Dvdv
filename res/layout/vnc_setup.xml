@@ -120,6 +120,14 @@
 
             </LinearLayout>
 
+            <Button
+                android:id="@+id/vnc_audio"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Enable audio"
+                android:textColor="#ffffffff" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
