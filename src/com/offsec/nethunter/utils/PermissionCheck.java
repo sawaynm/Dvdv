@@ -1,6 +1,5 @@
 package com.offsec.nethunter.utils;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -15,8 +14,6 @@ public class PermissionCheck {
 
     public static final int DEFAULT_PERMISSION_RQCODE = 1;
     public static final int NH_TERM_PERMISSIONS_RQCODE = 2;
-    public static final int NH_VNC_PERMISSIONS_RQCODE = 3;
-    public static final int NH_VNC_PERMISSIONS_ONFRAGMENTCLICK_RQCODE = 4;
 
     public static final String[] DEFAULT_PERMISSIONS = {
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -29,10 +26,6 @@ public class PermissionCheck {
             "com.offsec.nhterm.permission.RUN_SCRIPT_SU",
             "com.offsec.nhterm.permission.RUN_SCRIPT_NH",
             "com.offsec.nhterm.permission.RUN_SCRIPT_NH_LOGIN"
-    };
-
-    public static final String[] NH_VNC_PERMISSIONS = {
-            "com.offsec.nhvnc.permission.OPEN_VNC_CONN"
     };
 
     public PermissionCheck(Activity activity, Context context) {
