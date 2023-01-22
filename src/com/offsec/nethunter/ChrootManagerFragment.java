@@ -23,6 +23,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.offsec.nethunter.AsyncTask.ChrootManagerAsynctask;
+import com.offsec.nethunter.bridge.Bridge;
 import com.offsec.nethunter.service.CompatCheckService;
 import com.offsec.nethunter.service.NotificationChannelService;
 import com.offsec.nethunter.utils.NhPaths;
@@ -67,7 +68,7 @@ public class ChrootManagerFragment extends Fragment {
     private static final int NEED_TO_INSTALL = 2;
     public static boolean isAsyncTaskRunning = false;
     private Context context;
-    private Activity activity;
+    private static Activity activity;
 
     public static ChrootManagerFragment newInstance(int sectionNumber) {
         ChrootManagerFragment fragment = new ChrootManagerFragment();
@@ -509,10 +510,7 @@ public class ChrootManagerFragment extends Fragment {
                     }
                 }
                 try {
-                    Intent intent = new Intent("com.offsec.nhterm.RUN_SCRIPT_NH");
-                    intent.addCategory(Intent.CATEGORY_DEFAULT);
-                    intent.putExtra("com.offsec.nhterm.iInitialCommand", NhPaths.makeTermTitle("Updating") + "apt update && apt install " + sb.toString() + " -y && echo \"(You can close the terminal now)\n\"");
-                    startActivity(intent);
+                    run_cmd("apt update && apt install " + sb.toString() + " -y && echo \"(You can close the terminal now)\n\"");
                 } catch (Exception e) {
                     NhPaths.showMessage(context, getString(R.string.toast_install_terminal));
                 }
@@ -684,5 +682,14 @@ public class ChrootManagerFragment extends Fragment {
         backPressedintent.putExtra("isEnable", isEnabled);
         context.sendBroadcast(backPressedintent);
         setHasOptionsMenu(isEnabled);
+    }
+
+    ////
+    // Bridge side functions
+    ////
+
+    public static void run_cmd(String cmd) {
+        Intent intent = Bridge.createExecuteIntent("/data/data/com.offsec.nhterm/files/usr/bin/kali", cmd);
+        activity.startActivity(intent);
     }
 }

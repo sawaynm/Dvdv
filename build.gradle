@@ -61,6 +61,15 @@ android {
         multiDexEnabled true
     }
 
+    signingConfigs {
+        debug {
+            storeFile file('nethunter-debug.jks')
+            keyAlias 'nethunter'
+            storePassword 'nethunter'
+            keyPassword 'nethunter'
+        }
+    }
+
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -71,29 +80,6 @@ android {
             assets.srcDirs = ['assets']
         }
 
-    }
-
-    signingConfigs {
-
-        debug {
-            storeFile file("${System.properties['user.home']}" + "/.android/debug.keystore")
-        }
-
-        /* note:  To build a signed version of NetHunter:
-        1. Put your keystore in ~/.android/release-keystore and set up a key "NetHunter"
-        2. set KEYSTORE_PASSWORD and KEY_PASSWORD environment variables before running gradle.  this
-           can be done easily by adding them to .bashrc
-        (or change the below values, hard-coding or whatever...)
-        3. Don't forget to create a proguard.cfg file.  You can find a sample one in the sdk or
-           point to it directly.
-        release {
-            storePassword System.getenv("KEYSTORE_PASSWORD")
-            storeFile file("${System.properties['user.home']}" +  "/.android/release.keystore")
-            keyAlias "NetHunter"
-            keyPassword System.getenv("KEY_PASSWORD")
-
-        }
-       */ 
     }
 
     buildTypes {
