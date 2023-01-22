@@ -178,7 +178,7 @@ volume-down
 function print_usage(){
     echo "[!] Usage: sh duckyscript -i [input file] -o [output file] -l [keyboard layout]"
     echo "[!]   e.g. sh duckyscript -i /sdcard/ducky.in -o /sdcard/ducky.out -l us"
-    echo "[!] Available keyboard layout: [us|tr|sv|si|ru|pt|no|it|hr|gb|fr|fi|es|dk|de|ch|ca|cm|br|be]"
+    echo "[!] Available keyboard layout: [us|tr|sv|si|ru|pt|no|it|hr|gb|fr|fi|es|dk|de|ch|ca|cm|br|be|ch-de]"
 }
 
 ## For converting the "STRING <your string>"
@@ -3147,7 +3147,7 @@ if ! touch $OUTFILE; then
 fi
 
 case "$KB_LAYOUT" in
-    "us"|"tr"|"sv"|"si"|"ru"|"pt"|"no"|"it"|"hr"|"gb"|"fr"|"fi"|"es"|"dk"|"de"|"ca"|"br"|"be"|"hu")
+    "us"|"tr"|"sv"|"si"|"ru"|"pt"|"no"|"it"|"hr"|"gb"|"fr"|"fi"|"es"|"dk"|"de"|"ca"|"br"|"be"|"hu"|"ch-de")
     ;;
 *)
     echo "[-] $KB_LAYOUT is not a supported keyboard layout"
