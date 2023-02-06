@@ -146,7 +146,7 @@ public class BTFragment extends Fragment {
 
     public void RunSetupWatch() {
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-        intentClickListener_NH("echo -ne \"\\033]0;BT Arsenal Setup\\007\" && clear;" +
+        run_cmd("echo -ne \"\\033]0;BT Arsenal Setup\\007\" && clear;" +
                 "if [[ -f /usr/sbin/bluebinder ]]; then echo 'Bluebinder is installed!'; else wget https://raw.githubusercontent.com/yesimxev/bluebinder/master/prebuilt/armhf/bluebinder -P /usr/sbin/ && chmod +x /usr/sbin/bluebinder;fi;" +
                 "if [[ -f /usr/lib/libgbinder.so ]]; then echo 'libgbinder.so is installed!'; else wget https://raw.githubusercontent.com/yesimxev/libgbinder/master/prebuilt/armhf/libgbinder.so -P /usr/lib/;fi;" +
                 "if [[ -f /usr/lib/libgbinder.so.1 ]]; then echo 'libgbinder.so.1 is installed!'; else wget https://raw.githubusercontent.com/yesimxev/libgbinder/master/prebuilt/armhf/libgbinder.so.1 -P /usr/lib/;fi;" +
