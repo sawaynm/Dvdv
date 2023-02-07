@@ -174,10 +174,10 @@ public class BTFragment extends Fragment {
                         "git clone https://github.com/yesimxev/carwhisperer-0.2 /root/carwhisperer;" +
                         "cd /root/carwhisperer;make && make install;git clone https://github.com/yesimxev/bt_audit /root/bt_audit;cd /root/bt_audit/src;make;" +
                         "cp rfcomm_scan /usr/bin/;fi;" +
-                        "if [[ -f /usr/lib/libgbinder.so ]]; then echo 'Libgbinder is installed!'; else git clone https://github.com/yesimxev/libgbinder /root/libgbinder;" +
-                        "cd /root/libgbinder;make && make install-dev;fi;" +
                         "if [[ -f /usr/lib/libglibutil.so ]]; then echo 'Libglibutil is installed!'; else git clone https://github.com/yesimxev/libglibutil /root/libglibutil;" +
                         "cd /root/libglibutil;make && make install-dev;fi;" +
+                        "if [[ -f /usr/lib/libgbinder.so ]]; then echo 'Libgbinder is installed!'; else git clone https://github.com/yesimxev/libgbinder /root/libgbinder;" +
+                        "cd /root/libgbinder;make && make install-dev;fi;" +
                         "if [[ -f /usr/sbin/bluebinder ]]; then echo 'Bluebinder is installed!'; else git clone https://github.com/yesimxev/bluebinder /root/bluebinder;" +
                         "cd /root/bluebinder;make && make install;fi; echo 'Everything is installed! Closing in 3secs..'; sleep 3 && exit ");
                 sharedpreferences.edit().putBoolean("setup_done", true).apply();
