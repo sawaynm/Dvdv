@@ -20,6 +20,8 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.offsec.nethunter.AsyncTask.MacchangerAsyncTask;
 import com.offsec.nethunter.utils.NhPaths;
 
@@ -62,10 +64,6 @@ public class MacchangerFragment extends Fragment {
     private static HashMap<String, String> iFaceAndMacHashMap = new HashMap<>();
     private Context context;
     private Activity activity;
-
-    public MacchangerFragment() {
-
-    }
 
     public static MacchangerFragment newInstance(int sectionNumber) {
         MacchangerFragment fragment = new MacchangerFragment();
@@ -204,7 +202,7 @@ public class MacchangerFragment extends Fragment {
     }
 
     private void setIfaceSpinner() {
-        List<String> keys  = new ArrayList<>(iFaceAndMacHashMap.keySet());
+        List<String> keys = new ArrayList<>(iFaceAndMacHashMap.keySet());
         Collections.sort(keys, Collections.reverseOrder());
         String[] iFaceStrings = keys.toArray(new String[0]);
         ArrayAdapter<String> iFaceArrayAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item, iFaceStrings);
@@ -215,8 +213,8 @@ public class MacchangerFragment extends Fragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 lastSelectedIfacePosition = position;
                 currentMacTextView.setText(iFaceAndMacHashMap.get(interfaceSpinner.getSelectedItem().toString().toLowerCase()));
-                changeMacButton.setText("CHANGE MAC ON " + interfaceSpinner.getSelectedItem().toString().toUpperCase());
-                resetMacButton.setText("RESET MAC ON " + interfaceSpinner.getSelectedItem().toString().toUpperCase());
+                changeMacButton.setText(getString(R.string.changeMAC) + " " + interfaceSpinner.getSelectedItem().toString().toUpperCase());
+                resetMacButton.setText(getString(R.string.resetMAC) + " " + interfaceSpinner.getSelectedItem().toString().toUpperCase());
             }
 
             @Override
@@ -225,6 +223,7 @@ public class MacchangerFragment extends Fragment {
             }
         });
     }
+
 
     private void setMacModeSpinner() {
         if (macModeSpinner.getSelectedItemPosition() == 0){
@@ -293,7 +292,7 @@ public class MacchangerFragment extends Fragment {
                 }
                 StringBuilder macaddrStringBuilder = new StringBuilder();
                 for (byte b : macBytes) {
-                    macaddrStringBuilder.append(String.format("%02X:",b));
+                    macaddrStringBuilder.append(String.format("%02X:", b));
                 }
 
                 if (macaddrStringBuilder.length() > 0) {
@@ -304,6 +303,8 @@ public class MacchangerFragment extends Fragment {
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
         }
+
+        Log.d("DEBUG", iFaceAndMacHashMap.toString());
     }
 
     private void setResetMacButton() {
@@ -317,7 +318,7 @@ public class MacchangerFragment extends Fragment {
 
                 @Override
                 public void onAsyncTaskFinished(Object result) {
-                    AlertDialog.Builder adb = new AlertDialog.Builder(activity);
+                    MaterialAlertDialogBuilder adb = new MaterialAlertDialogBuilder(activity, R.style.DialogStyle);
                     final AlertDialog ad = adb.create();
                     String originalMac = result.toString();
                     ad.setTitle("Warning!");
@@ -325,7 +326,7 @@ public class MacchangerFragment extends Fragment {
                             "'s MAC address back to the original MAC address: " + originalMac + " ?");
                     ad.setButton(Dialog.BUTTON_POSITIVE, "YES", (dialog, which) -> {
                         ad.dismiss();
-                        AlertDialog.Builder adb1 = new AlertDialog.Builder(activity);
+                        MaterialAlertDialogBuilder adb1 = new MaterialAlertDialogBuilder(activity, R.style.DialogStyle);
                         final AlertDialog ad1 = adb1.create();
                         ad1.setCancelable(false);
                         ad1.setMessage("Changing MAC address on " + interfaceSpinner.getSelectedItem().toString().toLowerCase() + ". Please wait..");
@@ -367,7 +368,7 @@ public class MacchangerFragment extends Fragment {
                     mac5.getText().toString().toLowerCase() + ":" +
                     mac6.getText().toString().toLowerCase();
 
-            AlertDialog.Builder adb = new AlertDialog.Builder(activity);
+            MaterialAlertDialogBuilder adb = new MaterialAlertDialogBuilder(activity, R.style.DialogStyle);
             final AlertDialog ad = adb.create();
             ad.setCancelable(false);
             ad.setMessage("Changing MAC address on " + interfaceSpinner.getSelectedItem().toString().toLowerCase() + ". Please wait..");
@@ -386,7 +387,7 @@ public class MacchangerFragment extends Fragment {
                         NhPaths.showMessage(context, "The MAC address of " + interfaceSpinner.getSelectedItem().toString().toLowerCase() +
                                 " has been successfully changed to " + macAddress);
                     } else {
-                        AlertDialog.Builder adb = new AlertDialog.Builder(activity);
+                        MaterialAlertDialogBuilder adb = new MaterialAlertDialogBuilder(activity, R.style.DialogStyle);
                         final AlertDialog ad = adb.create();
                         ad.setTitle("Failed changing the MAC address on " + interfaceSpinner.getSelectedItem().toString().toLowerCase());
                         ad.setMessage("Please try to change to other MAC address as not all MAC address is valid to your system.");
