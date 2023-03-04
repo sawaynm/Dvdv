@@ -222,7 +222,6 @@ public class WPSFragment extends Fragment {
             getActivity().runOnUiThread(() -> {
                 //Disabling bluetooth so wifi will be definitely available for scanning
                 if (iswatch) {
-                    Toast.makeText(getActivity().getApplicationContext(), "Disabling bluetooth, so wireless scan will be available", Toast.LENGTH_SHORT).show();
                     exe.RunAsRoot(new String[]{"svc bluetooth disable;settings put system clockwork_wifi_setting on"});
                 }
                 else exe.RunAsRoot(new String[]{"svc wifi enable"});
@@ -248,7 +247,7 @@ public class WPSFragment extends Fragment {
                     }
             });
             if (iswatch) {
-                Toast.makeText(getActivity().getApplicationContext(), "Scan done, enabling bluetooth..", Toast.LENGTH_SHORT).show();
+                //re-enabling bluetooth
                 exe.RunAsRoot(new String[]{"svc bluetooth enable"});
             }
         });
