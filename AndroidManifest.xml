@@ -41,12 +41,10 @@
         android:resizeableActivity="true"
         android:theme="@style/Theme.Nethunter"
         android:windowSoftInputMode="adjustResize"
-        android:requestLegacyExternalStorage="true"
-        tools:replace="android:theme">
+        android:requestLegacyExternalStorage="true">
         <activity
             android:name=".AppNavHomeActivity"
             android:configChanges="orientation|keyboardHidden|screenSize|keyboard"
-            android:label="@string/app_name"
             android:launchMode="singleTop"
             android:theme="@style/Theme.Nethunter"
             android:exported="true">

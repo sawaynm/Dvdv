@@ -14,7 +14,7 @@
         android:id="@+id/wlan_interface"
         android:hint="@string/type_wlan_interface" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:text="@string/scan_networks"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -60,7 +60,7 @@
             android:text="@string/deauthenticate_anyone_besides_me" />
     </TableRow>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:text="@string/start_deauthentication"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

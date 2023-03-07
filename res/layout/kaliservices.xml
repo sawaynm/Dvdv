@@ -37,7 +37,7 @@
 
     <HorizontalScrollView
         android:id="@+id/f_kaliservices_btn_scrollView"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:animateLayoutChanges="true"
         android:scrollbars="none"
@@ -48,6 +48,7 @@
         <LinearLayout
             android:id="@+id/f_kaliservices_linearlayoutBtn"
             android:layout_width="wrap_content"
+            android:layout_gravity="center"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
@@ -55,28 +56,24 @@
                 android:id="@+id/f_kaliservices_refreshButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@android:style/Holo.Light.ButtonBar"
                 android:text="Refresh" />
 
             <Button
                 android:id="@+id/f_kaliservices_addItemButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@android:style/Holo.Light.ButtonBar"
                 android:text="Add" />
 
             <Button
                 android:id="@+id/f_kaliservices_deleteItemButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@android:style/Holo.Light.ButtonBar"
                 android:text="Delete" />
 
             <Button
                 android:id="@+id/f_kaliservices_moveItemButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@android:style/Holo.Light.ButtonBar"
                 android:text="Move" />
 
         </LinearLayout>

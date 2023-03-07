@@ -48,7 +48,7 @@
 
     </LinearLayout>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/set_target"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -131,7 +131,7 @@
         android:layout_gravity="center_horizontal"
         android:orientation="horizontal">
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/apply_spoof"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -139,7 +139,7 @@
             android:text="Apply"
             android:textColor="#ffffffff" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/refreshSpoof"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

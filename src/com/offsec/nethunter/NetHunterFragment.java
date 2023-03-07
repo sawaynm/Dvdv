@@ -2,7 +2,6 @@ package com.offsec.nethunter;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -24,6 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.offsec.nethunter.RecyclerViewAdapter.NethunterRecyclerViewAdapter;
 import com.offsec.nethunter.RecyclerViewAdapter.NethunterRecyclerViewAdapterDeleteItems;
@@ -38,6 +38,7 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
@@ -164,11 +165,11 @@ public class NetHunterFragment extends Fragment {
             case R.id.f_nethunter_menu_backupDB:
                 titleTextView.setText("Full path to where you want to save the database:");
                 storedpathEditText.setText(NhPaths.APP_SD_SQLBACKUP_PATH + "/FragmentNethunter");
-                AlertDialog.Builder adbBackup = new AlertDialog.Builder(activity);
+                MaterialAlertDialogBuilder adbBackup = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
                 adbBackup.setView(promptView);
                 adbBackup.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
                 adbBackup.setPositiveButton("OK", (dialog, which) -> { });
-                final AlertDialog adBackup = adbBackup.create();
+                final androidx.appcompat.app.AlertDialog adBackup = adbBackup.create();
                 adBackup.setOnShowListener(dialog -> {
                     final Button buttonOK = adBackup.getButton(DialogInterface.BUTTON_POSITIVE);
                     buttonOK.setOnClickListener(v -> {
@@ -177,7 +178,7 @@ public class NetHunterFragment extends Fragment {
                             NhPaths.showMessage(context, "db is successfully backup to " + storedpathEditText.getText().toString());
                         } else {
                             dialog.dismiss();
-                            new AlertDialog.Builder(context).setTitle("Failed to backup the DB.").setMessage(returnedResult).create().show();
+                            new MaterialAlertDialogBuilder(context).setTitle("Failed to backup the DB.").setMessage(returnedResult).create().show();
                         }
                         dialog.dismiss();
                     });
@@ -187,11 +188,11 @@ public class NetHunterFragment extends Fragment {
             case R.id.f_nethunter_menu_restoreDB:
                 titleTextView.setText("Full path of the db file from where you want to restore:");
                 storedpathEditText.setText(NhPaths.APP_SD_SQLBACKUP_PATH + "/FragmentNethunter");
-                AlertDialog.Builder adbRestore = new AlertDialog.Builder(activity);
+                MaterialAlertDialogBuilder adbRestore = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
                 adbRestore.setView(promptView);
                 adbRestore.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
                 adbRestore.setPositiveButton("OK", (dialog, which) -> { });
-                final AlertDialog adRestore = adbRestore.create();
+                final androidx.appcompat.app.AlertDialog adRestore = adbRestore.create();
                 adRestore.setOnShowListener(dialog -> {
                     final Button buttonOK = adRestore.getButton(DialogInterface.BUTTON_POSITIVE);
                     buttonOK.setOnClickListener(v -> {
@@ -200,7 +201,7 @@ public class NetHunterFragment extends Fragment {
                             NhPaths.showMessage(context, "db is successfully restored to " + storedpathEditText.getText().toString());
                         } else {
                             dialog.dismiss();
-                            new AlertDialog.Builder(context).setTitle("Failed to restore the DB.").setMessage(returnedResult).create().show();
+                            new MaterialAlertDialogBuilder(context).setTitle("Failed to restore the DB.").setMessage(returnedResult).create().show();
                         }
                         dialog.dismiss();
                     });
@@ -238,29 +239,29 @@ public class NetHunterFragment extends Fragment {
         addButton.setOnClickListener(v -> {
             List<NethunterModel> nethunterModelList = NethunterData.getInstance().nethunterModelListFull;
             if (nethunterModelList == null) return;
-            final LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            final View promptViewAdd = mInflater.inflate(R.layout.nethunter_add_dialog_view, null);
-            final EditText titleEditText = promptViewAdd.findViewById(R.id.f_nethunter_add_adb_et_title);
-            final EditText cmdEditText = promptViewAdd.findViewById(R.id.f_nethunter_add_adb_et_command);
-            final EditText delimiterEditText = promptViewAdd.findViewById(R.id.f_nethunter_add_adb_et_delimiter);
-            final CheckBox runOnCreateCheckbox = promptViewAdd.findViewById(R.id.f_nethunters_add_adb_checkbox_runoncreate);
-            final Spinner insertPositions = promptViewAdd.findViewById(R.id.f_nethunter_add_adb_spr_positions);
-            final Spinner insertTitles = promptViewAdd.findViewById(R.id.f_nethunter_add_adb_spr_titles);
+            final LayoutInflater mInflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            final View promptView = mInflater.inflate(R.layout.nethunter_add_dialog_view, null);
+            final EditText titleEditText = promptView.findViewById(R.id.f_nethunter_add_adb_et_title);
+            final EditText cmdEditText = promptView.findViewById(R.id.f_nethunter_add_adb_et_command);
+            final EditText delimiterEditText = promptView.findViewById(R.id.f_nethunter_add_adb_et_delimiter);
+            final CheckBox runOnCreateCheckbox = promptView.findViewById(R.id.f_nethunters_add_adb_checkbox_runoncreate);
+            final Spinner insertPositions = promptView.findViewById(R.id.f_nethunter_add_adb_spr_positions);
+            final Spinner insertTitles = promptView.findViewById(R.id.f_nethunter_add_adb_spr_titles);
             ArrayList<String> titleArrayList = new ArrayList<>();
             for (NethunterModel nethunterModel: nethunterModelList){
                 titleArrayList.add(nethunterModel.getTitle());
             }
-            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, titleArrayList);
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item, titleArrayList);
             arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-            final FloatingActionButton readmeButton1 = promptViewAdd.findViewById(R.id.f_nethunter_add_btn_info_fab1);
-            final FloatingActionButton readmeButton2 = promptViewAdd.findViewById(R.id.f_nethunter_add_btn_info_fab2);
-            final FloatingActionButton readmeButton3 = promptViewAdd.findViewById(R.id.f_nethunter_add_btn_info_fab3);
+            final FloatingActionButton readmeButton1 = promptView.findViewById(R.id.f_nethunter_add_btn_info_fab1);
+            final FloatingActionButton readmeButton2 = promptView.findViewById(R.id.f_nethunter_add_btn_info_fab2);
+            final FloatingActionButton readmeButton3 = promptView.findViewById(R.id.f_nethunter_add_btn_info_fab3);
 
             readmeButton1.setOnClickListener(view -> {
-                AlertDialog.Builder adb = new AlertDialog.Builder(context);
+                MaterialAlertDialogBuilder adb = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
                 adb.setTitle("HOW TO USE:")
-                        .setMessage(context.getString(R.string.nethunter_howtouse_cmd))
+                        .setMessage(activity.getString(R.string.nethunter_howtouse_cmd))
                         .setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
                 final AlertDialog ad = adb.create();
                 ad.setCancelable(true);
@@ -268,9 +269,9 @@ public class NetHunterFragment extends Fragment {
             });
 
             readmeButton2.setOnClickListener(view -> {
-                AlertDialog.Builder adb = new AlertDialog.Builder(context);
+                MaterialAlertDialogBuilder adb = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
                 adb.setTitle("HOW TO USE:")
-                        .setMessage(context.getString(R.string.nethunter_howtouse_delimiter))
+                        .setMessage(activity.getString(R.string.nethunter_howtouse_delimiter))
                         .setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
                 final AlertDialog ad = adb.create();
                 ad.setCancelable(true);
@@ -278,9 +279,9 @@ public class NetHunterFragment extends Fragment {
             });
 
             readmeButton3.setOnClickListener(view -> {
-                AlertDialog.Builder adb = new AlertDialog.Builder(context);
+                MaterialAlertDialogBuilder adb = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
                 adb.setTitle("HOW TO USE:")
-                        .setMessage(context.getString(R.string.nethunter_howtouse_runoncreate))
+                        .setMessage(activity.getString(R.string.nethunter_howtouse_runoncreate))
                         .setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
                 final AlertDialog ad = adb.create();
                 ad.setCancelable(true);
@@ -337,11 +338,11 @@ public class NetHunterFragment extends Fragment {
                 }
             });
 
-            AlertDialog.Builder adb = new AlertDialog.Builder(context);
+            MaterialAlertDialogBuilder adb = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
             adb.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
             adb.setPositiveButton("OK", (dialog, which) -> { });
-            final AlertDialog ad = adb.create();
-            ad.setView(promptViewAdd);
+            final androidx.appcompat.app.AlertDialog ad = adb.create();
+            ad.setView(promptView);
             ad.setCancelable(true);
             ad.setOnShowListener(dialog -> {
                 final Button buttonAdd = ad.getButton(DialogInterface.BUTTON_POSITIVE);
@@ -379,12 +380,12 @@ public class NetHunterFragment extends Fragment {
             recyclerViewDeleteItem.setLayoutManager(linearLayoutManagerDelete);
             recyclerViewDeleteItem.setAdapter(nethunterRecyclerViewAdapterDeleteItems);
 
-            AlertDialog.Builder adbDelete = new AlertDialog.Builder(activity);
+            MaterialAlertDialogBuilder adbDelete = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
             adbDelete.setView(promptViewDelete);
             adbDelete.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
             adbDelete.setPositiveButton("Delete", (dialog, which) -> { });
             //If you want the dialog to stay open after clicking OK, you need to do it this way...
-            final AlertDialog adDelete = adbDelete.create();
+            final androidx.appcompat.app.AlertDialog adDelete = adbDelete.create();
             adDelete.setMessage("Select the item you want to remove: ");
             adDelete.setOnShowListener(dialog -> {
                 final Button buttonDelete = adDelete.getButton(DialogInterface.BUTTON_POSITIVE);
@@ -431,7 +432,7 @@ public class NetHunterFragment extends Fragment {
             titlesBefore.setAdapter(arrayAdapter);
             titlesAfter.setAdapter(arrayAdapter);
 
-            AlertDialog.Builder adbMove = new AlertDialog.Builder(activity);
+            MaterialAlertDialogBuilder adbMove = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
             adbMove.setView(promptViewMove);
             adbMove.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
             adbMove.setPositiveButton("Move", (dialog, which) -> {

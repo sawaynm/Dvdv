@@ -27,12 +27,14 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.offsec.nethunter.bridge.Bridge;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 
 import java.io.File;
@@ -265,7 +267,7 @@ public class VNCFragment extends Fragment {
         });
 
         //Immersion switch
-        final Switch immersionSwitch = rootView.findViewById(R.id.immersionSwitch);
+        final SwitchCompat immersionSwitch = rootView.findViewById(R.id.immersionSwitch);
         final String immersion = exe.RunAsRootOutput("settings get global policy_control");
         if (immersion.equals("null*"))
             immersionSwitch.setChecked(false);

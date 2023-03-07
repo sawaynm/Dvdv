@@ -29,7 +29,7 @@
             android:layout_marginLeft="1dip"
             android:layout_marginRight="1dip" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/deauth_update"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

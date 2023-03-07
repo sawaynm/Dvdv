@@ -1,11 +1,8 @@
 package com.offsec.nethunter.AsyncTask;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -13,11 +10,12 @@ import android.util.Log;
 
 import com.offsec.nethunter.AppNavHomeActivity;
 import com.offsec.nethunter.BuildConfig;
-import com.offsec.nethunter.ChrootManagerFragment;
 import com.offsec.nethunter.utils.CheckForRoot;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.SharePrefTag;
 import com.offsec.nethunter.utils.ShellExecuter;
+
+import com.techiness.progressdialoglibrary.ProgressDialog;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -27,9 +25,7 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
 
@@ -66,7 +62,8 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
         if (prefs.getInt(SharePrefTag.VERSION_CODE_TAG, 0) != BuildConfig.VERSION_CODE || !prefs.getString(TAG, buildTime).equals(buildTime) || !sdCardDir.isDirectory() || !scriptsDir.isDirectory() || !etcDir.isDirectory()) {
             Log.d(TAG, "COPYING NEW FILES");
             ProgressDialog progressDialog = progressDialogRef.get();
-            progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            progressDialog.setTheme(ProgressDialog.THEME_DARK);
+
             progressDialog.setTitle("New app build detected:");
             progressDialog.setMessage("Coping new files...");
             progressDialog.setCancelable(false);
@@ -308,14 +305,18 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
     private void disableMagiskNotification(){
         if (exe.RunAsRootReturnValue("[ -f " + NhPaths.MAGISK_DB_PATH + " ]") == 0) {
             Log.d(TAG, "Disabling magisk notifcication and log for nethunter app.");
-            if (exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_BIN_PATH + "/sqlite3 " +
-                    NhPaths.MAGISK_DB_PATH +
-                    " \"UPDATE policies SET logging='0',notification='0' WHERE package_name='" +
-                    BuildConfig.APPLICATION_ID + "';\"").isEmpty()) {
+            if (exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_BIN_PATH +
+                    "/sqlite3 " + NhPaths.MAGISK_DB_PATH + " \"SELECT * from policies\" | grep " +
+                    BuildConfig.APPLICATION_ID).startsWith(BuildConfig.APPLICATION_ID)) {
+                exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_BIN_PATH +
+                        "/sqlite3 " + NhPaths.MAGISK_DB_PATH + " \"UPDATE policies SET logging='0',notification='0' WHERE package_name='" +
+                        BuildConfig.APPLICATION_ID + "';\"");
                 Log.d(TAG, "Updated magisk db successfully.");
-            } else { Log.e(TAG, "Failed updating to magisk db."); }
-        } else {
-            Log.e(TAG, NhPaths.MAGISK_DB_PATH + " not found, skip disabling the magisk notification for nethunter app.");
+            } else {
+                exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_BIN_PATH + "/sqlite3 " +
+                        NhPaths.MAGISK_DB_PATH + " \"UPDATE policies SET logging='0',notification='0' WHERE uid='$(stat -c %u /data/data/" +
+                        BuildConfig.APPLICATION_ID + ")';\"");
+            }
         }
     }
 
@@ -329,7 +330,7 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
     @Override
     protected void onPostExecute(String objects) {
         super.onPostExecute(objects);
-        if (progressDialogRef.get() != null && progressDialogRef.get().isShowing())
+        if (progressDialogRef.get() != null)
             progressDialogRef.get().dismiss();
         if (listener != null) {
             listener.onAsyncTaskFinished(result);
