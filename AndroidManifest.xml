@@ -4,6 +4,7 @@
     package="com.offsec.nethunter">
     <queries>
         <package android:name="com.offsec.nhterm" />
+        <package android:name="com.offsec.nethunter.kex" />
     </queries>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
