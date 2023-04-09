@@ -269,7 +269,14 @@ public class SettingsFragment extends Fragment {
         EditText BootanimationPath = rootView.findViewById(R.id.bootanimation_path);
         ShellExecuter exe = new ShellExecuter();
         String bootanimation_path = exe.RunAsRootOutput("find /vendor /system -name \"*ootanimation.zip\"");
-        BootanimationPath.setText(bootanimation_path);
+
+        if (bootanimation_path == "" ) {
+            BootanimationPath.setText("Bootanimation path not found");
+        } else {
+            BootanimationPath.setText(bootanimation_path);
+        }
+
+
 
         //Make bootanimation
         Button MakeBootAnimationButton = rootView.findViewById(R.id.make_bootanimation);
