@@ -276,7 +276,7 @@ if [ ! $# -eq 0 ]; then
                             fi
                         fi
                     done
-                    bklog "[!] Kali Chroot requires at least 8 Gb free sapce just to make sure it won't break your system."
+                    bklog "[!] Kali Chroot requires at least 8 Gb free space just to make sure it won't break your system."
                     bklog "[!] Checking storage capacity...."
                     SDCARD_PARTITION=$(mount | grep sdcardfs | $BUSYBOX awk '{print $1}' | head -n1)
                     AVAILABLESIZE=$(df $SDCARD_PARTITION | tail -n1 | $BUSYBOX awk '{s=$4} END{print (s/1024)}' | sed 's/\..*$//')
