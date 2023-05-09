@@ -5,7 +5,7 @@
 # For available keyboard layout, please refer to https://github.com/hak5darren/USB-Rubber-Ducky/tree/master/Encoder/resources
 # And this is my edited script used to run by my own edited nethunter app.
 # Usage: sh duckyscript -i [input file] -o [output file] -l [keyboard layout]"
-# Available keyboard layout: [us|tr|sv|si|ru|pt|no|it|hr|gb|fr|fi|es|dk|de|ca|cm|br|be|hu]
+# Available keyboard layout: [us|tr|sv|si|ru|pt|no|it|hr|gb|fr|fi|es|dk|de|ca|cm|br|be|hu|ch-de]
 
 SCRIPT_PATH=$(readlink -f $0)
 SOURCE_PATH=${SCRIPT_PATH%/*}
@@ -178,7 +178,7 @@ volume-down
 function print_usage(){
     echo "[!] Usage: sh duckyscript -i [input file] -o [output file] -l [keyboard layout]"
     echo "[!]   e.g. sh duckyscript -i /sdcard/ducky.in -o /sdcard/ducky.out -l us"
-    echo "[!] Available keyboard layout: [us|tr|sv|si|ru|pt|no|it|hr|gb|fr|fi|es|dk|de|ch|ca|cm|br|be]"
+    echo "[!] Available keyboard layout: [us|tr|sv|si|ru|pt|no|it|hr|gb|fr|fi|es|dk|de|ch|ca|cm|br|be|ch-de]"
 }
 
 ## For converting the "STRING <your string>"
@@ -2593,6 +2593,122 @@ function convert_kb_layout() {
             ASCII_7E=$(construct_kbbyte $KEY_1 $MODIFIERKEY_RIGHT_ALT)
             ASCII_7F=$(construct_kbbyte $KEY_BACKSPACE)
             ;;
+        ch-de)
+            KEY_NON_US_100='64'
+            ASCII_20=$(construct_kbbyte $KEY_SPACE) # [ ]
+            ASCII_21=$(construct_kbbyte $KEY_RIGHT_BRACE $MODIFIERKEY_SHIFT)
+            ASCII_22=$(construct_kbbyte $KEY_2 $MODIFIERKEY_SHIFT)
+            ASCII_23=$(construct_kbbyte $KEY_3 $MODIFIERKEY_RIGHT_ALT)
+            ASCII_24=$(construct_kbbyte $KEY_BACKSLASH)
+            ASCII_25=$(construct_kbbyte $KEY_5 $MODIFIERKEY_SHIFT)
+            ASCII_26=$(construct_kbbyte $KEY_6 $MODIFIERKEY_SHIFT)
+            ASCII_27=$(construct_kbbyte $KEY_MINUS)
+            ASCII_28=$(construct_kbbyte $KEY_8 $MODIFIERKEY_SHIFT)
+            ASCII_29=$(construct_kbbyte $KEY_9 $MODIFIERKEY_SHIFT)
+            ASCII_2A=$(construct_kbbyte $KEY_3 $MODIFIERKEY_SHIFT)
+            ASCII_2B=$(construct_kbbyte $KEY_1 $MODIFIERKEY_SHIFT)
+            ASCII_2C=$(construct_kbbyte $KEY_COMMA)
+            ASCII_2D=$(construct_kbbyte $KEY_SLASH)
+            ASCII_2E=$(construct_kbbyte $KEY_PERIOD)
+            ASCII_2F=$(construct_kbbyte $KEY_7 $MODIFIERKEY_SHIFT)
+            ASCII_30=$(construct_kbbyte $KEY_0) # [0]
+            ASCII_31=$(construct_kbbyte $KEY_1) # [1]
+            ASCII_32=$(construct_kbbyte $KEY_2) # [2]
+            ASCII_33=$(construct_kbbyte $KEY_3) # [3]
+            ASCII_34=$(construct_kbbyte $KEY_4) # [4]
+            ASCII_35=$(construct_kbbyte $KEY_5) # [5]
+            ASCII_36=$(construct_kbbyte $KEY_6) # [6]
+            ASCII_37=$(construct_kbbyte $KEY_7) # [7]
+            ASCII_38=$(construct_kbbyte $KEY_8) # [8]
+            ASCII_39=$(construct_kbbyte $KEY_9) # [9]
+            ASCII_3A=$(construct_kbbyte $KEY_PERIOD $MODIFIERKEY_SHIFT)
+            ASCII_3B=$(construct_kbbyte $KEY_COMMA $MODIFIERKEY_SHIFT)
+            ASCII_3C=$(construct_kbbyte $KEY_NON_US_100)
+            ASCII_3D=$(construct_kbbyte $KEY_0 $MODIFIERKEY_SHIFT)
+            ASCII_3E=$(construct_kbbyte $KEY_NON_US_100 $MODIFIERKEY_SHIFT)
+            ASCII_3F=$(construct_kbbyte $KEY_MINUS $MODIFIERKEY_SHIFT)
+            ASCII_40=$(construct_kbbyte $KEY_2 $MODIFIERKEY_RIGHT_ALT)
+            ASCII_41=$(construct_kbbyte $KEY_A $MODIFIERKEY_SHIFT) # [A]
+            ASCII_42=$(construct_kbbyte $KEY_B $MODIFIERKEY_SHIFT) # [B]
+            ASCII_43=$(construct_kbbyte $KEY_C $MODIFIERKEY_SHIFT) # [C]
+            ASCII_44=$(construct_kbbyte $KEY_D $MODIFIERKEY_SHIFT) # [D]
+            ASCII_45=$(construct_kbbyte $KEY_E $MODIFIERKEY_SHIFT) # [E]
+            ASCII_46=$(construct_kbbyte $KEY_F $MODIFIERKEY_SHIFT) # [F]
+            ASCII_47=$(construct_kbbyte $KEY_G $MODIFIERKEY_SHIFT) # [G]
+            ASCII_48=$(construct_kbbyte $KEY_H $MODIFIERKEY_SHIFT) # [H]
+            ASCII_49=$(construct_kbbyte $KEY_I $MODIFIERKEY_SHIFT) # [I]
+            ASCII_4A=$(construct_kbbyte $KEY_J $MODIFIERKEY_SHIFT) # [J]
+            ASCII_4B=$(construct_kbbyte $KEY_K $MODIFIERKEY_SHIFT) # [K]
+            ASCII_4C=$(construct_kbbyte $KEY_L $MODIFIERKEY_SHIFT) # [L]
+            ASCII_4D=$(construct_kbbyte $KEY_M $MODIFIERKEY_SHIFT) # [M]
+            ASCII_4E=$(construct_kbbyte $KEY_N $MODIFIERKEY_SHIFT) # [N]
+            ASCII_4F=$(construct_kbbyte $KEY_O $MODIFIERKEY_SHIFT) # [O]
+            ASCII_50=$(construct_kbbyte $KEY_P $MODIFIERKEY_SHIFT) # [P]
+            ASCII_51=$(construct_kbbyte $KEY_Q $MODIFIERKEY_SHIFT) # [Q]
+            ASCII_52=$(construct_kbbyte $KEY_R $MODIFIERKEY_SHIFT) # [R]
+            ASCII_53=$(construct_kbbyte $KEY_S $MODIFIERKEY_SHIFT) # [S]
+            ASCII_54=$(construct_kbbyte $KEY_T $MODIFIERKEY_SHIFT) # [T]
+            ASCII_55=$(construct_kbbyte $KEY_U $MODIFIERKEY_SHIFT) # [U]
+            ASCII_56=$(construct_kbbyte $KEY_V $MODIFIERKEY_SHIFT) # [V]
+            ASCII_57=$(construct_kbbyte $KEY_W $MODIFIERKEY_SHIFT) # [W]
+            ASCII_58=$(construct_kbbyte $KEY_X $MODIFIERKEY_SHIFT) # [X]
+            ASCII_59=$(construct_kbbyte $KEY_Z $MODIFIERKEY_SHIFT) # [Y]
+            ASCII_5A=$(construct_kbbyte $KEY_Y $MODIFIERKEY_SHIFT) # [Z]
+            ASCII_5B=$(construct_kbbyte $KEY_LEFT_BRACE $MODIFIERKEY_RIGHT_ALT)
+            ASCII_5C=$(construct_kbbyte $KEY_NON_US_100 $MODIFIERKEY_RIGHT_ALT)
+            ASCII_5D=$(construct_kbbyte $KEY_RIGHT_BRACE $MODIFIERKEY_RIGHT_ALT)
+            ASCII_5E=$(construct_kbbyte $KEY_EQUAL)
+            ASCII_5F=$(construct_kbbyte $KEY_SLASH $MODIFIERKEY_SHIFT)
+            ASCII_60=$(construct_kbbyte $KEY_EQUAL $MODIFIERKEY_SHIFT)
+            ASCII_61=$(construct_kbbyte $KEY_A) # [a]
+            ASCII_62=$(construct_kbbyte $KEY_B) # [b]
+            ASCII_63=$(construct_kbbyte $KEY_C) # [c]
+            ASCII_64=$(construct_kbbyte $KEY_D) # [d]
+            ASCII_65=$(construct_kbbyte $KEY_E) # [e]
+            ASCII_66=$(construct_kbbyte $KEY_F) # [f]
+            ASCII_67=$(construct_kbbyte $KEY_G) # [g]
+            ASCII_68=$(construct_kbbyte $KEY_H) # [h]
+            ASCII_69=$(construct_kbbyte $KEY_I) # [i]
+            ASCII_6A=$(construct_kbbyte $KEY_J) # [j]
+            ASCII_6B=$(construct_kbbyte $KEY_K) # [k]
+            ASCII_6C=$(construct_kbbyte $KEY_L) # [l]
+            ASCII_6D=$(construct_kbbyte $KEY_M) # [m]
+            ASCII_6E=$(construct_kbbyte $KEY_N) # [n]
+            ASCII_6F=$(construct_kbbyte $KEY_O) # [o]
+            ASCII_70=$(construct_kbbyte $KEY_P) # [p]
+            ASCII_71=$(construct_kbbyte $KEY_Q) # [q]
+            ASCII_72=$(construct_kbbyte $KEY_R) # [r]
+            ASCII_73=$(construct_kbbyte $KEY_S) # [s]
+            ASCII_74=$(construct_kbbyte $KEY_T) # [t]
+            ASCII_75=$(construct_kbbyte $KEY_U) # [u]
+            ASCII_76=$(construct_kbbyte $KEY_V) # [v]
+            ASCII_77=$(construct_kbbyte $KEY_W) # [w]
+            ASCII_78=$(construct_kbbyte $KEY_X) # [x]
+            ASCII_79=$(construct_kbbyte $KEY_Z) # [y]
+            ASCII_7A=$(construct_kbbyte $KEY_Y) # [z]
+            ASCII_7B=$(construct_kbbyte $KEY_QUOTE $MODIFIERKEY_RIGHT_ALT) # [{]
+            ASCII_7C=$(construct_kbbyte $KEY_7 $MODIFIERKEY_RIGHT_ALT) # AltGr 7 [|]
+            ASCII_7D=$(construct_kbbyte $KEY_BACKSLASH $MODIFIERKEY_RIGHT_ALT) # AltGr $ [}]
+            ASCII_7E=$(construct_kbbyte $KEY_EQUAL $MODIFIERKEY_RIGHT_ALT)
+            ASCII_7F=$(construct_kbbyte $KEY_BACKSPACE)
+            ISO_8859_1_A0=$(construct_kbbyte $KEY_SPACE)
+            ISO_8859_1_A4=$(construct_kbbyte $KEY_11 $MODIFIERKEY_RIGHT_ALT)
+            ISO_8859_1_A7=$(construct_kbbyte $KEY_TILDE)
+            ISO_8859_1_B0=$(construct_kbbyte $KEY_TILDE $MODIFIERKEY_SHIFT)
+            ISO_8859_1_B2=$(construct_kbbyte $KEY_11 $MODIFIERKEY_RIGHT_ALT)
+            ISO_8859_1_B3=$(construct_kbbyte $KEY_11 $MODIFIERKEY_RIGHT_ALT) # [?]
+            ISO_8859_1_DF=$(construct_kbbyte $KEY_MINUS)
+            ISO_8859_1_E4=$(construct_kbbyte $KEY_QUOTE) # [ä]
+            ISO_8859_1_F6=$(construct_kbbyte $KEY_SEMICOLON) # [ö]
+            ISO_8859_1_FC=$(construct_kbbyte $KEY_LEFT_BRACE) # [ü]
+            UNICODE_20AC=$(construct_kbbyte $KEY_E $MODIFIERKEY_RIGHT_ALT) # [€]
+            ISO_8859_1_E0=$(construct_kbbyte $KEY_QUOTE $MODIFIERKEY_SHIFT) # [à]
+            ISO_8859_1_E9=$(construct_kbbyte $KEY_SEMICOLON $MODIFIERKEY_SHIFT) # [é]
+            ISO_8859_1_E8=$(construct_kbbyte $KEY_LEFT_BRACE $MODIFIERKEY_SHIFT) # [è]
+            ISO_8859_1_A8=$(construct_kbbyte $KEY_RIGHT_BRACE) # [¨]
+            ISO_8859_1_E7=$(construct_kbbyte $KEY_4 $MODIFIERKEY_SHIFT) # [ç]
+            ISO_8859_1_B4=$(construct_kbbyte $KEY_MINUS $MODIFIERKEY_RIGHT_ALT) # [´]
+            ;;
     esac
 }
 
@@ -3031,7 +3147,7 @@ if ! touch $OUTFILE; then
 fi
 
 case "$KB_LAYOUT" in
-    "us"|"tr"|"sv"|"si"|"ru"|"pt"|"no"|"it"|"hr"|"gb"|"fr"|"fi"|"es"|"dk"|"de"|"ca"|"br"|"be"|"hu")
+    "us"|"tr"|"sv"|"si"|"ru"|"pt"|"no"|"it"|"hr"|"gb"|"fr"|"fi"|"es"|"dk"|"de"|"ca"|"br"|"be"|"hu"|"ch-de")
     ;;
 *)
     echo "[-] $KB_LAYOUT is not a supported keyboard layout"

@@ -101,10 +101,16 @@ public class BTFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.setup:
-                RunSetup();
+                SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+                Boolean iswatch = sharedpreferences.getBoolean("running_on_wearos", false);
+                if (iswatch) RunSetupWatch();
+                else RunSetup();
                 return true;
             case R.id.update:
-                RunUpdate();
+                sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+                iswatch = sharedpreferences.getBoolean("running_on_wearos", false);
+                if (iswatch) Toast.makeText(getActivity().getApplicationContext(), "Updates have to be done manually through adb shell. If anything gone wrong at first run, please run Setup again.", Toast.LENGTH_LONG).show();
+                else RunUpdate();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -113,17 +119,49 @@ public class BTFragment extends Fragment {
 
     public void SetupDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
         builder.setTitle("Welcome to Bluetooth Arsenal!");
         builder.setMessage("In order to make sure everything is working, an initial setup needs to be done.");
         builder.setPositiveButton("Check & Install", new DialogInterface.OnClickListener(){
             public void onClick(DialogInterface dialog, int which) {
                 RunSetup();
-                sharedpreferences.edit().putBoolean("setup_done", true).apply();
             }
         });
         builder.show();
 
+    }
+
+    public void SetupDialogWatch() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Welcome!");
+        builder.setMessage("In order to make sure everything is working, an initial setup needs to be done. You may need to disable bluetooth if your watch doesn't have an active WiFi connection.");
+        builder.setPositiveButton("Check & Install", new DialogInterface.OnClickListener(){
+            public void onClick(DialogInterface dialog, int which) {
+                RunSetupWatch();
+            }
+        });
+        builder.show();
+
+    }
+
+    public void RunSetupWatch() {
+        sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+        intentClickListener_NH("echo -ne \"\\033]0;BT Arsenal Setup\\007\" && clear;" +
+                "if [[ -f /usr/sbin/bluebinder ]]; then echo 'Bluebinder is installed!'; else wget https://raw.githubusercontent.com/yesimxev/bluebinder/master/prebuilt/armhf/bluebinder -P /usr/sbin/ && chmod +x /usr/sbin/bluebinder;fi;" +
+                "if [[ -f /usr/lib/libgbinder.so ]]; then echo 'libgbinder.so is installed!'; else wget https://raw.githubusercontent.com/yesimxev/libgbinder/master/prebuilt/armhf/libgbinder.so -P /usr/lib/;fi;" +
+                "if [[ -f /usr/lib/libgbinder.so.1 ]]; then echo 'libgbinder.so.1 is installed!'; else wget https://raw.githubusercontent.com/yesimxev/libgbinder/master/prebuilt/armhf/libgbinder.so.1 -P /usr/lib/;fi;" +
+                "if [[ -f /usr/lib/libgbinder.so.1.1 ]]; then echo 'libgbinder.so.1.1 is installed!'; else wget https://raw.githubusercontent.com/yesimxev/libgbinder/master/prebuilt/armhf/libgbinder.so.1.1 -P /usr/lib/;fi;" +
+                "if [[ -f /usr/lib/libgbinder.so.1.1.10 ]]; then echo 'libgbinder.so.1.1.10 is installed!'; else wget https://raw.githubusercontent.com/yesimxev/libgbinder/master/prebuilt/armhf/libgbinder.so.1.1.10 -P /usr/lib/;fi;" +
+                "if [[ -f /usr/lib/libgbinder.so.1.1.25 ]]; then echo 'libgbinder.so.1.1.25 is installed!'; else wget https://raw.githubusercontent.com/yesimxev/libgbinder/master/prebuilt/armhf/libgbinder.so.1.1.25 -P /usr/lib/;fi;" +
+                "if [[ -f /usr/lib/libglibutil.so ]]; then echo 'libglibutil.so is installed!'; else wget https://raw.githubusercontent.com/yesimxev/libglibutil/master/prebuilt/armhf/libglibutil.so -P /usr/lib/;fi;" +
+                "if [[ -f /usr/lib/libglibutil.so.1 ]]; then echo 'libglibutil.so.1 is installed!'; else wget https://raw.githubusercontent.com/yesimxev/libglibutil/master/prebuilt/armhf/libglibutil.so.1 -P /usr/lib/;fi;" +
+                "if [[ -f /usr/lib/libglibutil.so.1.0 ]]; then echo 'libglibutil.so.1.0 is installed!'; else wget https://raw.githubusercontent.com/yesimxev/libglibutil/master/prebuilt/armhf/libglibutil.so.1.0 -P /usr/lib/;fi;" +
+                "if [[ -f /usr/lib/libglibutil.so.1.0.53 ]]; then echo 'libglibutil.so.1.0.53 is installed!'; else wget https://raw.githubusercontent.com/yesimxev/libglibutil/master/prebuilt/armhf/libglibutil.so.1.0.53 -P /usr/lib/;fi;" +
+                "if [[ -f /usr/lib/libglibutil.so.1.0.67 ]]; then echo 'libglibutil.so.1.0.67 is installed!'; else wget https://raw.githubusercontent.com/yesimxev/libglibutil/master/prebuilt/armhf/libglibutil.so.1.0.67 -P /usr/lib/;fi;" +
+                "if [[ -f /usr/bin/carwhisperer ]]; then echo 'carwhisperer is installed!'; else wget https://raw.githubusercontent.com/yesimxev/carwhisperer-0.2/master/prebuilt/armhf/carwhisperer -P /usr/bin/ && chmod +x /usr/bin/carwhisperer;fi;" +
+                "if [[ -f /usr/bin/rfcomm_scan ]]; then echo 'rfcomm_scan is installed!'; else wget https://raw.githubusercontent.com/yesimxev/bt_audit/master/prebuilt/armhf/rfcomm_scan -P /usr/bin/ && chmod +x /usr/bin/rfcomm_scan;fi;" +
+                "if [[ -d /root/carwhisperer ]]; then echo '/root/carwhisperer is installed!'; else git clone https://github.com/yesimxev/carwhisperer-0.2 /root/carwhisperer;fi;" +
+                "echo 'Everything is installed! Closing in 3secs..'; sleep 3 && exit ");
+        sharedpreferences.edit().putBoolean("setup_done", true).apply();
     }
 
     public void RunSetup() {
@@ -136,10 +174,10 @@ public class BTFragment extends Fragment {
                         "git clone https://github.com/yesimxev/carwhisperer-0.2 /root/carwhisperer;" +
                         "cd /root/carwhisperer;make && make install;git clone https://github.com/yesimxev/bt_audit /root/bt_audit;cd /root/bt_audit/src;make;" +
                         "cp rfcomm_scan /usr/bin/;fi;" +
-                        "if [[ -f /usr/lib/libgbinder.so ]]; then echo 'Libgbinder is installed!'; else git clone https://github.com/yesimxev/libgbinder /root/libgbinder;" +
-                        "cd /root/libgbinder;make && make install-dev;fi;" +
                         "if [[ -f /usr/lib/libglibutil.so ]]; then echo 'Libglibutil is installed!'; else git clone https://github.com/yesimxev/libglibutil /root/libglibutil;" +
                         "cd /root/libglibutil;make && make install-dev;fi;" +
+                        "if [[ -f /usr/lib/libgbinder.so ]]; then echo 'Libgbinder is installed!'; else git clone https://github.com/yesimxev/libgbinder /root/libgbinder;" +
+                        "cd /root/libgbinder;make && make install-dev;fi;" +
                         "if [[ -f /usr/sbin/bluebinder ]]; then echo 'Bluebinder is installed!'; else git clone https://github.com/yesimxev/bluebinder /root/bluebinder;" +
                         "cd /root/bluebinder;make && make install;fi; echo 'Everything is installed! Closing in 3secs..'; sleep 3 && exit ");
                 sharedpreferences.edit().putBoolean("setup_done", true).apply();
@@ -223,17 +261,29 @@ public class BTFragment extends Fragment {
                                  Bundle savedInstanceState) {
 
             View rootView = inflater.inflate(R.layout.bt_main, container, false);
+
+            //Detecting watch
+            final TextView BTMainDesc = rootView.findViewById(R.id.bt_maindesc);
+            final TextView BTIface = rootView.findViewById(R.id.bt_if);
+            final TextView BTService = rootView.findViewById(R.id.bt_service);
+
             SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+            iswatch = sharedpreferences.getBoolean("running_on_wearos", false);
+            if (iswatch) {
+                BTMainDesc.setVisibility(View.GONE);
+                BTIface.setText("Interface");
+                BTService.setText("BT Service");
+            }
 
             //First run
             Boolean setupdone = sharedpreferences.getBoolean("setup_done", false);
             if (!setupdone.equals(true))
-                SetupDialog();
+                if (iswatch) SetupDialogWatch();
+                else SetupDialog();
 
             final Spinner ifaces = rootView.findViewById(R.id.hci_interface);
 
             //Bluebinder or bt_smd
-            final TextView Binderstatus = rootView.findViewById(R.id.BinderStatus);
             final TextView Binder = rootView.findViewById(R.id.bluebinder);
             File bt_smd = new File("/sys/module/hci_smd/parameters/hcismd_set");
             if (bt_smd.exists()) {
@@ -787,6 +837,7 @@ public class BTFragment extends Fragment {
         private String selected_mode;
         private NhPaths nh;
         final ShellExecuter exe = new ShellExecuter();
+        private Boolean iswatch;
 
         @Override
         public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -798,6 +849,13 @@ public class BTFragment extends Fragment {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.bt_carwhisperer, container, false);
+            SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+
+            final TextView CWdesc = rootView.findViewById(R.id.carwhisp_desc);
+            iswatch = sharedpreferences.getBoolean("running_on_wearos", false);
+            if (iswatch) {
+                CWdesc.setVisibility(View.GONE);
+            }
 
             //Selected iface
             final EditText cw_interface = rootView.findViewById(R.id.hci_interface);
