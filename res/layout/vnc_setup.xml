@@ -294,9 +294,8 @@
                     android:text="Remove selected Kali user"
                     android:textColor="#ffffffff" />
 
-                <Switch
+                <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/immersionSwitch"
-                    style="?android:attr/textAppearanceSmall"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:paddingTop="10dp"

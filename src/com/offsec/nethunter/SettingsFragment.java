@@ -40,6 +40,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
+import com.offsec.nethunter.bridge.Bridge;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
 
@@ -60,7 +61,7 @@ import java.util.Set;
 public class SettingsFragment extends Fragment {
 
     private Context context;
-    private Activity activity;
+    private static Activity activity;
     private static final String ARG_SECTION_NUMBER = "section_number";
     private String selected_animation;
     private String selected_prompt;
@@ -268,7 +269,14 @@ public class SettingsFragment extends Fragment {
         EditText BootanimationPath = rootView.findViewById(R.id.bootanimation_path);
         ShellExecuter exe = new ShellExecuter();
         String bootanimation_path = exe.RunAsRootOutput("find /vendor /system -name \"*ootanimation.zip\"");
-        BootanimationPath.setText(bootanimation_path);
+
+        if (bootanimation_path == "" ) {
+            BootanimationPath.setText("Bootanimation path not found");
+        } else {
+            BootanimationPath.setText(bootanimation_path);
+        }
+
+
 
         //Make bootanimation
         Button MakeBootAnimationButton = rootView.findViewById(R.id.make_bootanimation);
@@ -289,7 +297,7 @@ public class SettingsFragment extends Fragment {
             }
             String finalRES = FinalWidth.getText().toString() + "x" + FinalHeight.getText().toString();
             String finalFPS = FPS.getText().toString();
-            intentClickListener_NH("echo -ne \"\\033]0;Building animation\\007\" && clear;cd /root/nethunter-bootanimation &&" + imagesCMD + " && cp " + animation_dir[0] +
+            run_cmd("echo -ne \"\\033]0;Building animation\\007\" && clear;cd /root/nethunter-bootanimation &&" + imagesCMD + " && cp " + animation_dir[0] +
                     "/desc.txt new/ && sed -i '1s/.*/" + finalRES + " " + finalFPS +"/' new/desc.txt && sed -i 's/x/ /g' new/desc.txt && cd new && zip -0 -FSr -q /sdcard/bootanimation.zip * && cd .. && rm -r new && echo \"Done. Head back to NetHunter to install the bootanimation! Exiting in 3secs..\" && sleep 3 && exit");
         });
 
@@ -300,7 +308,7 @@ public class SettingsFragment extends Fragment {
                     if (AnimationZip.length() == 0)
                         Toast.makeText(getActivity().getApplicationContext(), "Bootanimation zip is not created!!", Toast.LENGTH_SHORT).show();
                     else {
-                        intentClickListener_NHSU("echo -ne \"\\033]0;Installing animation\\007\" && clear;grep ' / ' /proc/mounts | grep -qv 'rootfs' || grep -q ' /system_root ' /proc/mounts && SYSTEM=/ || SYSTEM=/system " +
+                        run_cmd_android("echo -ne \"\\033]0;Installing animation\\007\" && clear;grep ' / ' /proc/mounts | grep -qv 'rootfs' || grep -q ' /system_root ' /proc/mounts && SYSTEM=/ || SYSTEM=/system " +
                                 "&& mount -o rw,remount $SYSTEM && cp " + nh.SD_PATH + "/bootanimation.zip " + BootanimationPath.getText().toString() + " " +
                                 "&& echo \"Done. Please reboot to check the result! Exiting in 3secs..\" && sleep 3 && exit");
                     }
@@ -345,7 +353,7 @@ public class SettingsFragment extends Fragment {
         if (NhSystemApp.length() == 0) {
             Toast.makeText(getActivity().getApplicationContext(), "NetHunter was not flashed as system app! Please remove it from Android settings.", Toast.LENGTH_LONG).show();
         } else {
-            intentClickListener_NHSU("echo -ne \"\\033]0;Uninstalling NetHunter\\007\" && clear;grep ' / ' /proc/mounts | grep -qv 'rootfs' || grep -q ' /system_root ' /proc/mounts && SYSTEM=/ || SYSTEM=/system " +
+            run_cmd_android("echo -ne \"\\033]0;Uninstalling NetHunter\\007\" && clear;grep ' / ' /proc/mounts | grep -qv 'rootfs' || grep -q ' /system_root ' /proc/mounts && SYSTEM=/ || SYSTEM=/system " +
                         "&& mount -o rw,remount $SYSTEM && rm " + NhSystemApp + " && pm clear com.offsec.nethunter && echo 'Done! Reboot your device to complete the process. Exiting in 3secs..' && sleep 3 && exit");
                 }
         });
@@ -477,7 +485,7 @@ public class SettingsFragment extends Fragment {
 
     public void RunSetup() {
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-        intentClickListener_NH("echo -ne \"\\033]0;Bootanimation Setup\\007\" && clear;if [[ -f /usr/bin/convert ]];then echo 'Imagemagick is installed!'; else " +
+        run_cmd("echo -ne \"\\033]0;Bootanimation Setup\\007\" && clear;if [[ -f /usr/bin/convert ]];then echo 'Imagemagick is installed!'; else " +
                 "apt-get update && apt-get install imagemagick -y;fi; if [[ -f /root/nethunter-bootanimation ]];then echo 'Nethunter-bootanimation is installed!'; else " +
                 "git clone https://gitlab.com/kalilinux/nethunter/apps/kali-nethunter-bootanimation /root/nethunter-bootanimation;fi; echo 'Everything is ready! Closing in 3secs..'; sleep 3 && exit ");
         sharedpreferences.edit().putBoolean("animation_setup_done", true).apply();
@@ -485,7 +493,7 @@ public class SettingsFragment extends Fragment {
 
     public void RunUpdate() {
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-        intentClickListener_NH("echo -ne \"\\033]0;Bootanimation Update\\007\" && clear;apt-get update && apt-get install imagemagick -y;if [[ -d /root/nethunter-bootanimation ]];then cd /root/nethunter-bootanimation;git pull" +
+        run_cmd("echo -ne \"\\033]0;Bootanimation Update\\007\" && clear;apt-get update && apt-get install imagemagick -y;if [[ -d /root/nethunter-bootanimation ]];then cd /root/nethunter-bootanimation;git pull" +
                 ";fi; echo 'Done! Closing in 3secs..'; sleep 3 && exit ");
         sharedpreferences.edit().putBoolean("animation_setup_done", true).apply();
     }
@@ -495,29 +503,17 @@ public class SettingsFragment extends Fragment {
         _button.setOnClickListener(onClickListener);
     }
 
-    private void intentClickListener_NH(final String command) {
-        try {
-            Intent intent =
-                    new Intent("com.offsec.nhterm.RUN_SCRIPT_NH");
-            intent.addCategory(Intent.CATEGORY_DEFAULT);
-            intent.putExtra("com.offsec.nhterm.iInitialCommand", command);
-            startActivity(intent);
-        } catch (Exception e) {
-            nh.showMessage(context, getString(R.string.toast_install_terminal));
+    ////
+    // Bridge side functions
+    ////
 
-        }
+    public static void run_cmd(String cmd) {
+        Intent intent = Bridge.createExecuteIntent("/data/data/com.offsec.nhterm/files/usr/bin/kali", cmd);
+        activity.startActivity(intent);
     }
 
-    private void intentClickListener_NHSU(final String command) {
-        try {
-            Intent intent =
-                    new Intent("com.offsec.nhterm.RUN_SCRIPT_SU");
-            intent.addCategory(Intent.CATEGORY_DEFAULT);
-            intent.putExtra("com.offsec.nhterm.iInitialCommand", command);
-            startActivity(intent);
-        } catch (Exception e) {
-            nh.showMessage(context, getString(R.string.toast_install_terminal));
-
-        }
+    public static void run_cmd_android(String cmd) {
+        Intent intent = Bridge.createExecuteIntent("/data/data/com.offsec.nhterm/files/usr/bin/android-su", cmd);
+        activity.startActivity(intent);
     }
 }

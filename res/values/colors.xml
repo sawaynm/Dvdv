@@ -9,5 +9,8 @@
 
     <item name="darkTitle" type="color">#444</item>
 
-
+    <item name="colorPrimary" type="color">#37474F</item>
+    <item name="colorPrimaryDark" type="color">#21272B</item>
+    <item name="colorAccent" type="color">#45738C</item>
+    <item name="textColor" type="color">#FFFFFF</item>
 </resources>

@@ -21,6 +21,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.offsec.nethunter.RecyclerViewAdapter.KaliServicesRecyclerViewAdapter;
 import com.offsec.nethunter.RecyclerViewAdapter.KaliServicesRecyclerViewAdapterDeleteItems;
@@ -83,7 +84,7 @@ public class KaliServicesFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         KaliServicesViewModel kaliServicesViewModel = ViewModelProviders.of(this).get(KaliServicesViewModel.class);
         kaliServicesViewModel.init(context);
-        kaliServicesViewModel.getLiveDataKaliServicesModelList().observe(this, kaliServicesModelList -> kaliServicesRecyclerViewAdapter.notifyDataSetChanged());
+        kaliServicesViewModel.getLiveDataKaliServicesModelList().observe(getViewLifecycleOwner(), kaliServicesModelList -> kaliServicesRecyclerViewAdapter.notifyDataSetChanged());
 
         kaliServicesRecyclerViewAdapter = new KaliServicesRecyclerViewAdapter(context, kaliServicesViewModel.getLiveDataKaliServicesModelList().getValue());
         RecyclerView recyclerViewServiceTitle = view.findViewById(R.id.f_kaliservices_recyclerviewServiceTitle);
@@ -155,7 +156,7 @@ public class KaliServicesFragment extends Fragment {
             case R.id.f_kaliservices_menu_backupDB:
                 titleTextView.setText("Full path to where you want to save the database:");
                 storedpathEditText.setText(NhPaths.APP_SD_SQLBACKUP_PATH + "/FragmentKaliServices");
-                AlertDialog.Builder adbBackup = new AlertDialog.Builder(activity);
+                MaterialAlertDialogBuilder adbBackup = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
                 adbBackup.setView(promptView);
                 adbBackup.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
                 adbBackup.setPositiveButton("OK", (dialog, which) -> { });
@@ -168,7 +169,7 @@ public class KaliServicesFragment extends Fragment {
                             NhPaths.showMessage(context, "db is successfully backup to " + storedpathEditText.getText().toString());
                         } else {
                             dialog.dismiss();
-                            new AlertDialog.Builder(context).setTitle("Failed to backup the DB.").setMessage(returnedResult).create().show();
+                            new MaterialAlertDialogBuilder(context).setTitle("Failed to backup the DB.").setMessage(returnedResult).create().show();
                         }
                         dialog.dismiss();
                     });
@@ -178,7 +179,7 @@ public class KaliServicesFragment extends Fragment {
             case R.id.f_kaliservices_menu_restoreDB:
                 titleTextView.setText("Full path of the db file from where you want to restore:");
                 storedpathEditText.setText(NhPaths.APP_SD_SQLBACKUP_PATH + "/FragmentKaliServices");
-                AlertDialog.Builder adbRestore = new AlertDialog.Builder(activity);
+                MaterialAlertDialogBuilder adbRestore = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
                 adbRestore.setView(promptView);
                 adbRestore.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
                 adbRestore.setPositiveButton("OK", (dialog, which) -> { });
@@ -191,7 +192,7 @@ public class KaliServicesFragment extends Fragment {
                             NhPaths.showMessage(context, "db is successfully restored to " + storedpathEditText.getText().toString());
                         } else {
                             dialog.dismiss();
-                            new AlertDialog.Builder(context).setTitle("Failed to restore the DB.").setMessage(returnedResult).create().show();
+                            new MaterialAlertDialogBuilder(context).setTitle("Failed to restore the DB.").setMessage(returnedResult).create().show();
                         }
                         dialog.dismiss();
                     });
@@ -257,7 +258,7 @@ public class KaliServicesFragment extends Fragment {
             checkstatusCmdEditText.setText("<servicename>");
 
             readmeButton1.setOnClickListener(view -> {
-                AlertDialog.Builder adb = new AlertDialog.Builder(activity);
+                MaterialAlertDialogBuilder adb = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
                 adb.setTitle("HOW TO USE:")
                         .setMessage(getString(R.string.kaliservices_howto_startservice))
                         .setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
@@ -267,7 +268,7 @@ public class KaliServicesFragment extends Fragment {
             });
 
             readmeButton2.setOnClickListener(view -> {
-                AlertDialog.Builder adb = new AlertDialog.Builder(activity);
+                MaterialAlertDialogBuilder adb = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
                 adb.setTitle("HOW TO USE:")
                         .setMessage(getString(R.string.kaliservices_howto_stopservice))
                         .setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
@@ -277,7 +278,7 @@ public class KaliServicesFragment extends Fragment {
             });
 
             readmeButton3.setOnClickListener(view -> {
-                AlertDialog.Builder adb = new AlertDialog.Builder(activity);
+                MaterialAlertDialogBuilder adb = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
                 adb.setTitle("HOW TO USE:")
                         .setMessage(getString(R.string.kaliservices_howto_checkservice))
                         .setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
@@ -287,7 +288,7 @@ public class KaliServicesFragment extends Fragment {
             });
 
             readmeButton4.setOnClickListener(view -> {
-                AlertDialog.Builder adb = new AlertDialog.Builder(activity);
+                MaterialAlertDialogBuilder adb = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
                 adb.setTitle("HOW TO USE:")
                         .setMessage(getString(R.string.kaliservices_howto_runServiceOnBoot))
                         .setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
@@ -344,7 +345,7 @@ public class KaliServicesFragment extends Fragment {
                 }
             });
 
-            AlertDialog.Builder adbAdd = new AlertDialog.Builder(activity);
+            MaterialAlertDialogBuilder adbAdd = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
             adbAdd.setPositiveButton("OK", (dialog, which) -> { });
             final AlertDialog adAdd = adbAdd.create();
             adAdd.setView(promptViewAdd);
@@ -391,7 +392,7 @@ public class KaliServicesFragment extends Fragment {
             recyclerViewDeleteItem.setLayoutManager(linearLayoutManagerDelete);
             recyclerViewDeleteItem.setAdapter(kaliServicesRecyclerViewAdapterDeleteItems);
 
-            AlertDialog.Builder adbDelete = new AlertDialog.Builder(activity);
+            MaterialAlertDialogBuilder adbDelete = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
             adbDelete.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
             adbDelete.setPositiveButton("Delete", (dialog, which) -> { });
             final AlertDialog adDelete = adbDelete.create();
@@ -449,7 +450,7 @@ public class KaliServicesFragment extends Fragment {
             titlesBefore.setAdapter(arrayAdapter);
             titlesAfter.setAdapter(arrayAdapter);
 
-            AlertDialog.Builder adbMove = new AlertDialog.Builder(activity);
+            MaterialAlertDialogBuilder adbMove = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
             adbMove.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
             adbMove.setPositiveButton("Move", (dialog, which) -> { });
             final AlertDialog adMove = adbMove.create();

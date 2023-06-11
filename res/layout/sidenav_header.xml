@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="170dp"
     android:background="@color/primary_dark_material_dark"
@@ -13,21 +14,25 @@
         android:background="@drawable/nh_cropbg"
         android:orientation="horizontal">
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton xmlns:app="http://schemas.android.com/apk/res-auto"
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/info_fab"
             android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_alignParentEnd="true"
+            android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
             android:layout_gravity="right"
-            android:layout_margin="16dp"
-            android:src="@drawable/ic_action_information"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
             android:textSize="12sp"
+            android:src="@drawable/ic_action_information"
+            android:backgroundTint="@color/colorPrimary"
             app:elevation="6dp"
             app:fabSize="mini"
             app:pressedTranslationZ="12dp" />
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="100dp"
             android:layout_height="50dp"
             android:layout_gravity="left"
@@ -43,7 +48,7 @@
         android:focusableInTouchMode="false"
         android:orientation="vertical">
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/buildinfo1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -53,7 +58,7 @@
             android:textColor="@android:color/white"
             android:textSize="12sp" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/buildinfo2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

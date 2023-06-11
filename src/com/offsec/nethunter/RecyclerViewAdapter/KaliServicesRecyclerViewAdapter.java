@@ -1,6 +1,5 @@
 package com.offsec.nethunter.RecyclerViewAdapter;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -21,8 +20,10 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.offsec.nethunter.R;
 import com.offsec.nethunter.RecyclerViewData.KaliServicesData;
@@ -73,7 +74,7 @@ public class KaliServicesRecyclerViewAdapter extends RecyclerView.Adapter<KaliSe
 			final FloatingActionButton readmeButton4 = promptViewEdit.findViewById(R.id.f_kaliservices_edit_btn_info_fab4);
 
 			readmeButton1.setOnClickListener(view -> {
-				androidx.appcompat.app.AlertDialog.Builder adb = new androidx.appcompat.app.AlertDialog.Builder(context);
+				MaterialAlertDialogBuilder adb = new MaterialAlertDialogBuilder(context, R.style.DialogStyleCompat);
 				adb.setTitle("HOW TO USE:")
 						.setMessage(context.getString(R.string.kaliservices_howto_startservice))
 						.setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
@@ -83,7 +84,7 @@ public class KaliServicesRecyclerViewAdapter extends RecyclerView.Adapter<KaliSe
 			});
 
 			readmeButton2.setOnClickListener(view -> {
-				androidx.appcompat.app.AlertDialog.Builder adb = new androidx.appcompat.app.AlertDialog.Builder(context);
+				MaterialAlertDialogBuilder adb = new MaterialAlertDialogBuilder(context, R.style.DialogStyleCompat);
 				adb.setTitle("HOW TO USE:")
 						.setMessage(context.getString(R.string.kaliservices_howto_stopservice))
 						.setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
@@ -93,7 +94,7 @@ public class KaliServicesRecyclerViewAdapter extends RecyclerView.Adapter<KaliSe
 			});
 
 			readmeButton3.setOnClickListener(view -> {
-				androidx.appcompat.app.AlertDialog.Builder adb = new androidx.appcompat.app.AlertDialog.Builder(context);
+				MaterialAlertDialogBuilder adb = new MaterialAlertDialogBuilder(context, R.style.DialogStyleCompat);
 				adb.setTitle("HOW TO USE:")
 						.setMessage(context.getString(R.string.kaliservices_howto_checkservice))
 						.setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
@@ -103,7 +104,7 @@ public class KaliServicesRecyclerViewAdapter extends RecyclerView.Adapter<KaliSe
 			});
 
 			readmeButton4.setOnClickListener(view -> {
-				androidx.appcompat.app.AlertDialog.Builder adb = new androidx.appcompat.app.AlertDialog.Builder(context);
+				MaterialAlertDialogBuilder adb = new MaterialAlertDialogBuilder(context, R.style.DialogStyleCompat);
 				adb.setTitle("HOW TO USE:")
 						.setMessage(context.getString(R.string.kaliservices_howto_runServiceOnBoot))
 						.setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
@@ -127,7 +128,7 @@ public class KaliServicesRecyclerViewAdapter extends RecyclerView.Adapter<KaliSe
 			runOnChrootStartCheckbox.setChecked(KaliServicesData.getInstance().kaliServicesModelListFull.get(
 					KaliServicesData.getInstance().kaliServicesModelListFull.indexOf(
 							kaliServicesModelList.get(position))).getRunOnChrootStart().equals("1"));
-			AlertDialog.Builder adbEdit = new AlertDialog.Builder(context);
+			MaterialAlertDialogBuilder adbEdit = new MaterialAlertDialogBuilder(context, R.style.DialogStyleCompat);
 			adbEdit.setView(promptViewEdit);
 			adbEdit.setCancelable(true);
 			adbEdit.setPositiveButton("OK", (dialog, which) -> { });
