@@ -374,9 +374,9 @@ public class VNCFragment extends Fragment {
             } else {
                 String arch_path = exe.RunAsRootOutput("ls " + nh.CHROOT_PATH() + "/usr/lib/ | grep linux-gnu");
                 if(selected_user.equals("root")) {
-                        run_cmd("echo -ne \"\\033]0;Starting Server\\007\" && clear;if HOME=/root;USER=root;sudo -u root LD_PRELOAD=/usr/lib/" + arch_path + "/libgcc_s.so.1 nohup vncserver :" + selected_display + " " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 </dev/null;then echo \"Server started! Closing terminal..\";else echo -ne \"\\033[0;31mServer already started! \\n\";fi && sleep 2 && exit");
+                        run_cmd("echo -ne \"\\033]0;Starting Server\\007\" && clear;service dbus start;if HOME=/root;USER=root;sudo -u root LD_PRELOAD=/usr/lib/" + arch_path + "/libgcc_s.so.1 nohup vncserver :" + selected_display + " " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 </dev/null;then echo \"Server started! Closing terminal..\";else echo -ne \"\\033[0;31mServer already started! \\n\";fi && sleep 2 && exit");
                     } else {
-                        run_cmd("echo -ne \"\\033]0;Starting Server\\007\" && clear;if HOME=/home/" + selected_user + ";USER=" + selected_user + ";sudo -u " + selected_user + " LD_PRELOAD=/usr/lib/" + arch_path + "/libgcc_s.so.1 nohup vncserver :" + selected_display + " " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 </dev/null;then echo \"Server started! Closing terminal..\";else echo -ne \"\\033[0;31mServer already started! \\n\";fi && sleep 2 && exit");
+                        run_cmd("echo -ne \"\\033]0;Starting Server\\007\" && clear;service dbus start;if HOME=/home/" + selected_user + ";USER=" + selected_user + ";sudo -u " + selected_user + " LD_PRELOAD=/usr/lib/" + arch_path + "/libgcc_s.so.1 nohup vncserver :" + selected_display + " " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 </dev/null;then echo \"Server started! Closing terminal..\";else echo -ne \"\\033[0;31mServer already started! \\n\";fi && sleep 2 && exit");
                     }
                 Log.d(TAG, localhostonly);
             }
