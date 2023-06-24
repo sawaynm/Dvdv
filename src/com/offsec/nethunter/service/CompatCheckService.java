@@ -90,8 +90,8 @@ public class CompatCheckService extends IntentService {
         // And remember no any return true or false except the last line of this function.
         /* Other compat checks start from here */
 
-        // Check if selinux is in permissive mode, if not, set it to permissive mode.
-        new ShellExecuter().RunAsRootOutput("[ ! \"$(getenforce | grep Permissive)\" ] && setenforce 0");
+        // Check if selinux is in permissive mode, if not, set it to permissive mode, unless it was set manually in settings.
+        if (! sharedPreferences.contains("SElinux")) new ShellExecuter().RunAsRootOutput("[ ! \"$(getenforce | grep Permissive)\" ] && setenforce 0");
 
         // Check only for the first installation, find out the possible chroot folder and point it to the chroot path.
         if (sharedPreferences.getString(SharePrefTag.CHROOT_ARCH_SHAREPREF_TAG, null) == null) {
