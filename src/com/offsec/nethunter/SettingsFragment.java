@@ -358,6 +358,36 @@ public class SettingsFragment extends Fragment {
                 }
         });
 
+        //SELinux
+        TextView SELinux = rootView.findViewById(R.id.selinux);
+        final String selinux_status = exe.RunAsRootOutput("getenforce");
+        SELinux.setText(selinux_status);
+        final Button SELinuxButton = rootView.findViewById(R.id.selinux_toggle);
+        if (selinux_status.equals("Permissive")) SELinuxButton.setText("Set to Enforcing");
+        else if (selinux_status.equals("Disabled")) {
+            SELinuxButton.setText("SELinux is Disabled");
+            SELinuxButton.setEnabled(false);
+            SELinuxButton.setTextColor(Color.parseColor("#40FFFFFF"));
+        }
+        else SELinuxButton.setText("Set to Permissive");
+
+        SELinuxButton.setOnClickListener( v -> {
+            String selinux_status_now = exe.RunAsRootOutput("getenforce");
+            if (selinux_status_now.equals("Permissive")) {
+                exe.RunAsRoot(new String[]{"setenforce 1"});
+                SELinuxButton.setText("Set to Permissive");
+                SELinux.setText("Enforcing");
+                Toast.makeText(getActivity().getApplicationContext(), "SElinux set to Enforcing done", Toast.LENGTH_SHORT).show();
+                sharedpreferences.edit().putBoolean("SElinux", true).apply();
+           } else {
+                exe.RunAsRoot(new String[]{"setenforce 0"});
+                SELinuxButton.setText("Set to Enforcing");
+                SELinux.setText("Permissive");
+                Toast.makeText(getActivity().getApplicationContext(), "SElinux set to Permissive done", Toast.LENGTH_SHORT).show();
+                sharedpreferences.edit().putBoolean("SElinux", false).apply();
+            }
+        });
+
         //Busybox
         TextView BusyboxVersion = rootView.findViewById(R.id.busybox_version);
             String busybox_ver = exe.RunAsRootOutput("/system/xbin/busybox | head -n1 | cut -c 10-13");
