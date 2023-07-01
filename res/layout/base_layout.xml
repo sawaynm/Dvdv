@@ -40,7 +40,7 @@ view using match_parent for both width and height to consume the full space avai
         android:layout_alignParentTop="true"
         android:alpha="0.05"
         android:contentDescription="@string/app_name"
-        android:src="@drawable/kali_cubism"
+        android:src="@drawable/kali_newnh"
         android:keyboardNavigationCluster="false"
         android:scaleType="center" />
 
