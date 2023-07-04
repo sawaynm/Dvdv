@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.DisplayMetrics;
@@ -23,11 +23,9 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.offsec.nethunter.bridge.Bridge;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
@@ -39,6 +37,7 @@ import androidx.fragment.app.Fragment;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class VNCFragment extends Fragment {
 
@@ -61,6 +60,7 @@ public class VNCFragment extends Fragment {
     private boolean localhost;
     private boolean confirm_res;
     private String prevusr = "kali";
+    private String delay_cmd;
     private Integer posu;
     private Integer posd = 0;
     private static final int MIN_UID = 100000;
@@ -92,6 +92,7 @@ public class VNCFragment extends Fragment {
         View AdvancedView = rootView.findViewById(R.id.AdvancedView);
         Button Advanced = rootView.findViewById(R.id.AdvancedButton);
         CheckBox localhostCheckBox = rootView.findViewById(R.id.vnc_checkBox);
+
         SharedPreferences sharedpreferences = context.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
 
         confirm_res = sharedpreferences.getBoolean("confirm_res", false);
@@ -336,6 +337,31 @@ public class VNCFragment extends Fragment {
             }
         });
 
+        //Delay
+        final CheckBox delayCheckBox = rootView.findViewById(R.id.delay_checkBox);
+        final EditText delayText = rootView.findViewById(R.id.delay_time);
+        final Boolean delay = sharedpreferences.getBoolean("delay", false);
+        if (delay.equals(true)) {
+            delayCheckBox.setChecked(true);
+            delayText.setText(String.valueOf(sharedpreferences.getInt("delaysec", 20)));
+            delayText.setEnabled(true);
+            delayText.setTextColor(Color.parseColor("#FFFFFF"));
+        }
+
+        delayCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    sharedpreferences.edit().putBoolean("delay", true).apply();
+                    delayText.setEnabled(true);
+                    delayText.setTextColor(Color.parseColor("#FFFFFF"));
+                } else {
+                    sharedpreferences.edit().putBoolean("delay", false).apply();
+                    delayText.setEnabled(false);
+                    delayText.setTextColor(Color.parseColor("#40FFFFFF"));
+                }
+            }
+        });
+
         //Server status
         RefreshKeX.setOnClickListener(v -> {
             refreshVNC(rootView);
@@ -369,24 +395,30 @@ public class VNCFragment extends Fragment {
                 File uservncpasswd = new File(nh.CHROOT_PATH() + "/home/" + selected_user + "/.vnc/passwd");
                 vnc_passwd = exe.RunAsRootOutput("cat " + uservncpasswd);
             }
+            if(delayCheckBox.isChecked()) {
+                sharedpreferences.edit().putInt("delaysec", Integer.parseInt(delayText.getText().toString())).apply();
+                delay_cmd = "sleep " + delayText.getText().toString() + ";";
+            }
             if(vnc_passwd.equals("")) {
                 Toast.makeText(getActivity().getApplicationContext(), "Please setup local server first!", Toast.LENGTH_SHORT).show();
             } else {
                 String arch_path = exe.RunAsRootOutput("ls " + nh.CHROOT_PATH() + "/usr/lib/ | grep linux-gnu");
                 if(selected_user.equals("root")) {
                         exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service dbus start"});
-                        run_cmd("echo -ne \"\\033]0;Starting Server\\007\" && clear;sleep 5;if HOME=/root;USER=root;sudo -u root LD_PRELOAD=/usr/lib/" + arch_path +
+                        run_cmd("echo -ne \"\\033]0;Starting Server\\007\" && clear;" + delay_cmd + "if HOME=/root;USER=root;sudo -u root LD_PRELOAD=/usr/lib/" + arch_path +
                                 "/libgcc_s.so.1 nohup vncserver :" + selected_display + " " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 </dev/null;then echo \"Server started! Closing terminal..\";else echo -ne \"\\033[0;31mServer already started! \\n\";fi && sleep 2 && exit");
                     } else {
                         exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service dbus start"});
-                        run_cmd("echo -ne \"\\033]0;Starting Server\\007\" && clear;sleep 5;if HOME=/home/" + selected_user + ";USER=" + selected_user + ";sudo -u " + selected_user + " LD_PRELOAD=/usr/lib/" + arch_path +
+                        run_cmd("echo -ne \"\\033]0;Starting Server\\007\" && clear;" + delay_cmd + "if HOME=/home/" + selected_user + ";USER=" + selected_user + ";sudo -u " + selected_user + " LD_PRELOAD=/usr/lib/" + arch_path +
                                 "/libgcc_s.so.1 nohup vncserver :" + selected_display + " " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 </dev/null;then echo \"Server started! Closing terminal..\";else echo -ne \"\\033[0;31mServer already started! \\n\";fi && sleep 2 && exit");
                     }
                 Log.d(TAG, localhostonly);
             }
         });
         addClickListener(StopVNCButton, v -> {
-            run_cmd("echo -ne \"\\033]0;Killing Server\\007\" && clear;sudo -u " + selected_user + " vncserver -kill :" + selected_display + " ;sleep 2 && exit"); // since is a kali command we can send it as is
+            Toast.makeText(getActivity().getApplicationContext(), "Stopping display :" + selected_display + " for " + selected_user , Toast.LENGTH_SHORT).show();
+            exe.RunAsRoot(new String[]{nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd sudo -u " + selected_user + " vncserver -kill :" + selected_display}); // since is a kali command we can send it as is
+            refreshVNC(rootView);
         });
         addClickListener(OpenVNCButton, v -> {
             intentClickListener_VNC(); // since is a kali command we can send it as is

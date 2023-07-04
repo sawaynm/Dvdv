@@ -95,6 +95,13 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
             assetsToFiles(NhPaths.SD_PATH, "", "sdcard");
             publishProgress("Fixing permissions for new files");
             exe.RunAsRoot(new String[]{"chmod -R 700 " + NhPaths.APP_SCRIPTS_PATH + "/*", "chmod -R 700 " + NhPaths.APP_INITD_PATH + "/*"});
+            publishProgress("Checking for encrypted /data....");
+            CheckEncrypted();
+            publishProgress("Checking for bootkali symlinks....");
+            Symlink("bootkali");
+            Symlink("bootkali_bash");
+            Symlink("bootkali_init");
+            Symlink("bootkali_login");
             // disable the magisk notification for nethunter app as it will keep popping up bunch of toast message when executing runtime command.
             disableMagiskNotification();
             SharedPreferences.Editor ed = prefs.edit();
@@ -252,18 +259,36 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
 
     private void MakeSYSWriteable(){
         Log.d(TAG, "Making /system writeable for symlink");
-        exe.RunAsRoot(new String[]{"mount -o rw,remount,rw /system"});
+        exe.RunAsRoot(new String[]{"if [ \"$(getprop ro.build.system_root_image)\" == \"true\" ]; then export SYSTEM=/; else export SYSTEM=/system;fi;mount -o rw,remount,rw $SYSTEM"});
     }
 
     private void MakeSYSReadOnly(){
         Log.d(TAG, "Making /system readonly for symlink");
-        exe.RunAsRoot(new String[]{"mount -o ro,remount,ro /system"});
+        exe.RunAsRoot(new String[]{"if [ \"$(getprop ro.build.system_root_image)\" == \"true\" ]; then export SYSTEM=/; else export SYSTEM=/system;fi;mount -o ro,remount,ro $SYSTEM"});
     }
 
-    private void NotFound(String filename){
-        Log.d(TAG, "Symlinking " + filename);
-        Log.d(TAG, "command output: ln -s " + NhPaths.APP_SCRIPTS_PATH + "/" + filename + " /system/bin/" + filename);
-        exe.RunAsRoot(new String[]{"ln -s " + NhPaths.APP_SCRIPTS_PATH + "/" + filename + " /system/bin/" + filename});
+    private void CheckEncrypted(){
+        Log.d(TAG, "Checking if /data is encrypted...");
+        String encrypted = exe.RunAsRootOutput("getprop ro.crypto.state");
+        Log.d(TAG, "/data is " + encrypted);
+        if (encrypted.equals("encrypted")) {
+            Log.d(TAG, "Fixing pam.d and inet in chroot");
+            exe.RunAsRoot(new String[]{"sed -i \"s/pam_keyinit.so/pam_keyinit.so #/\" /data/local/nhsystem/kalifs/etc/pam.d/*"});
+            exe.RunAsRoot(new String[]{"echo 'APT::Sandbox::User \"root\";' > /etc/apt/apt.conf.d/01-android-nosandbox"});
+            exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd groupadd -g 3003 aid_inet\\;usermod -G nogroup -g aid_inet _apt"});
+        }
+    }
+
+    private void Symlink(String filename){
+        File checkfile = new File("/system/bin/" + filename);
+        Log.d (TAG, "Checking for " + filename + " symlink....");
+        if (!checkfile.exists()) {
+            Log.d(TAG, "Symlinking " + filename);
+            Log.d(TAG, "command output: ln -s " + NhPaths.APP_SCRIPTS_PATH + "/" + filename + " /system/bin/" + filename);
+            MakeSYSWriteable();
+            exe.RunAsRoot(new String[]{"ln -s " + NhPaths.APP_SCRIPTS_PATH + "/" + filename + " /system/bin/" + filename});
+            MakeSYSReadOnly();
+        }
     }
 
     // Get a list of files from a directory
