@@ -86,7 +86,7 @@ public class ManaFragment extends Fragment {
                 activity.invalidateOptionsMenu();
             }
         });
-
+        checkiptables();
         setHasOptionsMenu(true);
         return rootView;
     }
@@ -127,6 +127,34 @@ public class ManaFragment extends Fragment {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void checkiptables() {
+        ShellExecuter exe = new ShellExecuter();
+        String iptables_ver = exe.RunAsRootOutput("bootkali custom_cmd iptables -V | grep iptables");
+        String arch_path = exe.RunAsRootOutput("ls " + NhPaths.CHROOT_PATH() + "/usr/lib/ | grep linux-gnu");
+        String arch;
+        String old_kali = "http://old.kali.org/kali/pool/main/i/iptables/";
+        if (!iptables_ver.equals("iptables v1.6.2")) {
+            Toast.makeText(getActivity().getApplicationContext(), iptables_ver, Toast.LENGTH_LONG).show();
+            if (arch_path.equals("aarch64-linux-gnu")) arch = "arm64"; else arch = "armhf";
+            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+            builder.setTitle("Mana is deprecated!");
+            builder.setMessage("Until we find a perfect replacement, you can downgrade iptables in order to use Mana.");
+            builder.setPositiveButton("Downgrade", (dialog, which) -> {
+                run_cmd("echo -ne \"\\033]0;Downgrading iptables\\007\" && clear;" +
+                        "wget " + old_kali + "iptables_1.6.2-1.1_" + arch + ".deb && " +
+                        "wget " + old_kali + "libip4tc0_1.6.2-1.1_" + arch + ".deb && " +
+                        "wget " + old_kali + "libip6tc0_1.6.2-1.1_" + arch + ".deb && " +
+                        "wget " + old_kali + "libiptc0_1.6.2-1.1_" + arch + ".deb && " +
+                        "wget " + old_kali + "libxtables12_1.6.2-1.1_" + arch + ".deb && " +
+                        "dpkg -i *.deb && apt-mark hold iptables libip4tc0 libip6tc0 libiptc0 " +
+                        "libxtables12 && sleep 2 && echo 'Closing window..' && exit");
+            });
+            builder.setNegativeButton("Quit", (dialog, which) -> {
+            });
+            builder.show();
         }
     }
 
