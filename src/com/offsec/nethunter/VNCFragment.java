@@ -60,7 +60,7 @@ public class VNCFragment extends Fragment {
     private boolean localhost;
     private boolean confirm_res;
     private String prevusr = "kali";
-    private String delay_cmd;
+    private String delay_cmd = "";
     private Integer posu;
     private Integer posd = 0;
     private static final int MIN_UID = 100000;
