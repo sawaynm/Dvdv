@@ -22,10 +22,6 @@ public class PermissionCheck {
     };
 
     public static final String[] NH_TERM_PERMISSIONS = {
-            "com.offsec.nhterm.permission.RUN_SCRIPT",
-            "com.offsec.nhterm.permission.RUN_SCRIPT_SU",
-            "com.offsec.nhterm.permission.RUN_SCRIPT_NH",
-            "com.offsec.nhterm.permission.RUN_SCRIPT_NH_LOGIN"
     };
 
     public PermissionCheck(Activity activity, Context context) {

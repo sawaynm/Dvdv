@@ -30,7 +30,7 @@
         android:paddingRight="16sp"
         android:gravity="center_horizontal">
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/MaintainChrootInTerminal"
@@ -38,7 +38,7 @@
             android:paddingLeft="16sp"
             android:paddingRight="16sp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/installkalichrootbutton"

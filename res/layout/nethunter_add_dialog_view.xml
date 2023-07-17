@@ -3,12 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:layout_marginStart="10dp"
-    android:layout_marginLeft="10dp"
-    android:layout_marginEnd="10dp"
-    android:layout_marginRight="10dp"
-    android:layout_marginTop="20dp">
+    android:orientation="vertical">
 
     <TextView
         android:layout_width="match_parent"
@@ -43,6 +38,7 @@
             android:id="@+id/f_nethunter_add_btn_info_fab1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/colorPrimary"
             android:layout_weight="0.1"
             android:src="@drawable/ic_action_information"
             android:textSize="12sp"
@@ -77,6 +73,7 @@
             android:id="@+id/f_nethunter_add_btn_info_fab2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/colorPrimary"
             android:layout_weight="0.1"
             android:src="@drawable/ic_action_information"
             android:textSize="12sp"
@@ -111,6 +108,7 @@
             android:id="@+id/f_nethunter_add_btn_info_fab3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/colorPrimary"
             android:layout_marginStart="8dp"
             android:src="@drawable/ic_action_information"
             android:textSize="12sp"

@@ -82,7 +82,7 @@
                 android:id="@+id/scanwps"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Scan for WPS routers" />
+                android:text="Scan" />
 
             <Button
                 android:id="@+id/resetinterface"
@@ -91,7 +91,6 @@
                 android:text="Reset interface"/>
 
             </LinearLayout>
-
 
             <LinearLayout
                 android:layout_width="match_parent"

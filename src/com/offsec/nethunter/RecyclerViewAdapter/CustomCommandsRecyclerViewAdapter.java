@@ -1,6 +1,5 @@
 package com.offsec.nethunter.RecyclerViewAdapter;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.view.LayoutInflater;
@@ -15,8 +14,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.offsec.nethunter.R;
 import com.offsec.nethunter.RecyclerViewData.CustomCommandsData;
 import com.offsec.nethunter.SQL.CustomCommandsSQL;
@@ -75,7 +76,7 @@ public class CustomCommandsRecyclerViewAdapter extends RecyclerView.Adapter<Cust
 					CustomCommandsData.getInstance().customCommandsModelListFull.indexOf(
 							customCommandsModelList.get(position))).getRunOnBoot().equals("1"));
 
-			AlertDialog.Builder adbEdit = new AlertDialog.Builder(context);
+			MaterialAlertDialogBuilder adbEdit = new MaterialAlertDialogBuilder(context, R.style.DialogStyleCompat);
 			adbEdit.setView(promptViewEdit);
 			adbEdit.setCancelable(true);
 			adbEdit.setPositiveButton("OK", (dialog, which) -> { });

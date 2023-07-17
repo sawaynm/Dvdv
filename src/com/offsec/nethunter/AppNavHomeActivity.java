@@ -1,7 +1,7 @@
 package com.offsec.nethunter;
 
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
+import com.techiness.progressdialoglibrary.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -20,10 +20,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.offsec.nethunter.AsyncTask.CopyBootFilesAsyncTask;
@@ -68,8 +68,8 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
      */
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
-    private NavigationView navigationView;
-    private NavigationView navigationViewWear;
+    private com.google.android.material.navigation.NavigationView navigationView;
+    private com.google.android.material.navigation.NavigationView navigationViewWear;
     private CharSequence mTitle = "NetHunter";
     private final Stack<String> titles = new Stack<>();
     private SharedPreferences prefs;
@@ -381,11 +381,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
             navigationView.addHeaderView(navigationHeadView);
 
         FloatingActionButton readmeButton = navigationHeadView.findViewById(R.id.info_fab);
-        readmeButton.setOnTouchListener((v, event) -> {
-            //checkUpdate();
-            showLicense();
-            return false;
-        });
+        readmeButton.setOnClickListener(v -> showLicense());
 
         /// moved build info to the menu
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd KK:mm:ss a zzz",
@@ -448,10 +444,12 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         Linkify.addLinks(readmeText, Linkify.WEB_URLS);
 
 
-        AlertDialog.Builder adb = new AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder adb = new MaterialAlertDialogBuilder(this, R.style.DialogStyle);
         adb.setTitle("README INFO")
-                .setMessage(readmeText)
-                .setNegativeButton("Close", (dialog, which) -> dialog.cancel()); //nhwarning
+                .setMessage(readmeText);
+        adb.setNegativeButton("Cancel", (dialog, id) -> dialog.cancel());
+        adb.setCancelable(true);
+
         AlertDialog ad = adb.create();
         ad.setCancelable(false);
         if (ad.getWindow() != null) {
@@ -653,7 +651,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     }
 
     public void showWarningDialog(String title, String message, boolean NeedToExit) {
-        android.app.AlertDialog.Builder warningAD = new android.app.AlertDialog.Builder(this);
+        AlertDialog.Builder warningAD = new AlertDialog.Builder(this, R.style.DialogStyleCompat);
         warningAD.setCancelable(false);
         warningAD.setTitle(title);
         warningAD.setMessage(message);

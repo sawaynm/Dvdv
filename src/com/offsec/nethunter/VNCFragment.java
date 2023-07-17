@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.DisplayMetrics;
@@ -23,19 +23,21 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.offsec.nethunter.bridge.Bridge;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class VNCFragment extends Fragment {
 
@@ -44,7 +46,7 @@ public class VNCFragment extends Fragment {
     private String xheight;
     private String localhostonly = "";
     private Context context;
-    private Activity activity;
+    private static Activity activity;
     private static final String ARG_SECTION_NUMBER = "section_number";
     private String selected_res;
     private String selected_vncres;
@@ -58,6 +60,7 @@ public class VNCFragment extends Fragment {
     private boolean localhost;
     private boolean confirm_res;
     private String prevusr = "kali";
+    private String delay_cmd = "";
     private Integer posu;
     private Integer posd = 0;
     private static final int MIN_UID = 100000;
@@ -89,6 +92,7 @@ public class VNCFragment extends Fragment {
         View AdvancedView = rootView.findViewById(R.id.AdvancedView);
         Button Advanced = rootView.findViewById(R.id.AdvancedButton);
         CheckBox localhostCheckBox = rootView.findViewById(R.id.vnc_checkBox);
+
         SharedPreferences sharedpreferences = context.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
 
         confirm_res = sharedpreferences.getBoolean("confirm_res", false);
@@ -264,7 +268,7 @@ public class VNCFragment extends Fragment {
         });
 
         //Immersion switch
-        final Switch immersionSwitch = rootView.findViewById(R.id.immersionSwitch);
+        final SwitchCompat immersionSwitch = rootView.findViewById(R.id.immersionSwitch);
         final String immersion = exe.RunAsRootOutput("settings get global policy_control");
         if (immersion.equals("null*"))
             immersionSwitch.setChecked(false);
@@ -333,6 +337,31 @@ public class VNCFragment extends Fragment {
             }
         });
 
+        //Delay
+        final CheckBox delayCheckBox = rootView.findViewById(R.id.delay_checkBox);
+        final EditText delayText = rootView.findViewById(R.id.delay_time);
+        final Boolean delay = sharedpreferences.getBoolean("delay", false);
+        if (delay.equals(true)) {
+            delayCheckBox.setChecked(true);
+            delayText.setText(String.valueOf(sharedpreferences.getInt("delaysec", 20)));
+            delayText.setEnabled(true);
+            delayText.setTextColor(Color.parseColor("#FFFFFF"));
+        }
+
+        delayCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    sharedpreferences.edit().putBoolean("delay", true).apply();
+                    delayText.setEnabled(true);
+                    delayText.setTextColor(Color.parseColor("#FFFFFF"));
+                } else {
+                    sharedpreferences.edit().putBoolean("delay", false).apply();
+                    delayText.setEnabled(false);
+                    delayText.setTextColor(Color.parseColor("#40FFFFFF"));
+                }
+            }
+        });
+
         //Server status
         RefreshKeX.setOnClickListener(v -> {
             refreshVNC(rootView);
@@ -352,11 +381,11 @@ public class VNCFragment extends Fragment {
                 }
             } else {
                 Toast.makeText(getActivity().getApplicationContext(), "Installing missing audio script in chroot..", Toast.LENGTH_SHORT).show();
-                intentClickListener_NH("echo -ne \"\\033]0;Kali NetHunter Utils\\007\" && clear;apt-get update && apt-get install nethunter-utils;sleep 2 && exit"); // since is a kali command we can send it as is
+                run_cmd("echo -ne \"\\033]0;Kali NetHunter Utils\\007\" && clear;apt-get update && apt-get install nethunter-utils;sleep 2 && exit"); // since is a kali command we can send it as is
             }
         });
         addClickListener(SetupVNCButton, v -> {
-            intentClickListener_NH("echo -ne \"\\033]0;Setting up Server\\007\" && clear;chmod +x ~/.vnc/xstartup && clear;echo $'\n'\"Please enter your new VNC server password\"$'\n' && sudo -u " + selected_user + " vncpasswd && sleep 2 && exit"); // since is a kali command we can send it as is
+            run_cmd("echo -ne \"\\033]0;Setting up Server\\007\" && clear;chmod +x ~/.vnc/xstartup && clear;echo $'\n'\"Please enter your new VNC server password\"$'\n' && sudo -u " + selected_user + " vncpasswd && sleep 2 && exit"); // since is a kali command we can send it as is
         });
         addClickListener(StartVNCButton, v -> {
             if(selected_user.equals("root")) {
@@ -366,20 +395,30 @@ public class VNCFragment extends Fragment {
                 File uservncpasswd = new File(nh.CHROOT_PATH() + "/home/" + selected_user + "/.vnc/passwd");
                 vnc_passwd = exe.RunAsRootOutput("cat " + uservncpasswd);
             }
+            if(delayCheckBox.isChecked()) {
+                sharedpreferences.edit().putInt("delaysec", Integer.parseInt(delayText.getText().toString())).apply();
+                delay_cmd = "sleep " + delayText.getText().toString() + ";";
+            }
             if(vnc_passwd.equals("")) {
                 Toast.makeText(getActivity().getApplicationContext(), "Please setup local server first!", Toast.LENGTH_SHORT).show();
             } else {
                 String arch_path = exe.RunAsRootOutput("ls " + nh.CHROOT_PATH() + "/usr/lib/ | grep linux-gnu");
                 if(selected_user.equals("root")) {
-                        intentClickListener_NH("echo -ne \"\\033]0;Starting Server\\007\" && clear;if HOME=/root;USER=root;sudo -u root LD_PRELOAD=/usr/lib/" + arch_path + "/libgcc_s.so.1 nohup vncserver :" + selected_display + " " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 </dev/null;then echo \"Server started! Closing terminal..\";else echo -ne \"\\033[0;31mServer already started! \\n\";fi && sleep 2 && exit");
+                        exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service dbus start"});
+                        run_cmd("echo -ne \"\\033]0;Starting Server\\007\" && clear;" + delay_cmd + "if HOME=/root;USER=root;sudo -u root LD_PRELOAD=/usr/lib/" + arch_path +
+                                "/libgcc_s.so.1 nohup vncserver :" + selected_display + " " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 </dev/null;then echo \"Server started! Closing terminal..\";else echo -ne \"\\033[0;31mServer already started! \\n\";fi && sleep 2 && exit");
                     } else {
-                        intentClickListener_NH("echo -ne \"\\033]0;Starting Server\\007\" && clear;if HOME=/home/" + selected_user + ";USER=" + selected_user + ";sudo -u " + selected_user + " LD_PRELOAD=/usr/lib/" + arch_path + "/libgcc_s.so.1 nohup vncserver :" + selected_display + " " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 </dev/null;then echo \"Server started! Closing terminal..\";else echo -ne \"\\033[0;31mServer already started! \\n\";fi && sleep 2 && exit");
+                        exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service dbus start"});
+                        run_cmd("echo -ne \"\\033]0;Starting Server\\007\" && clear;" + delay_cmd + "if HOME=/home/" + selected_user + ";USER=" + selected_user + ";sudo -u " + selected_user + " LD_PRELOAD=/usr/lib/" + arch_path +
+                                "/libgcc_s.so.1 nohup vncserver :" + selected_display + " " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 </dev/null;then echo \"Server started! Closing terminal..\";else echo -ne \"\\033[0;31mServer already started! \\n\";fi && sleep 2 && exit");
                     }
                 Log.d(TAG, localhostonly);
             }
         });
         addClickListener(StopVNCButton, v -> {
-            intentClickListener_NH("echo -ne \"\\033]0;Killing Server\\007\" && clear;sudo -u " + selected_user + " vncserver -kill :" + selected_display + " ;sleep 2 && exit"); // since is a kali command we can send it as is
+            Toast.makeText(getActivity().getApplicationContext(), "Stopping display :" + selected_display + " for " + selected_user , Toast.LENGTH_SHORT).show();
+            exe.RunAsRoot(new String[]{nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd sudo -u " + selected_user + " vncserver -kill :" + selected_display}); // since is a kali command we can send it as is
+            refreshVNC(rootView);
         });
         addClickListener(OpenVNCButton, v -> {
             intentClickListener_VNC(); // since is a kali command we can send it as is
@@ -398,17 +437,17 @@ public class VNCFragment extends Fragment {
             }
         });
         addClickListener(AddUserButton, v -> {
-            intentClickListener_NH("echo -ne \"\\033]0;New User\\007\" && clear;if [[ $SHELL == *zsh ]];then read \"?Please enter your new username\"$'\n' USER;elif [[ $SHELL == *bash ]];then read -p \"Please enter your new username\"$'\n' USER;fi && adduser --firstuid " + MIN_UID + " --lastuid " + MAX_UID + " $USER; groupmod -g $(id -u $USER) $USER; usermod -aG sudo $USER; usermod -aG inet $USER; usermod -aG sockets $USER; echo \"Please refresh your KeX manager, closing in 2 secs\" && sleep 2 && exit");
+            run_cmd("echo -ne \"\\033]0;New User\\007\" && clear;if [[ $SHELL == *zsh ]];then read \"?Please enter your new username\"$'\n' USER;elif [[ $SHELL == *bash ]];then read -p \"Please enter your new username\"$'\n' USER;fi && adduser --firstuid " + MIN_UID + " --lastuid " + MAX_UID + " $USER; groupmod -g $(id -u $USER) $USER; usermod -aG sudo $USER; usermod -aG inet $USER; usermod -aG sockets $USER; echo \"Please refresh your KeX manager, closing in 2 secs\" && sleep 2 && exit");
         });
         addClickListener(DelUserButton, v -> {
             if (selected_user.contains("root")) {
                 Toast.makeText(getActivity().getApplicationContext(), "Can't remove root!", Toast.LENGTH_SHORT).show();
             } else {
-                intentClickListener_NH("echo -ne \"\\033]0;Removing User\\007\" && clear;deluser -remove-home " + selected_user + " && sleep 2 && exit");
+                run_cmd("echo -ne \"\\033]0;Removing User\\007\" && clear;deluser -remove-home " + selected_user + " && sleep 2 && exit");
             }
         });
         addClickListener(ResetHDMIButton, v -> {
-            intentClickListener_NHSU("wm size reset;wm density reset;am start com.offsec.nethunter/.AppNavHomeActivity -e \":android:show_fragment\" com.offsec.nethunter.VNCFragment;sleep 2 && exit");
+            run_cmd_android("wm size reset;wm density reset;am start com.offsec.nethunter/.AppNavHomeActivity -e \":android:show_fragment\" com.offsec.nethunter.VNCFragment;sleep 2 && exit");
             sharedpreferences.edit().putBoolean("confirm_res", false).apply();
         });
         addClickListener(BackupHDMI, v -> {
@@ -429,7 +468,7 @@ public class VNCFragment extends Fragment {
             openResolutionDialog();
         });
         addClickListener(ApplyResolutionButton, v -> {
-            intentClickListener_NHSU("wm size " + selected_disp + "; wm density " + selected_ppi + ";am start com.offsec.nethunter/.AppNavHomeActivity -e \":android:show_fragment\" com.offsec.nethunter.VNCFragment;sleep 2 && exit");
+            run_cmd_android("wm size " + selected_disp + "; wm density " + selected_ppi + ";am start com.offsec.nethunter/.AppNavHomeActivity -e \":android:show_fragment\" com.offsec.nethunter.VNCFragment;sleep 2 && exit");
             sharedpreferences.edit().putBoolean("confirm_res", true).apply();
         });
         addClickListener(DelResolutionButton, v -> {
@@ -647,29 +686,17 @@ public class VNCFragment extends Fragment {
         }
     }
 
-    private void intentClickListener_NH(final String command) {
-        try {
-            Intent intent =
-                    new Intent("com.offsec.nhterm.RUN_SCRIPT_NH");
-            intent.addCategory(Intent.CATEGORY_DEFAULT);
-            intent.putExtra("com.offsec.nhterm.iInitialCommand", command);
-            startActivity(intent);
-        } catch (Exception e) {
-            nh.showMessage(context, getString(R.string.toast_install_terminal));
+    ////
+    // Bridge side functions
+    ////
 
-        }
+    public static void run_cmd(String cmd) {
+        Intent intent = Bridge.createExecuteIntent("/data/data/com.offsec.nhterm/files/usr/bin/kali", cmd);
+        activity.startActivity(intent);
     }
 
-    private void intentClickListener_NHSU(final String command) {
-        try {
-            Intent intent =
-                    new Intent("com.offsec.nhterm.RUN_SCRIPT_SU");
-            intent.addCategory(Intent.CATEGORY_DEFAULT);
-            intent.putExtra("com.offsec.nhterm.iInitialCommand", command);
-            startActivity(intent);
-        } catch (Exception e) {
-            nh.showMessage(context, getString(R.string.toast_install_terminal));
-
-        }
+    public static void run_cmd_android(String cmd) {
+        Intent intent = Bridge.createExecuteIntent("/data/data/com.offsec.nhterm/files/usr/bin/android-su", cmd);
+        activity.startActivity(intent);
     }
 }

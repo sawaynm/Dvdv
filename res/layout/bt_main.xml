@@ -121,7 +121,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/bluebinder_button"
                     android:text="Start"
                     android:textColor="#ffffffff"
@@ -175,7 +175,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/dbus_button"
                     android:text="Start"
                     android:textColor="#ffffffff"
@@ -218,7 +218,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/guideline_3" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/bt_button"
                     android:text="Start"
                     android:textColor="#ffffffff"
@@ -272,7 +272,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/guideline_4" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/hci_button"
                     android:text="Start"
                     android:textColor="#ffffffff"
@@ -333,7 +333,7 @@
 
             </LinearLayout>
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/start_scan"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"

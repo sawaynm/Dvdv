@@ -21,6 +21,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.offsec.nethunter.RecyclerViewAdapter.CustomCommandsRecyclerViewAdapter;
 import com.offsec.nethunter.RecyclerViewAdapter.CustomCommandsRecyclerViewAdapterDeleteItems;
 import com.offsec.nethunter.RecyclerViewData.CustomCommandsData;
@@ -150,7 +151,7 @@ public class CustomCommandsFragment extends Fragment {
             case R.id.f_customcommands_menu_backupDB:
                 titleTextView.setText("Full path to where you want to save the database:");
                 storedpathEditText.setText(NhPaths.APP_SD_SQLBACKUP_PATH + "/FragmentCustomCommands");
-                AlertDialog.Builder adbBackup = new AlertDialog.Builder(activity);
+                MaterialAlertDialogBuilder adbBackup = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
                 adbBackup.setView(promptView);
                 adbBackup.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
                 adbBackup.setPositiveButton("OK", (dialog, which) -> { });
@@ -163,7 +164,7 @@ public class CustomCommandsFragment extends Fragment {
                             NhPaths.showMessage(context, "db is successfully backup to " + storedpathEditText.getText().toString());
                         } else {
                             dialog.dismiss();
-                            new AlertDialog.Builder(context).setTitle("Failed to backup the DB.").setMessage(returnedResult).create().show();
+                            new MaterialAlertDialogBuilder(context).setTitle("Failed to backup the DB.").setMessage(returnedResult).create().show();
                         }
                         dialog.dismiss();
                     });
@@ -173,7 +174,7 @@ public class CustomCommandsFragment extends Fragment {
             case R.id.f_customcommands_menu_restoreDB:
                 titleTextView.setText("Full path of the db file from where you want to restore:");
                 storedpathEditText.setText(NhPaths.APP_SD_SQLBACKUP_PATH + "/FragmentCustomCommands");
-                AlertDialog.Builder adbRestore = new AlertDialog.Builder(activity);
+                MaterialAlertDialogBuilder adbRestore = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
                 adbRestore.setView(promptView);
                 adbRestore.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
                 adbRestore.setPositiveButton("OK", (dialog, which) -> { });
@@ -186,7 +187,7 @@ public class CustomCommandsFragment extends Fragment {
                             NhPaths.showMessage(context, "db is successfully restored to " + storedpathEditText.getText().toString());
                         } else {
                             dialog.dismiss();
-                            new AlertDialog.Builder(context).setTitle("Failed to restore the DB.").setMessage(returnedResult).create().show();
+                            new MaterialAlertDialogBuilder(context).setTitle("Failed to restore the DB.").setMessage(returnedResult).create().show();
                         }
                         dialog.dismiss();
                     });
@@ -281,7 +282,7 @@ public class CustomCommandsFragment extends Fragment {
                 }
             });
 
-            AlertDialog.Builder adbAdd = new AlertDialog.Builder(activity);
+            MaterialAlertDialogBuilder adbAdd = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
             adbAdd.setPositiveButton("OK", (dialog, which) -> { });
             final AlertDialog adAdd = adbAdd.create();
             adAdd.setView(promptViewAdd);
@@ -324,7 +325,7 @@ public class CustomCommandsFragment extends Fragment {
             recyclerViewDeleteItem.setLayoutManager(linearLayoutManagerDelete);
             recyclerViewDeleteItem.setAdapter(customCommandsRecyclerViewAdapterDeleteItems);
 
-            AlertDialog.Builder adbDelete = new AlertDialog.Builder(activity);
+            MaterialAlertDialogBuilder adbDelete = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
             adbDelete.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
             adbDelete.setPositiveButton("Delete", (dialog, which) -> { });
             final AlertDialog adDelete = adbDelete.create();
@@ -382,7 +383,7 @@ public class CustomCommandsFragment extends Fragment {
             titlesBefore.setAdapter(arrayAdapter);
             titlesAfter.setAdapter(arrayAdapter);
 
-            AlertDialog.Builder adbMove = new AlertDialog.Builder(activity);
+            MaterialAlertDialogBuilder adbMove = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
             adbMove.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
             adbMove.setPositiveButton("Move", (dialog, which) -> { });
             final AlertDialog adMove = adbMove.create();
