@@ -397,7 +397,7 @@ public class VNCFragment extends Fragment {
             }
             if(delayCheckBox.isChecked()) {
                 sharedpreferences.edit().putInt("delaysec", Integer.parseInt(delayText.getText().toString())).apply();
-                delay_cmd = "sleep " + delayText.getText().toString() + ";";
+                delay_cmd = "echo \"Sleeping for " + delayText.getText().toString() + " sec to avoid soft reboot\" && sleep " + delayText.getText().toString() + ";";
             }
             if(vnc_passwd.equals("")) {
                 Toast.makeText(getActivity().getApplicationContext(), "Please setup local server first!", Toast.LENGTH_SHORT).show();
