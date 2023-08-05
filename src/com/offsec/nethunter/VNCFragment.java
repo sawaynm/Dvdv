@@ -397,12 +397,13 @@ public class VNCFragment extends Fragment {
             }
             if(delayCheckBox.isChecked()) {
                 sharedpreferences.edit().putInt("delaysec", Integer.parseInt(delayText.getText().toString())).apply();
-                delay_cmd = "echo \"Sleeping for " + delayText.getText().toString() + " sec to avoid soft reboot\" && sleep " + delayText.getText().toString() + ";";
+                delay_cmd = "echo \"Sleeping for " + delayText.getText().toString() + " seconds to avoid soft reboot\" && sleep " + delayText.getText().toString() + ";";
             }
             if(vnc_passwd.equals("")) {
                 Toast.makeText(getActivity().getApplicationContext(), "Please setup local server first!", Toast.LENGTH_SHORT).show();
             } else {
                 String arch_path = exe.RunAsRootOutput("ls " + nh.CHROOT_PATH() + "/usr/lib/ | grep linux-gnu");
+                Toast.makeText(getActivity().getApplicationContext(), "Starting server.. Please refresh the status in NetHunter app.", Toast.LENGTH_LONG).show();
                 if(selected_user.equals("root")) {
                         exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service dbus start"});
                         run_cmd("echo -ne \"\\033]0;Starting Server\\007\" && clear;" + delay_cmd + "if HOME=/root;USER=root;sudo -u root LD_PRELOAD=/usr/lib/" + arch_path +
@@ -415,11 +416,16 @@ public class VNCFragment extends Fragment {
                 Log.d(TAG, localhostonly);
             }
         });
+        final TextView KeXstatus = rootView.findViewById(R.id.KeXstatus);
         addClickListener(StopVNCButton, v -> {
-            Toast.makeText(getActivity().getApplicationContext(), "Stopping display :" + selected_display + " for " + selected_user , Toast.LENGTH_SHORT).show();
-            exe.RunAsRoot(new String[]{nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd sudo -u " + selected_user + " vncserver -kill :" + selected_display}); // since is a kali command we can send it as is
-            refreshVNC(rootView);
-        });
+            if (KeXstatus.getText().toString().equals("STOPPED")) Toast.makeText(getActivity().getApplicationContext(), "There's no active session!" , Toast.LENGTH_LONG).show();
+            else {
+                exe.RunAsRoot(new String[]{nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd sudo -u " + selected_user + " vncserver -kill :" + selected_display}); // since is a kali command we can send it as is
+                dbusDialog();
+                refreshVNC(rootView);
+                Toast.makeText(getActivity().getApplicationContext(), "Stopped display :" + selected_display + " for " + selected_user , Toast.LENGTH_LONG).show();
+                }
+            });
         addClickListener(OpenVNCButton, v -> {
             intentClickListener_VNC(); // since is a kali command we can send it as is
         });
@@ -630,8 +636,6 @@ public class VNCFragment extends Fragment {
         builder.show();
     }
 
-
-
     private void confirmDialog() {
 
         SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
@@ -669,6 +673,22 @@ public class VNCFragment extends Fragment {
         });
     }
 
+    private void dbusDialog() {
+
+        final AlertDialog.Builder dbusbuilder = new AlertDialog.Builder(getActivity());
+        ShellExecuter exe = new ShellExecuter();
+        dbusbuilder.setTitle("DBUS service");
+        dbusbuilder.setMessage("Do you want to stop dbus service? If you have no more sessions opened, press Yes.");
+        dbusbuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                exe.RunAsRoot(new String[]{nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd service dbus stop"});
+            }
+        });
+        dbusbuilder.setNegativeButton("No", (dialog, whichButton) -> {
+        });
+        dbusbuilder.show();
+    }
 
     private void addClickListener(Button _button, View.OnClickListener onClickListener) {
         _button.setOnClickListener(onClickListener);
