@@ -173,7 +173,7 @@ public class ChrootManagerFragment extends Fragment {
             chrootPathEditText.setLayoutParams(editTextParams);
             availableChrootPathextview.setLayoutParams(editTextParams);
             availableChrootPathextview.setTextColor(getResources().getColor(R.color.clearTitle));
-            availableChrootPathextview.setText("\n List of available folder(s) in\n\"" + NhPaths.NH_SYSTEM_PATH + "/\":\n\n");
+            availableChrootPathextview.setText(String.format("\n List of available folder(s) in\n\"%s/\":\n\n", NhPaths.NH_SYSTEM_PATH));
             File chrootDir = new File(NhPaths.NH_SYSTEM_PATH);
             int count = 0;
             for (File file : Objects.requireNonNull(chrootDir.listFiles())) {
@@ -192,7 +192,7 @@ public class ChrootManagerFragment extends Fragment {
             ad.setView(ll);
             ad.setButton(Dialog.BUTTON_POSITIVE, "Apply", (dialogInterface, i) -> {
                 if (chrootPathEditText.getText().toString().matches("^\\.(.*$)|^\\.\\.(.*$)|^/+(.*$)|^.*/+(.*$)|^$")){
-                    NhPaths.showMessage(activity, "Invilad Name, please try again.");
+                    NhPaths.showMessage(activity, "Invalid Name, please try again.");
                 } else {
                     NhPaths.ARCH_FOLDER = chrootPathEditText.getText().toString();
                     kaliFolderTextView.setText(NhPaths.ARCH_FOLDER);
