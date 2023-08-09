@@ -45,6 +45,7 @@ public class WPSFragment extends Fragment {
     private final ArrayList<String> arrayList = new ArrayList<>();
     private LinearLayout WPSPinLayout;
     private LinearLayout DelayLayout;
+    private Context context;
     private Activity activity;
     private NhPaths nh;
     private final ShellExecuter exe = new ShellExecuter();
@@ -70,7 +71,7 @@ public class WPSFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Context context = getContext();
+        context = getContext();
         activity = getActivity();
     }
 
@@ -191,7 +192,7 @@ public class WPSFragment extends Fragment {
                 if (iswatch)
                     AsyncTask.execute(() -> {
                         requireActivity().runOnUiThread(() -> {
-                            exe.RunAsRoot(new String[]{"sleep 12 && settings put system clockwork_wifi_setting off; sleep 2 && ifconfig wlan0 up"});
+                            exe.RunAsRoot(new String[]{"sleep 12 && settings put system clockwork_wifi_setting off; sleep 2 && ip link set wlan0 up"});
                         });
                     });
             }
@@ -226,24 +227,24 @@ public class WPSFragment extends Fragment {
                 else exe.RunAsRoot(new String[]{"svc wifi enable"});
                 arrayList.clear();
                 arrayList.add("Scanning...");
-                WPSList.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, arrayList));
+                WPSList.setAdapter(new ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, arrayList));
                 WPSList.setVisibility(View.VISIBLE);
             });
             String outputScanLog = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd python3 /sdcard/nh_files/modules/oneshot.py -i wlan0 -s | grep -E '[0-9])' | awk '{print $2\";\"$3}'");
             requireActivity().runOnUiThread(() -> {
-                final String[] arrayList = "\n".split(outputScanLog);
-                ArrayAdapter<String> targetsadapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, arrayList);
+                final String[] arrayList = outputScanLog.split("\n");
+                ArrayAdapter targetsadapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, arrayList);
                 if (outputScanLog.equals("")) {
                     final ArrayList<String> notargets = new ArrayList<>();
                     notargets.add("No nearby WPS networks");
-                    WPSList.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, notargets));
+                    WPSList.setAdapter(new ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, notargets));
                 } else if (outputScanLog.equals("Error:;command")){
                     final ArrayList<String> notargets = new ArrayList<>();
                     notargets.add("Please reset the interface!");
-                    WPSList.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, notargets));
+                    WPSList.setAdapter(new ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, notargets));
                 } else {
                     WPSList.setAdapter(targetsadapter);
-                    }
+                }
             });
             if (iswatch) {
                 //re-enabling bluetooth
