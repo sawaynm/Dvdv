@@ -4,7 +4,6 @@ package com.offsec.nethunter;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,24 +19,24 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.offsec.nethunter.AsyncTask.MacchangerAsyncTask;
 import com.offsec.nethunter.utils.NhPaths;
 
 import java.net.NetworkInterface;
 import java.security.SecureRandom;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
-import static com.offsec.nethunter.R.id.f_nethunter_action_search;
 
 public class MacchangerFragment extends Fragment {
 
@@ -61,7 +60,7 @@ public class MacchangerFragment extends Fragment {
     private TextView currentMacTextView;
     private TextView currentHostNameTextView;
     private ImageButton reloadImageButton;
-    private static HashMap<String, String> iFaceAndMacHashMap = new HashMap<>();
+    private static final HashMap<String, String> iFaceAndMacHashMap = new HashMap<>();
     private Context context;
     private Activity activity;
 
@@ -203,7 +202,7 @@ public class MacchangerFragment extends Fragment {
 
     private void setIfaceSpinner() {
         List<String> keys = new ArrayList<>(iFaceAndMacHashMap.keySet());
-        Collections.sort(keys, Collections.reverseOrder());
+        keys.sort(Collections.reverseOrder());
         String[] iFaceStrings = keys.toArray(new String[0]);
         ArrayAdapter<String> iFaceArrayAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item, iFaceStrings);
         iFaceArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -213,8 +212,8 @@ public class MacchangerFragment extends Fragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 lastSelectedIfacePosition = position;
                 currentMacTextView.setText(iFaceAndMacHashMap.get(interfaceSpinner.getSelectedItem().toString().toLowerCase()));
-                changeMacButton.setText(getString(R.string.changeMAC) + " " + interfaceSpinner.getSelectedItem().toString().toUpperCase());
-                resetMacButton.setText(getString(R.string.resetMAC) + " " + interfaceSpinner.getSelectedItem().toString().toUpperCase());
+                changeMacButton.setText(MessageFormat.format("{0} {1}", getString(R.string.changeMAC), interfaceSpinner.getSelectedItem().toString().toUpperCase()));
+                resetMacButton.setText(MessageFormat.format("{0} {1}", getString(R.string.resetMAC), interfaceSpinner.getSelectedItem().toString().toUpperCase()));
             }
 
             @Override
@@ -272,7 +271,7 @@ public class MacchangerFragment extends Fragment {
         reloadImageButton.setOnClickListener(v -> {
             getIfaceAndMacAddr();
             List<String> keys  = new ArrayList<>(iFaceAndMacHashMap.keySet());
-            Collections.sort(keys, Collections.reverseOrder());
+            keys.sort(Collections.reverseOrder());
             String[] iFaceStrings = keys.toArray(new String[0]);
             ArrayAdapter<String> iFaceArrayAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item, iFaceStrings);
             iFaceArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -301,7 +300,7 @@ public class MacchangerFragment extends Fragment {
                 iFaceAndMacHashMap.put(iface.getName().toLowerCase(), macaddrStringBuilder.toString());
             }
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(TAG, Objects.requireNonNull(e.getMessage()));
         }
 
         Log.d("DEBUG", iFaceAndMacHashMap.toString());
