@@ -1,6 +1,7 @@
 package com.offsec.nethunter;
 
 import android.app.Activity;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -10,12 +11,10 @@ import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
 
 import java.util.Locale;
-import java.util.Objects;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NavUtils;
-import androidx.core.content.ContextCompat;
 
 public class EditSourceActivity extends AppCompatActivity {
 
@@ -28,9 +27,12 @@ public class EditSourceActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         activity = this;
         Bundle b = getIntent().getExtras();
-        configFilePath = Objects.requireNonNull(b).getString("path");
+        configFilePath = b.getString("path");
         setContentView(R.layout.source);
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.darkTitle));
+        if (Build.VERSION.SDK_INT >= 21) {
+            // detail for android 5 devices
+            getWindow().setStatusBarColor(getResources().getColor(R.color.darkTitle));
+        }
 
         EditText source = findViewById(R.id.source);
         source.setText(String.format(Locale.getDefault(),getString(R.string.loading_file), configFilePath));
@@ -69,7 +71,7 @@ public class EditSourceActivity extends AppCompatActivity {
     public void updateSource(View view) {
         EditText source = findViewById(R.id.source);
         String newSource = source.getText().toString();
-        boolean isSaved = exe.SaveFileContents(newSource, configFilePath);
+        Boolean isSaved = exe.SaveFileContents(newSource, configFilePath);
         if (isSaved) {
             NhPaths.showMessage(activity,"Source updated");
         } else {

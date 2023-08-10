@@ -1,13 +1,19 @@
 package com.offsec.nethunter;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.text.InputType;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,17 +22,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
@@ -35,18 +44,24 @@ import com.offsec.nethunter.bridge.Bridge;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
 
+import org.checkerframework.checker.units.qual.A;
+import org.checkerframework.checker.units.qual.Time;
 
 import java.io.File;
-import java.text.MessageFormat;
+import java.lang.reflect.Type;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Objects;
+import java.util.Set;
 
 public class SettingsFragment extends Fragment {
 
     private Context context;
-    private Activity activity;
+    private static Activity activity;
     private static final String ARG_SECTION_NUMBER = "section_number";
     private String selected_animation;
     private String selected_prompt;
@@ -72,7 +87,7 @@ public class SettingsFragment extends Fragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater menuinflater) {
+    public void onCreateOptionsMenu(Menu menu, MenuInflater menuinflater) {
         menuinflater.inflate(R.menu.bt, menu);
     }
 
@@ -104,7 +119,7 @@ public class SettingsFragment extends Fragment {
         //Bootanimation spinner
         String[] animations = new String[]{"Classic", "Burning", "New Kali", "ctOS", "Glitch"};
         Spinner animation_spinner = rootView.findViewById(R.id.animation_spinner);
-        animation_spinner.setAdapter(new ArrayAdapter<>(requireContext(),
+        animation_spinner.setAdapter(new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_list_item_1, animations));
 
         //Select Animation
@@ -114,42 +129,31 @@ public class SettingsFragment extends Fragment {
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int pos, long id) {
                 final VideoView videoview = rootView.findViewById(R.id.videoView);
                 selected_animation = parentView.getItemAtPosition(pos).toString();
-                switch (selected_animation) {
-                    case "Classic": {
-                        String path = ("android.resource://" + context.getPackageName() + "/" + R.raw.boot_classic);
-                        videoview.setVideoURI(Uri.parse(path));
-                        animation_dir[0] = "src";
-                        bootanimation_start();
-                        break;
-                    }
-                    case "Burning": {
-                        String path = ("android.resource://" + context.getPackageName() + "/" + R.raw.boot_mk);
-                        videoview.setVideoURI(Uri.parse(path));
-                        animation_dir[0] = "src_mk";
-                        bootanimation_start();
-                        break;
-                    }
-                    case "New Kali": {
-                        String path = ("android.resource://" + context.getPackageName() + "/" + R.raw.boot_kali);
-                        videoview.setVideoURI(Uri.parse(path));
-                        animation_dir[0] = "src_kali";
-                        bootanimation_start();
-                        break;
-                    }
-                    case "ctOS": {
-                        String path = ("android.resource://" + context.getPackageName() + "/" + R.raw.boot_ctos);
-                        videoview.setVideoURI(Uri.parse(path));
-                        animation_dir[0] = "src_ctos";
-                        bootanimation_start();
-                        break;
-                    }
-                    case "Glitch": {
-                        String path = ("android.resource://" + context.getPackageName() + "/" + R.raw.boot_glitch);
-                        videoview.setVideoURI(Uri.parse(path));
-                        animation_dir[0] = "src_glitch";
-                        bootanimation_start();
-                        break;
-                    }
+                if (selected_animation.equals("Classic")) {
+                    String path = ("android.resource://" + context.getPackageName() + "/" + R.raw.boot_classic);
+                    videoview.setVideoURI(Uri.parse(path));
+                    animation_dir[0] = "src";
+                    bootanimation_start();
+                } else if (selected_animation.equals("Burning")){
+                    String path = ("android.resource://" + context.getPackageName() + "/" + R.raw.boot_mk);
+                    videoview.setVideoURI(Uri.parse(path));
+                    animation_dir[0] = "src_mk";
+                    bootanimation_start();
+                } else if (selected_animation.equals("New Kali")){
+                    String path = ("android.resource://" + context.getPackageName() + "/" + R.raw.boot_kali);
+                    videoview.setVideoURI(Uri.parse(path));
+                    animation_dir[0] = "src_kali";
+                    bootanimation_start();
+                } else if (selected_animation.equals("ctOS")){
+                    String path = ("android.resource://" + context.getPackageName() + "/" + R.raw.boot_ctos);
+                    videoview.setVideoURI(Uri.parse(path));
+                    animation_dir[0] = "src_ctos";
+                    bootanimation_start();
+                } else if (selected_animation.equals("Glitch")){
+                    String path = ("android.resource://" + context.getPackageName() + "/" + R.raw.boot_glitch);
+                    videoview.setVideoURI(Uri.parse(path));
+                    animation_dir[0] = "src_glitch";
+                    bootanimation_start();
                 }
             }
             @Override
@@ -173,25 +177,27 @@ public class SettingsFragment extends Fragment {
         ImageHeight.setEnabled(false);
         ImageResMinus.setEnabled(false);
         ImageResPlus.setEnabled(false);
-        ConvertCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                ImageWidth.setEnabled(true);
-                ImageWidth.setTextColor(Color.parseColor("#FFFFFF"));
-                ImageHeight.setEnabled(true);
-                ImageHeight.setTextColor(Color.parseColor("#FFFFFF"));
-                ImageResMinus.setEnabled(true);
-                ImageResMinus.setTextColor(Color.parseColor("#FFFFFF"));
-                ImageResPlus.setEnabled(true);
-                ImageResPlus.setTextColor(Color.parseColor("#FFFFFF"));
-            } else {
-                ImageWidth.setEnabled(false);
-                ImageWidth.setTextColor(Color.parseColor("#40FFFFFF"));
-                ImageHeight.setEnabled(false);
-                ImageHeight.setTextColor(Color.parseColor("#40FFFFFF"));
-                ImageResMinus.setEnabled(false);
-                ImageResMinus.setTextColor(Color.parseColor("#40FFFFFF"));
-                ImageResPlus.setEnabled(false);
-                ImageResPlus.setTextColor(Color.parseColor("#40FFFFFF"));
+        ConvertCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    ImageWidth.setEnabled(true);
+                    ImageWidth.setTextColor(Color.parseColor("#FFFFFF"));
+                    ImageHeight.setEnabled(true);
+                    ImageHeight.setTextColor(Color.parseColor("#FFFFFF"));
+                    ImageResMinus.setEnabled(true);
+                    ImageResMinus.setTextColor(Color.parseColor("#FFFFFF"));
+                    ImageResPlus.setEnabled(true);
+                    ImageResPlus.setTextColor(Color.parseColor("#FFFFFF"));
+                } else {
+                    ImageWidth.setEnabled(false);
+                    ImageWidth.setTextColor(Color.parseColor("#40FFFFFF"));
+                    ImageHeight.setEnabled(false);
+                    ImageHeight.setTextColor(Color.parseColor("#40FFFFFF"));
+                    ImageResMinus.setEnabled(false);
+                    ImageResMinus.setTextColor(Color.parseColor("#40FFFFFF"));
+                    ImageResPlus.setEnabled(false);
+                    ImageResPlus.setTextColor(Color.parseColor("#40FFFFFF"));
+                }
             }
         });
         addClickListener(ImageResMinus, v -> {
@@ -230,13 +236,15 @@ public class SettingsFragment extends Fragment {
         //Preview Checkbox
         View PreView = rootView.findViewById(R.id.pre_view);
         CheckBox PreviewCheckbox = rootView.findViewById(R.id.preview_checkbox);
-        PreviewCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                PreView.setVisibility(View.VISIBLE);
-            } else {
-                PreView.setVisibility(View.GONE);
-            }
-        });
+        PreviewCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                               public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                                   if (isChecked) {
+                                                       PreView.setVisibility(View.VISIBLE);
+                                                   } else {
+                                                       PreView.setVisibility(View.GONE);
+                                                   }
+                                               }
+                                           });
 
         // Screen size
         DisplayMetrics displaymetrics = new DisplayMetrics();
@@ -262,11 +270,12 @@ public class SettingsFragment extends Fragment {
         ShellExecuter exe = new ShellExecuter();
         String bootanimation_path = exe.RunAsRootOutput("find /vendor /system -name \"*ootanimation.zip\"");
 
-        if (Objects.equals(bootanimation_path, "")) {
+        if (bootanimation_path == "" ) {
             BootanimationPath.setText("Bootanimation path not found");
         } else {
             BootanimationPath.setText(bootanimation_path);
         }
+
 
 
         //Make bootanimation
@@ -295,12 +304,12 @@ public class SettingsFragment extends Fragment {
         //Install bootanimation
         Button InstallBootAnimationButton = rootView.findViewById(R.id.set_bootanimation);
         addClickListener(InstallBootAnimationButton, v -> {
-            File AnimationZip = new File(MessageFormat.format("{0}/bootanimation.zip", NhPaths.SD_PATH));
+            File AnimationZip = new File(nh.SD_PATH + "/bootanimation.zip");
                     if (AnimationZip.length() == 0)
-                        Toast.makeText(requireActivity().getApplicationContext(), "Bootanimation zip is not created!!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity().getApplicationContext(), "Bootanimation zip is not created!!", Toast.LENGTH_SHORT).show();
                     else {
                         run_cmd_android("echo -ne \"\\033]0;Installing animation\\007\" && clear;grep ' / ' /proc/mounts | grep -qv 'rootfs' || grep -q ' /system_root ' /proc/mounts && SYSTEM=/ || SYSTEM=/system " +
-                                "&& mount -o rw,remount $SYSTEM && cp " + NhPaths.SD_PATH + "/bootanimation.zip " + BootanimationPath.getText().toString() + " " +
+                                "&& mount -o rw,remount $SYSTEM && cp " + nh.SD_PATH + "/bootanimation.zip " + BootanimationPath.getText().toString() + " " +
                                 "&& echo \"Done. Please reboot to check the result! Exiting in 3secs..\" && sleep 3 && exit");
                     }
         });
@@ -310,8 +319,8 @@ public class SettingsFragment extends Fragment {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault());
         addClickListener(BackupButton, v -> {
             String currentDateandTime = sdf.format(new Date());
-            exe.RunAsRoot(new String[]{"cd " + NhPaths.SD_PATH + "/nh_files && tar -czvf /sdcard/nh_files_" + currentDateandTime +".tar *"});
-            Toast.makeText(requireActivity().getApplicationContext(), "Backup has been saved to /sdcard/nh_files_" + currentDateandTime , Toast.LENGTH_LONG).show();
+            exe.RunAsRoot(new String[]{"cd " + nh.SD_PATH + "/nh_files && tar -czvf /sdcard/nh_files_" + currentDateandTime +".tar *"});
+            Toast.makeText(getActivity().getApplicationContext(), "Backup has been saved to /sdcard/nh_files_" + currentDateandTime , Toast.LENGTH_LONG).show();
         });
 
         //Restore
@@ -330,10 +339,10 @@ public class SettingsFragment extends Fragment {
             String RestoreFilePath = RestoreFileName.getText().toString();
             File RestoreFile = new File(RestoreFilePath);
             if (RestoreFile.length() == 0) {
-                Toast.makeText(requireActivity().getApplicationContext(), "Select a backup file to restore!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity().getApplicationContext(), "Select a backup file to restore!", Toast.LENGTH_SHORT).show();
             } else {
-                exe.RunAsRoot(new String[]{"rm -r " + NhPaths.SD_PATH + "/nh_files/* && tar -xvf " + RestoreFilePath + " -C " + NhPaths.SD_PATH + "/nh_files/"});
-                Toast.makeText(requireActivity().getApplicationContext(), "nh_files has been successfully restored", Toast.LENGTH_SHORT).show();
+                exe.RunAsRoot(new String[]{"rm -r " + nh.SD_PATH + "/nh_files/* && tar -xvf " + RestoreFilePath + " -C " + nh.SD_PATH + "/nh_files/"});
+                Toast.makeText(getActivity().getApplicationContext(), "nh_files has been successfully restored", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -342,7 +351,7 @@ public class SettingsFragment extends Fragment {
         File NhSystemApp = new File("/system/app/NetHunter/NetHunter.apk");
         addClickListener(UninstallButton, v -> {
         if (NhSystemApp.length() == 0) {
-            Toast.makeText(requireActivity().getApplicationContext(), "NetHunter was not flashed as system app! Please remove it from Android settings.", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity().getApplicationContext(), "NetHunter was not flashed as system app! Please remove it from Android settings.", Toast.LENGTH_LONG).show();
         } else {
             run_cmd_android("echo -ne \"\\033]0;Uninstalling NetHunter\\007\" && clear;grep ' / ' /proc/mounts | grep -qv 'rootfs' || grep -q ' /system_root ' /proc/mounts && SYSTEM=/ || SYSTEM=/system " +
                         "&& mount -o rw,remount $SYSTEM && rm " + NhSystemApp + " && pm clear com.offsec.nethunter && echo 'Done! Reboot your device to complete the process. Exiting in 3secs..' && sleep 3 && exit");
@@ -368,13 +377,13 @@ public class SettingsFragment extends Fragment {
                 exe.RunAsRoot(new String[]{"setenforce 1"});
                 SELinuxButton.setText("Set to Permissive");
                 SELinux.setText("Enforcing");
-                Toast.makeText(requireActivity().getApplicationContext(), "SElinux set to Enforcing done", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity().getApplicationContext(), "SElinux set to Enforcing done", Toast.LENGTH_SHORT).show();
                 sharedpreferences.edit().putBoolean("SElinux", true).apply();
            } else {
                 exe.RunAsRoot(new String[]{"setenforce 0"});
                 SELinuxButton.setText("Set to Enforcing");
                 SELinux.setText("Permissive");
-                Toast.makeText(requireActivity().getApplicationContext(), "SElinux set to Permissive done", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity().getApplicationContext(), "SElinux set to Permissive done", Toast.LENGTH_SHORT).show();
                 sharedpreferences.edit().putBoolean("SElinux", false).apply();
             }
         });
@@ -391,7 +400,7 @@ public class SettingsFragment extends Fragment {
         String commandBB = ("ls /system/xbin | grep busybox_nh- | cut -f 2 -d '-'");
         String outputBB = exe.RunAsRootOutput(commandBB);
         final String[] bbArray = outputBB.split("\n");
-        ArrayAdapter<String> usersadapter = new ArrayAdapter<>(requireContext(),android.R.layout.simple_list_item_1, bbArray);
+        ArrayAdapter usersadapter = new ArrayAdapter<>(getContext(),android.R.layout.simple_list_item_1, bbArray);
         busybox_spinner.setAdapter(usersadapter);
 
         //Select Version
@@ -415,7 +424,7 @@ public class SettingsFragment extends Fragment {
         BusyboxButton.setOnClickListener( v -> {
             File busybox = new File("/system/xbin/" + busybox_file[0]);
                 exe.RunAsRoot(new String[]{"if [ \"$(getprop ro.build.system_root_image)\" == \"true\" ]; then export SYSTEM=/; else export SYSTEM=/system;fi;mount -o rw,remount $SYSTEM && rm /system/xbin/busybox_nh;ln -s " + busybox + " /system/xbin/busybox_nh"});
-                Toast.makeText(requireActivity().getApplicationContext(), "NetHunter BusyBox version has been successfully modified", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity().getApplicationContext(), "NetHunter BusyBox version has been successfully modified", Toast.LENGTH_SHORT).show();
         });
         final Button BusyboxSystemButton = rootView.findViewById(R.id.system_bb);
         String busybox_system = exe.RunAsRootOutput("/system/xbin/busybox | head -n1 | grep -iF nethunter");
@@ -428,7 +437,7 @@ public class SettingsFragment extends Fragment {
         }
         BusyboxSystemButton.setOnClickListener( v -> {
                 exe.RunAsRoot(new String[]{"if [ \"$(getprop ro.build.system_root_image)\" == \"true\" ]; then export SYSTEM=/; else export SYSTEM=/system;fi;mount -o rw,remount $SYSTEM && rm /system/xbin/busybox;ln -s /system/xbin/busybox_nh /system/xbin/busybox"});
-                Toast.makeText(requireActivity().getApplicationContext(), "Default system BusyBox has been changed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity().getApplicationContext(), "Default system BusyBox has been changed", Toast.LENGTH_SHORT).show();
         });
 
         //Terminal style
@@ -439,7 +448,7 @@ public class SettingsFragment extends Fragment {
         //Prompt spinner
         Spinner PromptSpinner = rootView.findViewById(R.id.prompt_spinner);
         String[] Prompts = new String[]{"oneline", "twoline", "backtrack"};
-        PromptSpinner.setAdapter(new ArrayAdapter<>(requireContext(),
+        PromptSpinner.setAdapter(new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_list_item_1, Prompts));
 
         //Select prompt
@@ -457,7 +466,7 @@ public class SettingsFragment extends Fragment {
         final Button ApplyPromptButton = rootView.findViewById(R.id.apply_prompt);
         ApplyPromptButton.setOnClickListener( v -> {
             exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd sed -i '0,/.*PROMPT_ALTERNATIVE=.*/s//PROMPT_ALTERNATIVE=" + selected_prompt + "/' /root/.zshrc");
-            Toast.makeText(requireActivity().getApplicationContext(), "Zsh terminal prompt style has been successfully changed", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity().getApplicationContext(), "Zsh terminal prompt style has been successfully changed", Toast.LENGTH_SHORT).show();
             TerminalStyle.setText(selected_prompt);
         });
 
@@ -465,11 +474,13 @@ public class SettingsFragment extends Fragment {
     }
 
     private void bootanimation_start() {
-        final VideoView videoview = requireActivity().findViewById(R.id.videoView);
+        final VideoView videoview = getActivity().findViewById(R.id.videoView);
         videoview.requestFocus();
-        videoview.setOnPreparedListener(mp -> {
-            videoview.start();
-            mp.setLooping(true);
+        videoview.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            public void onPrepared(MediaPlayer mp) {
+                videoview.start();
+                mp.setLooping(true);
+            }
         });
     }
 
@@ -479,22 +490,24 @@ public class SettingsFragment extends Fragment {
         if (requestCode == 1001) {
             if (resultCode == Activity.RESULT_OK) {
                 ShellExecuter exe = new ShellExecuter();
-                EditText RestoreFileName = requireActivity().findViewById(R.id.restorefilename);
-                String FilePath = Objects.requireNonNull(data.getData()).getPath();
+                EditText ResotreFileName = getActivity().findViewById(R.id.restorefilename);
+                String FilePath = data.getData().getPath();
                 FilePath = exe.RunAsRootOutput("echo " + FilePath + " | sed -e 's/\\/document\\/primary:/\\/sdcard\\//g' ");
-                RestoreFileName.setText(FilePath);
+                ResotreFileName.setText(FilePath);
             }
         }
     }
 
     public void SetupDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
         builder.setTitle("Welcome to Settings!");
         builder.setMessage("In order to make sure everything is working, an initial setup needs to be done.");
-        builder.setPositiveButton("Check & Install", (dialog, which) -> {
-            RunSetup();
-            sharedpreferences.edit().putBoolean("animation_setup_done", true).apply();
+        builder.setPositiveButton("Check & Install", new DialogInterface.OnClickListener(){
+            public void onClick(DialogInterface dialog, int which) {
+                RunSetup();
+                sharedpreferences.edit().putBoolean("animation_setup_done", true).apply();
+            }
         });
         builder.show();
 
@@ -503,14 +516,14 @@ public class SettingsFragment extends Fragment {
     public void RunSetup() {
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
         run_cmd("echo -ne \"\\033]0;Bootanimation Setup\\007\" && clear;if [[ -f /usr/bin/convert ]];then echo 'Imagemagick is installed!'; else " +
-                "apt update && apt install imagemagick -y;fi; if [[ -f /root/nethunter-bootanimation ]];then echo 'Nethunter-bootanimation is installed!'; else " +
+                "apt-get update && apt-get install imagemagick -y;fi; if [[ -f /root/nethunter-bootanimation ]];then echo 'Nethunter-bootanimation is installed!'; else " +
                 "git clone https://gitlab.com/kalilinux/nethunter/apps/kali-nethunter-bootanimation /root/nethunter-bootanimation;fi; echo 'Everything is ready! Closing in 3secs..'; sleep 3 && exit ");
         sharedpreferences.edit().putBoolean("animation_setup_done", true).apply();
     }
 
     public void RunUpdate() {
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-        run_cmd("echo -ne \"\\033]0;Bootanimation Update\\007\" && clear;apt update && apt install imagemagick -y;if [[ -d /root/nethunter-bootanimation ]];then cd /root/nethunter-bootanimation;git pull" +
+        run_cmd("echo -ne \"\\033]0;Bootanimation Update\\007\" && clear;apt-get update && apt-get install imagemagick -y;if [[ -d /root/nethunter-bootanimation ]];then cd /root/nethunter-bootanimation;git pull" +
                 ";fi; echo 'Done! Closing in 3secs..'; sleep 3 && exit ");
         sharedpreferences.edit().putBoolean("animation_setup_done", true).apply();
     }
@@ -524,12 +537,12 @@ public class SettingsFragment extends Fragment {
     // Bridge side functions
     ////
 
-    public void run_cmd(String cmd) {
+    public static void run_cmd(String cmd) {
         Intent intent = Bridge.createExecuteIntent("/data/data/com.offsec.nhterm/files/usr/bin/kali", cmd);
         activity.startActivity(intent);
     }
 
-    public void run_cmd_android(String cmd) {
+    public static void run_cmd_android(String cmd) {
         Intent intent = Bridge.createExecuteIntent("/data/data/com.offsec.nhterm/files/usr/bin/android-su", cmd);
         activity.startActivity(intent);
     }

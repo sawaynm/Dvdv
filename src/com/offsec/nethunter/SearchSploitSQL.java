@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
+import android.os.Environment;
 import android.util.Log;
 
 import com.offsec.nethunter.utils.NhPaths;
@@ -67,7 +68,8 @@ class SearchSploitSQL extends SQLiteOpenHelper {
         String sql = "SELECT COUNT(*) FROM " + SearchSploit.TABLE;
         SQLiteDatabase db = this.getWritableDatabase();
         SQLiteStatement statement = db.compileStatement(sql);
-        return statement.simpleQueryForLong();
+        long count = statement.simpleQueryForLong();
+        return count;
     }
 
     public List<SearchSploit> getAllExploits() {

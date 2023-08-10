@@ -407,7 +407,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                 .replace(R.id.container, NetHunterFragment.newInstance(R.id.nethunter_item))
                 .commit();
             // and put the title in the queue for when you need to back through them
-            titles.push(Objects.requireNonNull(navigationView.getMenu().getItem(0).getTitle()).toString());
+            titles.push(navigationView.getMenu().getItem(0).getTitle().toString());
             // disable all fragment first until it passes the compat check.
             navigationView.getMenu().setGroupEnabled(R.id.chrootDependentGroup, false);
        // }
@@ -424,7 +424,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
             lastSelectedMenuItem.setChecked(true);
         }
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.drawer_opened, R.string.drawer_closed);
-        mDrawerLayout.addDrawerListener(mDrawerToggle);
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
         startService(new Intent(getApplicationContext(), CompatCheckService.class));
 
@@ -467,9 +467,8 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                     // only change it if is not the same as the last one
                     if (lastSelectedMenuItem != menuItem) {
                         //remove last
-                        if (lastSelectedMenuItem != null) {
+                        if(lastSelectedMenuItem != null)
                             lastSelectedMenuItem.setChecked(false);
-                        }
                         // update for the next
                         lastSelectedMenuItem = menuItem;
                     }
@@ -477,7 +476,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                     menuItem.setChecked(true);
                     mDrawerLayout.closeDrawers();
                     mTitle = menuItem.getTitle();
-                    titles.push(Objects.requireNonNull(mTitle).toString());
+                    titles.push(mTitle.toString());
 
                     int itemId = menuItem.getItemId();
                     changeDrawer(itemId);
@@ -501,7 +500,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                     menuItem.setChecked(true);
                     mDrawerLayout.closeDrawers();
                     mTitle = menuItem.getTitle();
-                    titles.push(Objects.requireNonNull(mTitle).toString());
+                    titles.push(mTitle.toString());
 
                     int itemId = menuItem.getItemId();
                     changeDrawer(itemId);

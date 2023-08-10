@@ -21,6 +21,7 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.offsec.nethunter.utils.NhPaths;
@@ -34,15 +35,16 @@ import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
 import java.util.List;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
+//import androidx.appcompat.widget.SearchView;
+
 
 public class SearchSploitFragment extends Fragment {
 
-    public static final String TAG = "SearchSploitFragment";
+    private static final String TAG = "SearchSploitFragment";
     private static final String ARG_SECTION_NUMBER = "section_number";
     private Boolean withFilters = true;
     private String sel_type;
@@ -145,7 +147,7 @@ public class SearchSploitFragment extends Fragment {
 
                             src.close();
                             dst.close();
-                            Log.d("importDB", "Successfully imported " + DATABASE_NAME);
+                            Log.d("importDB", "Successfuly imported " + DATABASE_NAME);
                             main(rootView);
 
                             pd.dismiss();
@@ -169,41 +171,43 @@ public class SearchSploitFragment extends Fragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.searchsploit, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
-        if (item.getItemId() == R.id.rawSearch_ON) {
-            if (getView() == null) return true;
-            if (!withFilters) {
-                getView().findViewById(R.id.search_filters).setVisibility(View.VISIBLE);
-                withFilters = true;
-                item.setTitle("Enable Raw search");
-                loadExploits();
-                hideSoftKeyboard(getView());
-            } else {
-                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
-                builder.setTitle("Raw search warning");
+        switch (item.getItemId()) {
+            case R.id.rawSearch_ON:
+                if (getView() == null) return true;
+                if (!withFilters) {
+                    getView().findViewById(R.id.search_filters).setVisibility(View.VISIBLE);
+                    withFilters = true;
+                    item.setTitle("Enable Raw search");
+                    loadExploits();
+                    hideSoftKeyboard(getView());
+                } else {
+                    MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
+                    builder.setTitle("Raw search warning");
 
-                builder.setMessage("The exploit db is pretty big (+30K exploits), activating raw search will make the search slow.\nIs useful to do global searches when you don't find a exploit.")
-                        .setNegativeButton("Cancel", (dialog, id) -> dialog.dismiss())
-                        .setPositiveButton("Enable", (dialog, id) -> {
-                            getView().findViewById(R.id.search_filters).setVisibility(View.GONE);
-                            item.setTitle("Disable Raw search");
-                            withFilters = false;
-                            loadExploits();
-                            hideSoftKeyboard(getView());
-                        });
+                    builder.setMessage("The exploit db is pretty big (+30K exploits), activating raw search will make the search slow.\nIs useful to do global searches when you don't find a exploit.")
+                            .setNegativeButton("Cancel", (dialog, id) -> dialog.dismiss())
+                            .setPositiveButton("Enable", (dialog, id) -> {
+                                getView().findViewById(R.id.search_filters).setVisibility(View.GONE);
+                                item.setTitle("Disable Raw search");
+                                withFilters = false;
+                                loadExploits();
+                                hideSoftKeyboard(getView());
+                            });
 
-                AlertDialog ad = builder.create();
-                ad.setCancelable(false);
-                ad.show();
-            }
-            return true;
+                    AlertDialog ad = builder.create();
+                    ad.setCancelable(false);
+                    ad.show();
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 
     private static void hideSoftKeyboard(final View caller) {
@@ -216,13 +220,13 @@ public class SearchSploitFragment extends Fragment {
     private void main(final View rootView) {
 
         searchSploitListView = rootView.findViewById(R.id.searchResultsList);
-        long exploitCount = database.getCount();
+        Long exploitCount = database.getCount();
         Button searchSearchSploit = rootView.findViewById(R.id.serchsploit_loadDB);
         if (exploitCount == 0) {
             searchSearchSploit.setVisibility(View.VISIBLE);
             rootView.findViewById(R.id.search_filters).setVisibility(View.GONE);
             adi.dismiss();
-            hideSoftKeyboard(requireView());
+            hideSoftKeyboard(getView());
             return;
         } else {
             rootView.findViewById(R.id.search_filters).setVisibility(View.VISIBLE);
@@ -279,7 +283,7 @@ public class SearchSploitFragment extends Fragment {
             }
             if (exploitList == null) {
                 new android.os.Handler().postDelayed(
-                        this::loadExploits, 1500);
+                        () -> loadExploits(), 1500);
                 return;
             }
             numex.setText(String.format("%d results", exploitList.size()));
@@ -292,7 +296,7 @@ public class SearchSploitFragment extends Fragment {
 
                 adi.dismiss();
                 isLoaded = true;
-                hideSoftKeyboard(requireView());
+                hideSoftKeyboard(getView());
             }
         }
     }
@@ -373,7 +377,7 @@ class ExploitLoader extends BaseAdapter {
         final SearchSploit exploitItem = getItem(position);
 
         final String _file = exploitItem.getFile();
-        final long _id = exploitItem.getId();
+        final Long _id = exploitItem.getId();
         String _desc = exploitItem.getDescription();
         String _date = exploitItem.getDate();
         String _author = exploitItem.getAuthor();

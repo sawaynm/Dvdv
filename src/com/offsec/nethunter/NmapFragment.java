@@ -19,14 +19,15 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Switch;
+import android.widget.Toast;
 
 import com.offsec.nethunter.bridge.Bridge;
+import com.offsec.nethunter.utils.NhPaths;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 
 public class NmapFragment extends Fragment {
@@ -81,7 +82,7 @@ public class NmapFragment extends Fragment {
         SharedPreferences sharedpreferences = context.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
 
         // Switch to activate open/close of advanced options
-        SwitchCompat advswitch = rootView.findViewById(R.id.nmap_adv_switch);
+        Switch advswitch = rootView.findViewById(R.id.nmap_adv_switch);
         advswitch.setChecked(false);
         advswitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
@@ -405,7 +406,7 @@ public class NmapFragment extends Fragment {
     private String getCmd() {
         String genCmd = "";
         for (int j = CommandComposed.size() - 1; j >= 0; j--) {
-            genCmd = MessageFormat.format("{0}{1}", genCmd, CommandComposed.get(j));
+            genCmd = genCmd + CommandComposed.get(j);
         }
         //Log.d("NMAP SQL:", "nmap --script sqlite-output --script-args=dbname=/tmp/scan.sqlite,dbtable=scandata " + genCmd);
         Log.d("NMAP CMD OUTPUT: ", "nmap " + genCmd);
