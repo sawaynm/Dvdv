@@ -27,7 +27,8 @@ public class KaliServicesSQL extends SQLiteOpenHelper {
 			{"1", "SSH", "service ssh start", "service ssh stop", "sshd", "0"},
 			{"2", "APACHE2", "service apache2 start", "service apache2 stop", "apache2", "0"},
 			{"3", "POSTGRESQL", "service postgresql start", "service postgresql stop", "postgres", "0"},
-			{"4", "DNSMASQ", "service dnsmasq start", "service dnsmasq stop", "dnsmasq", "0"}
+			{"4", "DNSMASQ", "service dnsmasq start", "service dnsmasq stop", "dnsmasq", "0"},
+			{"5", "DBUS", "service dbus start", "service dbus stop", "dbus", "0"}
 	};
 
 	public synchronized static KaliServicesSQL getInstance(Context context){

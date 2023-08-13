@@ -11,6 +11,7 @@ import com.offsec.nethunter.models.CustomCommandsModel;
 import com.offsec.nethunter.service.NotificationChannelService;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
+import com.offsec.nethunter.bridge.*;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ public class CustomCommandsAsyncTask extends AsyncTask<List<CustomCommandsModel>
 	private int position;
 	private int originalPositionIndex;
 	private int targetPositionIndex;
-	private WeakReference<Context> context = null;
+	private static WeakReference<Context> context = null;
 	private ArrayList<Integer> selectedPositionsIndex;
 	private ArrayList<Integer> selectedTargetIds;
 	private ArrayList<String> dataArrayList;
@@ -100,11 +101,16 @@ public class CustomCommandsAsyncTask extends AsyncTask<List<CustomCommandsModel>
 				customCommandsModelList = copyOfcustomCommandsModelList[0];
 				if (customCommandsModelList != null){
 					if (customCommandsModelList.get(position).getExecutionMode().equals("interactive")){
-						Intent intent = new Intent(customCommandsModelList.get(position).getRuntimeEnv().equals("android")?"com.offsec.nhterm.RUN_SCRIPT":"com.offsec.nhterm.RUN_SCRIPT_NH");
-						intent.addCategory(Intent.CATEGORY_DEFAULT);
-						intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-						intent.putExtra("com.offsec.nhterm.iInitialCommand", customCommandsModelList.get(position).getCommand());
-						context.get().startActivity(intent);
+						if (customCommandsModelList.get(position).getRuntimeEnv().equals("android")) {
+							// INTERACTIVE - ANDROID
+							String cmd = customCommandsModelList.get(position).getCommand();
+							run_cmd_android(cmd);
+						}
+						if (customCommandsModelList.get(position).getRuntimeEnv().equals("kali")) {
+							// INTERACTIVE - KALI
+							String cmd = customCommandsModelList.get(position).getCommand();
+							run_cmd(cmd);
+						}
 					} else {
 						Intent intent = new Intent(context.get(), NotificationChannelService.class).setAction(NotificationChannelService.CUSTOMCOMMAND_START);
 						intent.putExtra("ENV", customCommandsModelList.get(position).getRuntimeEnv()).putExtra("CMD", customCommandsModelList.get(position).getCommand());
@@ -232,5 +238,19 @@ public class CustomCommandsAsyncTask extends AsyncTask<List<CustomCommandsModel>
 			}
 		}
 		new ShellExecuter().RunAsRootOutput("cat << 'EOF' > "  + NhPaths.APP_SCRIPTS_PATH + "/runonboot_services" + "\n" + tmpStringBuilder.toString() + "\nEOF");
+	}
+
+	////
+	// Bridge side functions
+	////
+
+	public static void run_cmd(String cmd) {
+		Intent intent = Bridge.createExecuteIntent("/data/data/com.offsec.nhterm/files/usr/bin/kali", cmd);
+		context.get().startActivity(intent);
+	}
+
+	public static void run_cmd_android(String cmd) {
+		Intent intent = Bridge.createExecuteIntent("/system/bin/sh", cmd);
+		context.get().startActivity(intent);
 	}
 }

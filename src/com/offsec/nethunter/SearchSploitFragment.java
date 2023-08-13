@@ -1,7 +1,6 @@
 package com.offsec.nethunter;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -24,8 +23,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
+
+import com.techiness.progressdialoglibrary.ProgressDialog;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -80,7 +82,7 @@ public class SearchSploitFragment extends Fragment {
 
         setHasOptionsMenu(true);
         database = new SearchSploitSQL(context);
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
         builder.setTitle("Exploit Database Archive");
         builder.setMessage("Loading...wait");
 
@@ -116,7 +118,7 @@ public class SearchSploitFragment extends Fragment {
         final Button searchSearchSploit = rootView.findViewById(R.id.serchsploit_loadDB);
         searchSearchSploit.setVisibility(View.GONE);
         searchSearchSploit.setOnClickListener(v -> {
-            final ProgressDialog pd = new ProgressDialog(activity);
+            final ProgressDialog pd = new ProgressDialog(activity, ProgressDialog.THEME_DARK);
             pd.setTitle("Feeding Exploit DB");
             pd.setMessage("This can take a minute, wait...");
             pd.setCancelable(false);
@@ -147,6 +149,7 @@ public class SearchSploitFragment extends Fragment {
                             dst.close();
                             Log.d("importDB", "Successfuly imported " + DATABASE_NAME);
                             main(rootView);
+
                             pd.dismiss();
                         } catch (Exception e) {
                             Log.d("importDB", e.toString());
@@ -184,7 +187,7 @@ public class SearchSploitFragment extends Fragment {
                     loadExploits();
                     hideSoftKeyboard(getView());
                 } else {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                    MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
                     builder.setTitle("Raw search warning");
 
                     builder.setMessage("The exploit db is pretty big (+30K exploits), activating raw search will make the search slow.\nIs useful to do global searches when you don't find a exploit.")
@@ -334,8 +337,8 @@ class ExploitLoader extends BaseAdapter {
 
     private void start(String file) {
         String[] command = new String[1];
-        command[0] = "su -c /data/data/com.offsec.nethunter/files/scripts/bootkali file2hid-file " + file;
-        String test = "su -c /data/data/com.offsec.nethunter/files/scripts/bootkali file2hid-file " + file;
+        command[0] = "su -mm -c /data/data/com.offsec.nethunter/files/scripts/bootkali file2hid-file " + file;
+        String test = "su -mm -c /data/data/com.offsec.nethunter/files/scripts/bootkali file2hid-file " + file;
         Log.d("Exe:", test);
         ShellExecuter exe = new ShellExecuter();
         exe.RunAsRoot(command);
@@ -392,7 +395,7 @@ class ExploitLoader extends BaseAdapter {
         vH.viewSource.setOnClickListener(v -> {
             Intent i = new Intent(_mContext, EditSourceActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            i.putExtra("path", "/data/local/nhsystem/kali-armhf/usr/share/exploitdb/" + _file);
+            i.putExtra("path", "/data/local/nhsystem/kalifs/usr/share/exploitdb/" + _file);
             _mContext.startActivity(i);
 
         });

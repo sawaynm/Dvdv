@@ -414,25 +414,41 @@
               android:textColor="#ffffffff" />
 
             <View
-                android:id="@+id/divider7"
+                android:id="@+id/divider11"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="?android:attr/listDivider" />
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="REMOVE NETHUNTER SYSTEM APP"
-                android:paddingTop="10dp"
-                android:padding="4dp" />
+                android:layout_gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="SELINUX STATUS"
+                    android:paddingTop="10dp"
+                    android:padding="4dp"
+                    android:layout_weight="1"/>
+
+                <TextView
+                    android:id="@+id/selinux"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Loading.."
+                    android:paddingTop="10dp"
+                    android:padding="4dp"
+                    android:layout_weight="3"/>
+
+            </LinearLayout>
 
             <Button
-                android:id="@+id/uninstall_nh"
-                android:layout_width="fill_parent"
+                android:id="@+id/selinux_toggle"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="5"
-                android:paddingBottom="10dp"
-                android:text="Uninstall NetHunter App"
+                android:text="Loading.."
                 android:textColor="#ffffffff" />
 
             <View
@@ -566,6 +582,28 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="10dp"
                 android:text="Set zsh style"
+                android:textColor="#ffffffff" />
+
+            <View
+                android:id="@+id/divider7"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="REMOVE NETHUNTER SYSTEM APP"
+                android:paddingTop="10dp"
+                android:padding="4dp" />
+
+            <Button
+                android:id="@+id/uninstall_nh"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="5"
+                android:paddingBottom="10dp"
+                android:text="Uninstall NetHunter App"
                 android:textColor="#ffffffff" />
 
       </LinearLayout>

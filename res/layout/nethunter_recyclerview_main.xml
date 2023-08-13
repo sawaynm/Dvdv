@@ -63,7 +63,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:layout_weight="0.6"
-            android:text="RUN"
-            android:textColor="@color/accent_material_dark" />
+            android:text="EXECUTE" />
     </LinearLayout>
 </LinearLayout>
