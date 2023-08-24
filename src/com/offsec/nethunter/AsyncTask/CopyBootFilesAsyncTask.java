@@ -1,6 +1,7 @@
 package com.offsec.nethunter.AsyncTask;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
@@ -15,7 +16,6 @@ import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.SharePrefTag;
 import com.offsec.nethunter.utils.ShellExecuter;
 
-import com.techiness.progressdialoglibrary.ProgressDialog;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -62,8 +62,7 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
         if (prefs.getInt(SharePrefTag.VERSION_CODE_TAG, 0) != BuildConfig.VERSION_CODE || !prefs.getString(TAG, buildTime).equals(buildTime) || !sdCardDir.isDirectory() || !scriptsDir.isDirectory() || !etcDir.isDirectory()) {
             Log.d(TAG, "COPYING NEW FILES");
             ProgressDialog progressDialog = progressDialogRef.get();
-            progressDialog.setTheme(ProgressDialog.THEME_DARK);
-
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
             progressDialog.setTitle("New app build detected:");
             progressDialog.setMessage("Coping new files...");
             progressDialog.setCancelable(false);

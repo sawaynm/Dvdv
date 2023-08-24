@@ -471,11 +471,7 @@ public class ManaFragment extends Fragment {
             loadOptions(rootView);
 
             gencerts.setOnClickListener(v -> {
-                Intent intent =
-                        new Intent("com.offsec.nhterm.RUN_SCRIPT_NH");
-                intent.addCategory(Intent.CATEGORY_DEFAULT);
-                intent.putExtra("com.offsec.nhterm.iInitialCommand", "cd /etc/hostapd-wpe/certs && ./bootstrap");
-                startActivity(intent);
+                run_cmd("cd /etc/hostapd-wpe/certs && ./bootstrap");
             });
 
             button.setOnClickListener(v -> {
