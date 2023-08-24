@@ -1,7 +1,7 @@
 package com.offsec.nethunter;
 
 import android.annotation.SuppressLint;
-import com.techiness.progressdialoglibrary.ProgressDialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;

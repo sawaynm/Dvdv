@@ -1,6 +1,7 @@
 package com.offsec.nethunter;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -27,7 +28,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
 
-import com.techiness.progressdialoglibrary.ProgressDialog;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -118,7 +118,7 @@ public class SearchSploitFragment extends Fragment {
         final Button searchSearchSploit = rootView.findViewById(R.id.serchsploit_loadDB);
         searchSearchSploit.setVisibility(View.GONE);
         searchSearchSploit.setOnClickListener(v -> {
-            final ProgressDialog pd = new ProgressDialog(activity, ProgressDialog.THEME_DARK);
+            final ProgressDialog pd = new ProgressDialog(activity);
             pd.setTitle("Feeding Exploit DB");
             pd.setMessage("This can take a minute, wait...");
             pd.setCancelable(false);
