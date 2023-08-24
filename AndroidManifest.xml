@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.offsec.nethunter"
-    android:sharedUserId="com.offsec.nhterm">
 
     <queries>
         <package android:name="com.offsec.nhterm" />
