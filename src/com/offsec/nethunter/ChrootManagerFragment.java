@@ -2,9 +2,9 @@ package com.offsec.nethunter;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -14,6 +14,7 @@ import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -161,12 +162,12 @@ public class ChrootManagerFragment extends Fragment {
             MaterialAlertDialogBuilder adb = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
             final AlertDialog ad = adb.create();
             LinearLayout ll = new LinearLayout(activity);
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             ll.setOrientation(LinearLayout.VERTICAL);
             ll.setLayoutParams(layoutParams);
             EditText chrootPathEditText = new EditText(activity);
             TextView availableChrootPathextview = new TextView(activity);
-            LinearLayout.LayoutParams editTextParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            LinearLayout.LayoutParams editTextParams = new LinearLayout.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             editTextParams.setMargins(58,0,58,0);
             chrootPathEditText.setText(sharedPreferences.getString(SharePrefTag.CHROOT_ARCH_SHAREPREF_TAG, ""));
             chrootPathEditText.setSingleLine();
@@ -190,7 +191,7 @@ public class ChrootManagerFragment extends Fragment {
             ad.setMessage("The Chroot Path is prefixed to \n\"/data/local/nhsystem/\"\n\n" +
                         "Just put the basename of your Kali Chroot Folder:");
             ad.setView(ll);
-            ad.setButton(Dialog.BUTTON_POSITIVE, "Apply", (dialogInterface, i) -> {
+            ad.setButton(DialogInterface.BUTTON_POSITIVE, "Apply", (dialogInterface, i) -> {
                 if (chrootPathEditText.getText().toString().matches("^\\.(.*$)|^\\.\\.(.*$)|^/+(.*$)|^.*/+(.*$)|^$")){
                     NhPaths.showMessage(activity, "Invilad Name, please try again.");
                 } else {
@@ -331,12 +332,12 @@ public class ChrootManagerFragment extends Fragment {
             restoreButton2.setOnClickListener(view12 -> {
                 MaterialAlertDialogBuilder adb2 = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
                 LinearLayout ll1 = new LinearLayout(activity);
-                LinearLayout.LayoutParams layoutParams1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                LinearLayout.LayoutParams layoutParams1 = new LinearLayout.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 ll1.setOrientation(LinearLayout.VERTICAL);
                 ll1.setLayoutParams(layoutParams1);
                 TextView chrootTarHintTextView = new TextView(activity);
                 EditText chrootTarFileEditText = new EditText(activity);
-                LinearLayout.LayoutParams editTextParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                LinearLayout.LayoutParams editTextParams = new LinearLayout.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 editTextParams.setMargins(58,40,58,0);
                 chrootTarHintTextView.setText("Type the full path of your Kali Chroot tarball file:");
                 chrootTarHintTextView.setLayoutParams(editTextParams);
@@ -532,10 +533,10 @@ public class ChrootManagerFragment extends Fragment {
             AlertDialog ad = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat).create();
             EditText backupFullPathEditText = new EditText(activity);
             LinearLayout ll = new LinearLayout(activity);
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
             ll.setOrientation(LinearLayout.VERTICAL);
             ll.setLayoutParams(layoutParams);
-            LinearLayout.LayoutParams editTextParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            LinearLayout.LayoutParams editTextParams = new LinearLayout.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             editTextParams.setMargins(58,40,58,0);
             backupFullPathEditText.setLayoutParams(editTextParams);
             ll.addView(backupFullPathEditText);
@@ -543,13 +544,13 @@ public class ChrootManagerFragment extends Fragment {
             ad.setTitle("Backup Chroot");
             ad.setMessage("* It is strongly suggested to create your backup chroot as tar.gz format just for faster process but bigger file size.\n\nbackup \"" + NhPaths.CHROOT_PATH() + "\" to:" );
             backupFullPathEditText.setText(sharedPreferences.getString(SharePrefTag.CHROOT_DEFAULT_BACKUP_SHAREPREF_TAG, ""));
-            ad.setButton(Dialog.BUTTON_POSITIVE, "OK", (dialogInterface, i) -> {
+            ad.setButton(DialogInterface.BUTTON_POSITIVE, "OK", (dialogInterface, i) -> {
                 sharedPreferences.edit().putString(SharePrefTag.CHROOT_DEFAULT_BACKUP_SHAREPREF_TAG, backupFullPathEditText.getText().toString()).apply();
                 if (new File(backupFullPathEditText.getText().toString()).exists()){
                     ad.dismiss();
                     AlertDialog ad2 = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat).create();
                     ad2.setMessage("File exists already, do you want ot overwrite it anyway?");
-                    ad2.setButton(Dialog.BUTTON_POSITIVE, "YES", (dialogInterface1, i1) -> {
+                    ad2.setButton(DialogInterface.BUTTON_POSITIVE, "YES", (dialogInterface1, i1) -> {
                         chrootManagerAsynctask = new ChrootManagerAsynctask(ChrootManagerAsynctask.BACKUP_CHROOT);
                         chrootManagerAsynctask.setListener(new ChrootManagerAsynctask.ChrootManagerAsyncTaskListener() {
                             @Override
