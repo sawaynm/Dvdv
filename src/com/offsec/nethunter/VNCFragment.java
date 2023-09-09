@@ -26,6 +26,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.offsec.nethunter.bridge.Bridge;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
@@ -565,7 +566,7 @@ public class VNCFragment extends Fragment {
     }
 
     private void openResolutionDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getActivity(), R.style.DialogStyleCompat);
         LayoutInflater inflater = this.getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.resolutiondialog, null);
         builder.setView(dialogView);
@@ -584,7 +585,7 @@ public class VNCFragment extends Fragment {
                     Toast.makeText(getActivity().getApplicationContext(), "Please enter the values!", Toast.LENGTH_SHORT).show();
                     openResolutionDialog();
                 } else if (Integer.parseInt(width.getText().toString()) > Integer.parseInt(height.getText().toString())){
-                    AlertDialog.Builder builder2 = new AlertDialog.Builder(getActivity());
+                    MaterialAlertDialogBuilder builder2 = new MaterialAlertDialogBuilder(getActivity(), R.style.DialogStyleCompat);
                     builder2.setTitle("Width is bigger than height!");
                     builder2.setMessage("Bigger width is usually only for tablets. Misconfiguration can render the device unresponsive");
                     builder2.setPositiveButton("Keep", new DialogInterface.OnClickListener() {
@@ -609,7 +610,7 @@ public class VNCFragment extends Fragment {
     }
 
     private void openVNCResolutionDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getActivity(), R.style.DialogStyleCompat);
         LayoutInflater inflater = this.getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.vncresolutiondialog, null);
         builder.setView(dialogView);
@@ -639,7 +640,7 @@ public class VNCFragment extends Fragment {
     private void confirmDialog() {
 
         SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-        final AlertDialog.Builder confirmbuilder = new AlertDialog.Builder(getActivity());
+        final MaterialAlertDialogBuilder confirmbuilder = new MaterialAlertDialogBuilder(getActivity(), R.style.DialogStyleCompat);
         confirmbuilder.setTitle("Do you want to keep the resolution?");
         confirmbuilder.setMessage("Loading..");
         confirmbuilder.setPositiveButton("Keep resolution", new DialogInterface.OnClickListener() {
@@ -675,7 +676,7 @@ public class VNCFragment extends Fragment {
 
     private void dbusDialog() {
 
-        final AlertDialog.Builder dbusbuilder = new AlertDialog.Builder(getActivity());
+        final MaterialAlertDialogBuilder dbusbuilder = new MaterialAlertDialogBuilder(getActivity(), R.style.DialogStyleCompat);
         ShellExecuter exe = new ShellExecuter();
         dbusbuilder.setTitle("DBUS service");
         dbusbuilder.setMessage("Do you want to stop dbus service? If you have no more sessions opened, press Yes.");

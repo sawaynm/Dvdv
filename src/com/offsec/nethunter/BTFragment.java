@@ -37,6 +37,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.offsec.nethunter.bridge.Bridge;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
@@ -113,15 +114,13 @@ public class BTFragment extends Fragment {
     }
 
     public void SetupDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getActivity(), R.style.DialogStyleCompat);
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
         builder.setTitle("Welcome to Bluetooth Arsenal!");
         builder.setMessage("In order to make sure everything is working, an initial setup needs to be done.");
-        builder.setPositiveButton("Check & Install", new DialogInterface.OnClickListener(){
-            public void onClick(DialogInterface dialog, int which) {
-                RunSetup();
-                sharedpreferences.edit().putBoolean("setup_done", true).apply();
-            }
+        builder.setPositiveButton("Check & Install", (dialog, which) -> {
+            RunSetup();
+            sharedpreferences.edit().putBoolean("setup_done", true).apply();
         });
         builder.show();
 
@@ -292,7 +291,7 @@ public class BTFragment extends Fragment {
             bluebinderButton.setOnClickListener( v -> {
                 if (bluebinderButton.getText().equals("Start")) {
                     if (!bt_smd.exists() && !hwbinder.exists() && !vhci.exists()) {
-                        final AlertDialog.Builder confirmbuilder = new AlertDialog.Builder(getActivity());
+                        final MaterialAlertDialogBuilder confirmbuilder = new MaterialAlertDialogBuilder(getActivity(), R.style.DialogStyleCompat);
                         confirmbuilder.setTitle("Internal bluetooth support disabled");
                         confirmbuilder.setMessage("Your device does not support hwbinder, vhci, or bt_smd. Make sure your kernel config has the recommended drivers enabled in order to use internal bluetooth.");
                         confirmbuilder.setPositiveButton("Sure", new DialogInterface.OnClickListener() {
