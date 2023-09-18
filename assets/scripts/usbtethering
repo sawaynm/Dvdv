@@ -57,7 +57,7 @@ function kill_proc() {
     ## Bringing down the usb interface ##
     ip link set $USB_IFACE down
     ip addr flush dev $USB_IFACE
-    $BUSYBOX ifconfig $USB_IFACE down
+    $BUSYBOX ip link set $USB_IFACE down
 
     bklog "[+] Done."
     exit 0
