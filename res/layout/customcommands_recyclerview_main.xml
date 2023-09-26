@@ -117,14 +117,13 @@
             </LinearLayout>
         </LinearLayout>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/f_customcommands_recyclerview_btn_run"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.6"
-            android:textColor="@android:color/holo_blue_dark"
             android:layout_gravity="bottom"
-            android:text="RUN"/>
+            android:text="EXECUTE"/>
     </LinearLayout>
 
 </LinearLayout>

@@ -37,6 +37,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.offsec.nethunter.bridge.Bridge;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
 
@@ -53,7 +54,7 @@ public class BTFragment extends Fragment {
     private SharedPreferences sharedpreferences;
     private NhPaths nh;
     private Context context;
-    private Activity activity;
+    private static Activity activity;
     private static final String ARG_SECTION_NUMBER = "section_number";
 
     public static BTFragment newInstance(int sectionNumber) {
@@ -101,16 +102,10 @@ public class BTFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.setup:
-                SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-                Boolean iswatch = sharedpreferences.getBoolean("running_on_wearos", false);
-                if (iswatch) RunSetupWatch();
-                else RunSetup();
+                RunSetup();
                 return true;
             case R.id.update:
-                sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-                iswatch = sharedpreferences.getBoolean("running_on_wearos", false);
-                if (iswatch) Toast.makeText(getActivity().getApplicationContext(), "Updates have to be done manually through adb shell. If anything gone wrong at first run, please run Setup again.", Toast.LENGTH_LONG).show();
-                else RunUpdate();
+                RunUpdate();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -119,54 +114,22 @@ public class BTFragment extends Fragment {
 
     public void SetupDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
         builder.setTitle("Welcome to Bluetooth Arsenal!");
         builder.setMessage("In order to make sure everything is working, an initial setup needs to be done.");
         builder.setPositiveButton("Check & Install", new DialogInterface.OnClickListener(){
             public void onClick(DialogInterface dialog, int which) {
                 RunSetup();
+                sharedpreferences.edit().putBoolean("setup_done", true).apply();
             }
         });
         builder.show();
 
-    }
-
-    public void SetupDialogWatch() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Welcome!");
-        builder.setMessage("In order to make sure everything is working, an initial setup needs to be done. You may need to disable bluetooth if your watch doesn't have an active WiFi connection.");
-        builder.setPositiveButton("Check & Install", new DialogInterface.OnClickListener(){
-            public void onClick(DialogInterface dialog, int which) {
-                RunSetupWatch();
-            }
-        });
-        builder.show();
-
-    }
-
-    public void RunSetupWatch() {
-        sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-        intentClickListener_NH("echo -ne \"\\033]0;BT Arsenal Setup\\007\" && clear;" +
-                "if [[ -f /usr/sbin/bluebinder ]]; then echo 'Bluebinder is installed!'; else wget https://raw.githubusercontent.com/yesimxev/bluebinder/master/prebuilt/armhf/bluebinder -P /usr/sbin/ && chmod +x /usr/sbin/bluebinder;fi;" +
-                "if [[ -f /usr/lib/libgbinder.so ]]; then echo 'libgbinder.so is installed!'; else wget https://raw.githubusercontent.com/yesimxev/libgbinder/master/prebuilt/armhf/libgbinder.so -P /usr/lib/;fi;" +
-                "if [[ -f /usr/lib/libgbinder.so.1 ]]; then echo 'libgbinder.so.1 is installed!'; else wget https://raw.githubusercontent.com/yesimxev/libgbinder/master/prebuilt/armhf/libgbinder.so.1 -P /usr/lib/;fi;" +
-                "if [[ -f /usr/lib/libgbinder.so.1.1 ]]; then echo 'libgbinder.so.1.1 is installed!'; else wget https://raw.githubusercontent.com/yesimxev/libgbinder/master/prebuilt/armhf/libgbinder.so.1.1 -P /usr/lib/;fi;" +
-                "if [[ -f /usr/lib/libgbinder.so.1.1.10 ]]; then echo 'libgbinder.so.1.1.10 is installed!'; else wget https://raw.githubusercontent.com/yesimxev/libgbinder/master/prebuilt/armhf/libgbinder.so.1.1.10 -P /usr/lib/;fi;" +
-                "if [[ -f /usr/lib/libgbinder.so.1.1.25 ]]; then echo 'libgbinder.so.1.1.25 is installed!'; else wget https://raw.githubusercontent.com/yesimxev/libgbinder/master/prebuilt/armhf/libgbinder.so.1.1.25 -P /usr/lib/;fi;" +
-                "if [[ -f /usr/lib/libglibutil.so ]]; then echo 'libglibutil.so is installed!'; else wget https://raw.githubusercontent.com/yesimxev/libglibutil/master/prebuilt/armhf/libglibutil.so -P /usr/lib/;fi;" +
-                "if [[ -f /usr/lib/libglibutil.so.1 ]]; then echo 'libglibutil.so.1 is installed!'; else wget https://raw.githubusercontent.com/yesimxev/libglibutil/master/prebuilt/armhf/libglibutil.so.1 -P /usr/lib/;fi;" +
-                "if [[ -f /usr/lib/libglibutil.so.1.0 ]]; then echo 'libglibutil.so.1.0 is installed!'; else wget https://raw.githubusercontent.com/yesimxev/libglibutil/master/prebuilt/armhf/libglibutil.so.1.0 -P /usr/lib/;fi;" +
-                "if [[ -f /usr/lib/libglibutil.so.1.0.53 ]]; then echo 'libglibutil.so.1.0.53 is installed!'; else wget https://raw.githubusercontent.com/yesimxev/libglibutil/master/prebuilt/armhf/libglibutil.so.1.0.53 -P /usr/lib/;fi;" +
-                "if [[ -f /usr/lib/libglibutil.so.1.0.67 ]]; then echo 'libglibutil.so.1.0.67 is installed!'; else wget https://raw.githubusercontent.com/yesimxev/libglibutil/master/prebuilt/armhf/libglibutil.so.1.0.67 -P /usr/lib/;fi;" +
-                "if [[ -f /usr/bin/carwhisperer ]]; then echo 'carwhisperer is installed!'; else wget https://raw.githubusercontent.com/yesimxev/carwhisperer-0.2/master/prebuilt/armhf/carwhisperer -P /usr/bin/ && chmod +x /usr/bin/carwhisperer;fi;" +
-                "if [[ -f /usr/bin/rfcomm_scan ]]; then echo 'rfcomm_scan is installed!'; else wget https://raw.githubusercontent.com/yesimxev/bt_audit/master/prebuilt/armhf/rfcomm_scan -P /usr/bin/ && chmod +x /usr/bin/rfcomm_scan;fi;" +
-                "if [[ -d /root/carwhisperer ]]; then echo '/root/carwhisperer is installed!'; else git clone https://github.com/yesimxev/carwhisperer-0.2 /root/carwhisperer;fi;" +
-                "echo 'Everything is installed! Closing in 3secs..'; sleep 3 && exit ");
-        sharedpreferences.edit().putBoolean("setup_done", true).apply();
     }
 
     public void RunSetup() {
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-                intentClickListener_NH("echo -ne \"\\033]0;BT Arsenal Setup\\007\" && clear;if [[ -f /usr/bin/hciconfig && -f /usr/bin/l2ping && " +
+        run_cmd("echo -ne \"\\033]0;BT Arsenal Setup\\007\" && clear;if [[ -f /usr/bin/hciconfig && -f /usr/bin/l2ping && " +
                         "-f /usr/bin/fang && -f /usr/bin/blueranger &&-f /usr/bin/bluelog && -f /usr/bin/sdptool && -f /usr/bin/spooftooph && -f /usr/bin/sox && -f /usr/include/bluetooth/bluetooth.h ]];then echo 'All packages are installed!'; else " +
                         "apt-get update && apt-get install bluetooth bluez bluez-tools bluez-obexd libbluetooth3 sox spooftooph libglib2.0*-dev libsystemd-dev " +
                         "libbluetooth-dev redfang bluelog blueranger -y;fi;" +
@@ -185,7 +148,7 @@ public class BTFragment extends Fragment {
 
     public void RunUpdate() {
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-        intentClickListener_NH("echo -ne \"\\033]0;BT Arsenal Update\\007\" && clear;apt-get update && apt-get install bluetooth bluez bluez-tools bluez-obexd libbluetooth3 sox spooftooph " +
+        run_cmd("echo -ne \"\\033]0;BT Arsenal Update\\007\" && clear;apt-get update && apt-get install bluetooth bluez bluez-tools bluez-obexd libbluetooth3 sox spooftooph " +
                 "libbluetooth-dev redfang bluelog blueranger libglib2.0*-dev libsystemd-dev -y;if [[ -f /usr/bin/carwhisperer && -f /usr/bin/rfcomm_scan && -f /root/bluebinder && -f /root/libgbinder && -f /root/libglibutil ]];" +
                 "then cd /root/carwhisperer/;git pull && make && make install;cd /root/bluebinder/;git pull && make && make install;cd /root/libgbinder/;git pull && make && " +
                 "make install-dev;cd /root/libglibutil/;git pull && make && make install-dev;cd /root/bt_audit; git pull; cd src && make;" +
@@ -261,29 +224,17 @@ public class BTFragment extends Fragment {
                                  Bundle savedInstanceState) {
 
             View rootView = inflater.inflate(R.layout.bt_main, container, false);
-
-            //Detecting watch
-            final TextView BTMainDesc = rootView.findViewById(R.id.bt_maindesc);
-            final TextView BTIface = rootView.findViewById(R.id.bt_if);
-            final TextView BTService = rootView.findViewById(R.id.bt_service);
-
             SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-            iswatch = sharedpreferences.getBoolean("running_on_wearos", false);
-            if (iswatch) {
-                BTMainDesc.setVisibility(View.GONE);
-                BTIface.setText("Interface");
-                BTService.setText("BT Service");
-            }
 
             //First run
             Boolean setupdone = sharedpreferences.getBoolean("setup_done", false);
             if (!setupdone.equals(true))
-                if (iswatch) SetupDialogWatch();
-                else SetupDialog();
+                SetupDialog();
 
             final Spinner ifaces = rootView.findViewById(R.id.hci_interface);
 
             //Bluebinder or bt_smd
+            final TextView Binderstatus = rootView.findViewById(R.id.BinderStatus);
             final TextView Binder = rootView.findViewById(R.id.bluebinder);
             File bt_smd = new File("/sys/module/hci_smd/parameters/hcismd_set");
             if (bt_smd.exists()) {
@@ -371,7 +322,7 @@ public class BTFragment extends Fragment {
                             File bluebinder = new File(nh.CHROOT_PATH() + "/usr/sbin/bluebinder");
                             if (bluebinder.exists()) {
                                 exe.RunAsRoot(new String[]{"svc bluetooth disable"});
-                                intentClickListener_NH("echo -ne \"\\033]0;Bluebinder\\007\" && clear;bluebinder || bluebinder;exit");
+                                run_cmd("echo -ne \"\\033]0;Bluebinder\\007\" && clear;bluebinder || bluebinder;exit");
                                 Toast.makeText(getActivity().getApplicationContext(), "Starting bluebinder.. Please refresh in NetHunter app to check the status", Toast.LENGTH_LONG).show();
                             } else {
                                 Toast.makeText(getActivity().getApplicationContext(), "Bluebinder is not installed. Launching setup..", Toast.LENGTH_SHORT).show();
@@ -581,19 +532,6 @@ public class BTFragment extends Fragment {
         }
     }
 
-    final void intentClickListener_NH(final String command) {
-        try {
-            Intent intent =
-                    new Intent("com.offsec.nhterm.RUN_SCRIPT_NH");
-            intent.addCategory(Intent.CATEGORY_DEFAULT);
-            intent.putExtra("com.offsec.nhterm.iInitialCommand", command);
-            startActivity(intent);
-        } catch (Exception e) {
-            nh.showMessage(context, getString(R.string.toast_install_terminal));
-
-        }
-    }
-
     public static class ToolsFragment extends BTFragment {
         private Context context;
         private Activity activity;
@@ -654,7 +592,7 @@ public class BTFragment extends Fragment {
                     String l2ping_size = l2ping_Size.getText().toString();
                     String l2ping_count = l2ping_Count.getText().toString();
                     String l2ping_interface = hci_interface.getText().toString();
-                    intentClickListener_NH("echo -ne \"\\033]0;Pinging BT device\\007\" && clear;l2ping -i " + l2ping_interface + " -s " + l2ping_size + " -c " + l2ping_count + flood + reverse + " " + l2ping_target + " && echo \"\nPinging done, closing in 3 secs..\";sleep 3 && exit");
+                    run_cmd("echo -ne \"\\033]0;Pinging BT device\\007\" && clear;l2ping -i " + l2ping_interface + " -s " + l2ping_size + " -c " + l2ping_count + flood + reverse + " " + l2ping_target + " && echo \"\nPinging done, closing in 3 secs..\";sleep 3 && exit");
                 } else {
                     Toast.makeText(getActivity().getApplicationContext(), "No target address!", Toast.LENGTH_SHORT).show();
                 }
@@ -666,7 +604,7 @@ public class BTFragment extends Fragment {
             StartRFCommscan.setOnClickListener( v -> {
                 String sdp_target = sdp_address.getText().toString();
                 if (!sdp_target.equals(""))
-                    intentClickListener_NH("echo -ne \"\\033]0;RFComm Scan\\007\" && clear;rfcomm_scan " + sdp_target);
+                    run_cmd("echo -ne \"\\033]0;RFComm Scan\\007\" && clear;rfcomm_scan " + sdp_target);
                 else
                     Toast.makeText(getActivity().getApplicationContext(), "No target address!", Toast.LENGTH_SHORT).show();
             });
@@ -678,7 +616,7 @@ public class BTFragment extends Fragment {
                 String redfang_range = redfang_Range.getText().toString();
                 String redfang_logfile = redfang_Log.getText().toString();
                 if (!redfang_range.equals(""))
-                    intentClickListener_NH("echo -ne \"\\033]0;Redfang\\007\" && clear;fang -r " + redfang_range + " -o " + redfang_logfile);
+                    run_cmd("echo -ne \"\\033]0;Redfang\\007\" && clear;fang -r " + redfang_range + " -o " + redfang_logfile);
                 else
                     Toast.makeText(getActivity().getApplicationContext(), "No target range!", Toast.LENGTH_SHORT).show();
             });
@@ -689,7 +627,7 @@ public class BTFragment extends Fragment {
                 String blueranger_target = sdp_address.getText().toString();
                 String blueranger_interface = hci_interface.getText().toString();
                 if (!blueranger_target.equals(""))
-                    intentClickListener_NH("echo -ne \"\\033]0;Blueranger\\007\" && clear;blueranger " + blueranger_interface + " " + blueranger_target);
+                    run_cmd("echo -ne \"\\033]0;Blueranger\\007\" && clear;blueranger " + blueranger_interface + " " + blueranger_target);
                 else
                     Toast.makeText(getActivity().getApplicationContext(), "No target address!", Toast.LENGTH_SHORT).show();
             });
@@ -790,10 +728,10 @@ public class BTFragment extends Fragment {
                 } else {
                     final String target_classname = target_class + target_name;
                     if (!target_address.equals(" -a ")) {
-                        intentClickListener_NH("echo -ne \"\\033]0;Spoofing Bluetooth\\007\" && clear;echo 'Spooftooph started..';spooftooph -i " + target_interface + target_address +
+                        run_cmd("echo -ne \"\\033]0;Spoofing Bluetooth\\007\" && clear;echo 'Spooftooph started..';spooftooph -i " + target_interface + target_address +
                                 "; sleep 2 && hciconfig " + target_interface + " up && spooftooph -i " + target_interface + target_classname + " && echo '\nBringing interface up with hciconfig..\n\nClass/Name changed, closing in 3 secs..';sleep 3 && exit");
                     } else {
-                        intentClickListener_NH("echo -ne \"\\033]0;Spoofing Bluetooth\\007\" && clear;echo 'Spooftooph started..';spooftooph -i " + target_interface + target_classname + " && echo '\nClass/Name changed, closing in 3 secs..';sleep 3 && exit");
+                        run_cmd("echo -ne \"\\033]0;Spoofing Bluetooth\\007\" && clear;echo 'Spooftooph started..';spooftooph -i " + target_interface + target_classname + " && echo '\nClass/Name changed, closing in 3 secs..';sleep 3 && exit");
                     }
                 }
             });
@@ -837,7 +775,6 @@ public class BTFragment extends Fragment {
         private String selected_mode;
         private NhPaths nh;
         final ShellExecuter exe = new ShellExecuter();
-        private Boolean iswatch;
 
         @Override
         public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -849,13 +786,6 @@ public class BTFragment extends Fragment {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.bt_carwhisperer, container, false);
-            SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-
-            final TextView CWdesc = rootView.findViewById(R.id.carwhisp_desc);
-            iswatch = sharedpreferences.getBoolean("running_on_wearos", false);
-            if (iswatch) {
-                CWdesc.setVisibility(View.GONE);
-            }
 
             //Selected iface
             final EditText cw_interface = rootView.findViewById(R.id.hci_interface);
@@ -916,10 +846,10 @@ public class BTFragment extends Fragment {
                     String cw_injectfile = injectfilename.getText().toString();
 
                     if (selected_mode.equals("Listen")) {
-                        intentClickListener_NH("echo -ne \"\\033]0;Listening BT audio\\007\" && clear;echo 'Carwhisperer starting..\nReturn to NetHunter to kill, or to listen live!'$'\n';carwhisperer " + cw_iface + " /root/carwhisperer/in.raw /sdcard/rec.raw " + cw_target + " " + cw_channel +
+                        run_cmd("echo -ne \"\\033]0;Listening BT audio\\007\" && clear;echo 'Carwhisperer starting..\nReturn to NetHunter to kill, or to listen live!'$'\n';carwhisperer " + cw_iface + " /root/carwhisperer/in.raw /sdcard/rec.raw " + cw_target + " " + cw_channel +
                                 " && echo 'Converting to wav to target directory..';sox -t raw -r 8000 -e signed -b 16 /sdcard/rec.raw -r 8000 -b 16 /sdcard/" + cw_listenfile + ";echo Done! || echo 'No convert file!'");
                     } else if (selected_mode.equals("Inject")) {
-                        intentClickListener_NH("echo -ne \"\\033]0;Injecting BT audio\\007\" && clear;echo 'Carwhisperer starting..';length=$(($(soxi -D '" + cw_injectfile + "' | cut -d. -f1)+8));sox '" + cw_injectfile + "' -r 8000 -b 16 -c 1 tempi.raw && timeout $length " +
+                        run_cmd("echo -ne \"\\033]0;Injecting BT audio\\007\" && clear;echo 'Carwhisperer starting..';length=$(($(soxi -D '" + cw_injectfile + "' | cut -d. -f1)+8));sox '" + cw_injectfile + "' -r 8000 -b 16 -c 1 tempi.raw && timeout $length " +
                                 "carwhisperer " + cw_iface + " tempi.raw tempo.raw " + cw_target + " " + cw_channel + "; rm tempi.raw && rm tempo.raw;echo '\nInjection done, closing in 3 secs..';sleep 3 && exit");
                     }
                 } else
@@ -1003,4 +933,12 @@ public class BTFragment extends Fragment {
         }
     }
 
+    ////
+    // Bridge side functions
+    ////
+
+    public static void run_cmd(String cmd) {
+        Intent intent = Bridge.createExecuteIntent("/data/data/com.offsec.nhterm/files/usr/bin/kali", cmd);
+        activity.startActivity(intent);
+    }
 }

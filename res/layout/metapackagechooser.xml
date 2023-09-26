@@ -169,8 +169,6 @@
             android:paddingBottom="16sp"
             android:paddingTop="16sp"
             android:text="@string/metapackagesAdditionalInfo"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="@color/highlighted_text_material_dark"
             android:textIsSelectable="false" />
 
         <Button

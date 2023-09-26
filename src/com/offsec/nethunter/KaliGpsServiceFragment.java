@@ -1,6 +1,7 @@
 package com.offsec.nethunter;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -17,6 +18,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.offsec.nethunter.bridge.Bridge;
 import com.offsec.nethunter.gps.KaliGPSUpdates;
 import com.offsec.nethunter.gps.LocationUpdateService;
 import com.offsec.nethunter.utils.NhPaths;
@@ -36,6 +38,7 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
     private KaliGPSUpdates.Provider gpsProvider = null;
     private TextView gpsTextView;
     private Context context;
+    private static Activity activity;
     private boolean wantKismet = false;
     private boolean wantHelpView = true;
     private boolean reattachedToRunningService = false;
@@ -296,15 +299,15 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
 
     private void startKismet() {
         try {
-            Intent intent =
-                    new Intent("com.offsec.nhterm.RUN_SCRIPT_NH");
-            intent.addCategory(Intent.CATEGORY_DEFAULT);
-
-            intent.putExtra("com.offsec.nhterm.iInitialCommand", "/usr/bin/start-kismet");
-            startActivity(intent);
+            run_cmd("/usr/bin/start-kismet");
         } catch (Exception e) {
             NhPaths.showMessage(context, getString(R.string.toast_install_terminal));
         }
+    }
+
+    public static void run_cmd(String cmd) {
+        Intent intent = Bridge.createExecuteIntent("/data/data/com.offsec.nhterm/files/usr/bin/kali", cmd);
+        activity.startActivity(intent);
     }
 }
 

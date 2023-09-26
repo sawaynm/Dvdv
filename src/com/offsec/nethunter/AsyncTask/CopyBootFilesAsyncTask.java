@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -13,11 +11,11 @@ import android.util.Log;
 
 import com.offsec.nethunter.AppNavHomeActivity;
 import com.offsec.nethunter.BuildConfig;
-import com.offsec.nethunter.ChrootManagerFragment;
 import com.offsec.nethunter.utils.CheckForRoot;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.SharePrefTag;
 import com.offsec.nethunter.utils.ShellExecuter;
+
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -27,9 +25,7 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
 
@@ -98,6 +94,13 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
             assetsToFiles(NhPaths.SD_PATH, "", "sdcard");
             publishProgress("Fixing permissions for new files");
             exe.RunAsRoot(new String[]{"chmod -R 700 " + NhPaths.APP_SCRIPTS_PATH + "/*", "chmod -R 700 " + NhPaths.APP_INITD_PATH + "/*"});
+            publishProgress("Checking for encrypted /data....");
+            CheckEncrypted();
+            publishProgress("Checking for bootkali symlinks....");
+            Symlink("bootkali");
+            Symlink("bootkali_bash");
+            Symlink("bootkali_init");
+            Symlink("bootkali_login");
             // disable the magisk notification for nethunter app as it will keep popping up bunch of toast message when executing runtime command.
             disableMagiskNotification();
             SharedPreferences.Editor ed = prefs.edit();
@@ -255,18 +258,36 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
 
     private void MakeSYSWriteable(){
         Log.d(TAG, "Making /system writeable for symlink");
-        exe.RunAsRoot(new String[]{"mount -o rw,remount,rw /system"});
+        exe.RunAsRoot(new String[]{"if [ \"$(getprop ro.build.system_root_image)\" == \"true\" ]; then export SYSTEM=/; else export SYSTEM=/system;fi;mount -o rw,remount,rw $SYSTEM"});
     }
 
     private void MakeSYSReadOnly(){
         Log.d(TAG, "Making /system readonly for symlink");
-        exe.RunAsRoot(new String[]{"mount -o ro,remount,ro /system"});
+        exe.RunAsRoot(new String[]{"if [ \"$(getprop ro.build.system_root_image)\" == \"true\" ]; then export SYSTEM=/; else export SYSTEM=/system;fi;mount -o ro,remount,ro $SYSTEM"});
     }
 
-    private void NotFound(String filename){
-        Log.d(TAG, "Symlinking " + filename);
-        Log.d(TAG, "command output: ln -s " + NhPaths.APP_SCRIPTS_PATH + "/" + filename + " /system/bin/" + filename);
-        exe.RunAsRoot(new String[]{"ln -s " + NhPaths.APP_SCRIPTS_PATH + "/" + filename + " /system/bin/" + filename});
+    private void CheckEncrypted(){
+        Log.d(TAG, "Checking if /data is encrypted...");
+        String encrypted = exe.RunAsRootOutput("getprop ro.crypto.state");
+        Log.d(TAG, "/data is " + encrypted);
+        if (encrypted.equals("encrypted")) {
+            Log.d(TAG, "Fixing pam.d and inet in chroot");
+            exe.RunAsRoot(new String[]{"sed -i \"s/pam_keyinit.so/pam_keyinit.so #/\" /data/local/nhsystem/kalifs/etc/pam.d/*"});
+            exe.RunAsRoot(new String[]{"echo 'APT::Sandbox::User \"root\";' > /etc/apt/apt.conf.d/01-android-nosandbox"});
+            exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd groupadd -g 3003 aid_inet\\;usermod -G nogroup -g aid_inet _apt"});
+        }
+    }
+
+    private void Symlink(String filename){
+        File checkfile = new File("/system/bin/" + filename);
+        Log.d (TAG, "Checking for " + filename + " symlink....");
+        if (!checkfile.exists()) {
+            Log.d(TAG, "Symlinking " + filename);
+            Log.d(TAG, "command output: ln -s " + NhPaths.APP_SCRIPTS_PATH + "/" + filename + " /system/bin/" + filename);
+            MakeSYSWriteable();
+            exe.RunAsRoot(new String[]{"ln -s " + NhPaths.APP_SCRIPTS_PATH + "/" + filename + " /system/bin/" + filename});
+            MakeSYSReadOnly();
+        }
     }
 
     // Get a list of files from a directory
@@ -308,14 +329,18 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
     private void disableMagiskNotification(){
         if (exe.RunAsRootReturnValue("[ -f " + NhPaths.MAGISK_DB_PATH + " ]") == 0) {
             Log.d(TAG, "Disabling magisk notifcication and log for nethunter app.");
-            if (exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_BIN_PATH + "/sqlite3 " +
-                    NhPaths.MAGISK_DB_PATH +
-                    " \"UPDATE policies SET logging='0',notification='0' WHERE package_name='" +
-                    BuildConfig.APPLICATION_ID + "';\"").isEmpty()) {
+            if (exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_BIN_PATH +
+                    "/sqlite3 " + NhPaths.MAGISK_DB_PATH + " \"SELECT * from policies\" | grep " +
+                    BuildConfig.APPLICATION_ID).startsWith(BuildConfig.APPLICATION_ID)) {
+                exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_BIN_PATH +
+                        "/sqlite3 " + NhPaths.MAGISK_DB_PATH + " \"UPDATE policies SET logging='0',notification='0' WHERE package_name='" +
+                        BuildConfig.APPLICATION_ID + "';\"");
                 Log.d(TAG, "Updated magisk db successfully.");
-            } else { Log.e(TAG, "Failed updating to magisk db."); }
-        } else {
-            Log.e(TAG, NhPaths.MAGISK_DB_PATH + " not found, skip disabling the magisk notification for nethunter app.");
+            } else {
+                exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_BIN_PATH + "/sqlite3 " +
+                        NhPaths.MAGISK_DB_PATH + " \"UPDATE policies SET logging='0',notification='0' WHERE uid='$(stat -c %u /data/data/" +
+                        BuildConfig.APPLICATION_ID + ")';\"");
+            }
         }
     }
 
@@ -329,7 +354,7 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
     @Override
     protected void onPostExecute(String objects) {
         super.onPostExecute(objects);
-        if (progressDialogRef.get() != null && progressDialogRef.get().isShowing())
+        if (progressDialogRef.get() != null)
             progressDialogRef.get().dismiss();
         if (listener != null) {
             listener.onAsyncTaskFinished(result);
