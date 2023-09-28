@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
 
@@ -255,7 +256,7 @@ public class HidFragment extends Fragment {
     private void openDialog() {
 
         int UACBypassIndex = sharedpreferences.getInt("UACBypassIndex", 0);
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
         builder.setTitle("UAC Bypass:");
         builder.setPositiveButton("OK", (dialog, which) -> {
         });
@@ -272,7 +273,7 @@ public class HidFragment extends Fragment {
 
         int keyboardLayoutIndex = sharedpreferences.getInt("HIDKeyboardLayoutIndex", 0);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
         builder.setTitle("Keyboard Layout:");
         builder.setPositiveButton("OK", (dialog, which) -> {
 
@@ -504,7 +505,7 @@ public class HidFragment extends Fragment {
                     } catch (Exception e) {
                         NhPaths.showMessage(context, e.getMessage());
                     }
-                    AlertDialog.Builder alert = new AlertDialog.Builder(activity);
+                    MaterialAlertDialogBuilder alert = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
 
                     alert.setTitle("Name");
                     alert.setMessage("Please enter a name for your script.");

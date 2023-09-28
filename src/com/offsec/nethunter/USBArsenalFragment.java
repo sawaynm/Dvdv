@@ -31,11 +31,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.offsec.nethunter.HandlerThread.USBArsenalHandlerThread;
 import com.offsec.nethunter.SQL.USBArsenalSQL;
+import com.offsec.nethunter.bridge.Bridge;
 import com.offsec.nethunter.models.USBArsenalUSBNetworkModel;
 import com.offsec.nethunter.models.USBArsenalUSBSwitchModel;
 import com.offsec.nethunter.utils.NhPaths;
@@ -229,17 +231,12 @@ public class USBArsenalFragment extends Fragment {
         });
 
         setUSBNetworkTetheringButton.setOnClickListener(v -> {
-            Intent intent = new Intent("com.offsec.nhterm.RUN_SCRIPT_SU");
-            intent.addCategory(Intent.CATEGORY_DEFAULT);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.putExtra("com.offsec.nhterm.iInitialCommand",
-                    "usbtethering -o " + usbNetworkInfoEditTextGroup[0].getText().toString() +
-                            " -i " + usbNetworkInfoEditTextGroup[1].getText().toString() +
-                            " -A " + usbNetworkInfoEditTextGroup[2].getText().toString() +
-                            " -B " + usbNetworkInfoEditTextGroup[2].getText().toString() +
-                            " -C " + usbNetworkInfoEditTextGroup[3].getText().toString() +
-                            " -D " + usbNetworkInfoEditTextGroup[4].getText().toString());
-            context.startActivity(intent);
+            run_cmd_android("usbtethering -o " + usbNetworkInfoEditTextGroup[0].getText().toString() +
+                    " -i " + usbNetworkInfoEditTextGroup[1].getText().toString() +
+                    " -A " + usbNetworkInfoEditTextGroup[2].getText().toString() +
+                    " -B " + usbNetworkInfoEditTextGroup[2].getText().toString() +
+                    " -C " + usbNetworkInfoEditTextGroup[3].getText().toString() +
+                    " -D " + usbNetworkInfoEditTextGroup[4].getText().toString());
         });
 
         reloadUSBStateImageButton.setOnClickListener(v -> {
@@ -295,12 +292,12 @@ public class USBArsenalFragment extends Fragment {
         saveUSBFunctionConfigButton.setOnClickListener(v -> {
             if (!usbSwitchInfoEditTextGroup[0].getText().toString().matches("0x[0-9a-fA-F]{4}") ||
                     !usbSwitchInfoEditTextGroup[1].getText().toString().matches("0x[0-9a-fA-F]{4}")) {
-                new AlertDialog.Builder(context).setTitle("Invalid Format").setMessage("The regex must be 0x[0-9a-fA-F]{4}").create().show();
+                new MaterialAlertDialogBuilder(context, R.style.DialogStyleCompat).setTitle("Invalid Format").setMessage("The regex must be 0x[0-9a-fA-F]{4}").create().show();
             } else if (!usbSwitchInfoEditTextGroup[2].getText().toString().matches("\\w+|^$") ||
                     !usbSwitchInfoEditTextGroup[3].getText().toString().matches("\\w+|^$")) {
-                new AlertDialog.Builder(context).setTitle("Invalid Format").setMessage("The regex must be \\w*|^$").create().show();
+                new MaterialAlertDialogBuilder(context, R.style.DialogStyleCompat).setTitle("Invalid Format").setMessage("The regex must be \\w*|^$").create().show();
             } else if (!usbSwitchInfoEditTextGroup[4].getText().toString().matches("[0-9A-Z]{10}|^$")) {
-                new AlertDialog.Builder(context).setTitle("Invalid Format").setMessage("The regex must be [0-9A-Z]{10}|^$").create().show();
+                new MaterialAlertDialogBuilder(context, R.style.DialogStyleCompat).setTitle("Invalid Format").setMessage("The regex must be [0-9A-Z]{10}|^$").create().show();
             } else {
                 for (int i = 0; i < usbSwitchInfoEditTextGroup.length; i++) {
                     if (!USBArsenalSQL.getInstance(context).setUSBSwitchColumnData(
@@ -500,7 +497,7 @@ public class USBArsenalFragment extends Fragment {
             case R.id.f_usbarsenal_menu_backupDB:
                 titleTextView.setText("Full path to where you want to save the database:");
                 storedpathEditText.setText(NhPaths.APP_SD_SQLBACKUP_PATH + "/FragmentUSBArsenal");
-                AlertDialog.Builder adbBackup = new AlertDialog.Builder(activity);
+                MaterialAlertDialogBuilder adbBackup = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
                 adbBackup.setView(promptView);
                 adbBackup.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
                 adbBackup.setPositiveButton("OK", (dialog, which) -> { });
@@ -513,7 +510,7 @@ public class USBArsenalFragment extends Fragment {
                             NhPaths.showMessage(context, "db successfully backed up to " + storedpathEditText.getText().toString());
                         } else {
                             dialog.dismiss();
-                            new AlertDialog.Builder(context).setTitle("Failed to backup the DB.").setMessage(returnedResult).create().show();
+                            new MaterialAlertDialogBuilder(context, R.style.DialogStyleCompat).setTitle("Failed to backup the DB.").setMessage(returnedResult).create().show();
                         }
                         dialog.dismiss();
                     });
@@ -523,7 +520,7 @@ public class USBArsenalFragment extends Fragment {
             case R.id.f_usbarsenal_menu_restoreDB:
                 titleTextView.setText("Full path of the db file from where you want to restore:");
                 storedpathEditText.setText(NhPaths.APP_SD_SQLBACKUP_PATH + "/FragmentUSBArsenal");
-                AlertDialog.Builder adbRestore = new AlertDialog.Builder(activity);
+                MaterialAlertDialogBuilder adbRestore = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
                 adbRestore.setView(promptView);
                 adbRestore.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
                 adbRestore.setPositiveButton("OK", (dialog, which) -> { });
@@ -538,7 +535,7 @@ public class USBArsenalFragment extends Fragment {
                             refreshUSBNetworkInfos(getusbNetWorkModeSpinnerPosition());
                         } else {
                             dialog.dismiss();
-                            new AlertDialog.Builder(context).setTitle("Failed to restore the DB.").setMessage(returnedResult).create().show();
+                            new MaterialAlertDialogBuilder(context, R.style.DialogStyleCompat).setTitle("Failed to restore the DB.").setMessage(returnedResult).create().show();
                         }
                         dialog.dismiss();
                     });
@@ -641,23 +638,23 @@ public class USBArsenalFragment extends Fragment {
     private boolean isAllUSBInfosValid() {
         if (!is_init_exists){
             if (!usbSwitchInfoEditTextGroup[0].getText().toString().matches("^0x[0-9a-fA-F]{4}$")) {
-                new AlertDialog.Builder(context).setTitle("Invalid Format").setMessage("The regex must be ^0x[0-9a-fA-F]{4}$").create().show();
+                new MaterialAlertDialogBuilder(context, R.style.DialogStyleCompat).setTitle("Invalid Format").setMessage("The regex must be ^0x[0-9a-fA-F]{4}$").create().show();
                 return false;
             }
             if (!usbSwitchInfoEditTextGroup[1].getText().toString().matches("^0x[0-9a-fA-F]{4}$")) {
-                new AlertDialog.Builder(context).setTitle("Invalid Format").setMessage("The regex must be ^0x[0-9a-fA-F]{4}$").create().show();
+                new MaterialAlertDialogBuilder(context, R.style.DialogStyleCompat).setTitle("Invalid Format").setMessage("The regex must be ^0x[0-9a-fA-F]{4}$").create().show();
                 return false;
             }
             if (!usbSwitchInfoEditTextGroup[2].getText().toString().matches("^\\w+$|^$")) {
-                new AlertDialog.Builder(context).setTitle("Invalid Format").setMessage("The regex must be ^\\w+$|^$").create().show();
+                new MaterialAlertDialogBuilder(context, R.style.DialogStyleCompat).setTitle("Invalid Format").setMessage("The regex must be ^\\w+$|^$").create().show();
                 return false;
             }
             if (!usbSwitchInfoEditTextGroup[3].getText().toString().matches("^\\w+$|^$")) {
-                new AlertDialog.Builder(context).setTitle("Invalid Format").setMessage("The regex must be ^\\w+$|^$").create().show();
+                new MaterialAlertDialogBuilder(context, R.style.DialogStyleCompat).setTitle("Invalid Format").setMessage("The regex must be ^\\w+$|^$").create().show();
                 return false;
             }
             if (!usbSwitchInfoEditTextGroup[4].getText().toString().matches("^[0-9A-Z]{10}$|^$")) {
-                new AlertDialog.Builder(context).setTitle("Invalid Format").setMessage("The regex must be ^[0-9A-Z]{10}$|^$").create().show();
+                new MaterialAlertDialogBuilder(context, R.style.DialogStyleCompat).setTitle("Invalid Format").setMessage("The regex must be ^[0-9A-Z]{10}$|^$").create().show();
                 return false;
             }
         }
@@ -681,5 +678,14 @@ public class USBArsenalFragment extends Fragment {
         msg.obj = context;
         msg.arg1 = attackModePosition;
         usbArsenalHandlerThread.getHandler().sendMessage(msg);
+    }
+
+    ////
+    // Bridge side functions
+    ////
+
+    public void run_cmd_android(String cmd) {
+        Intent intent = Bridge.createExecuteIntent("/data/data/com.offsec.nhterm/files/usr/bin/android-su", cmd);
+        context.startActivity(intent);
     }
 }

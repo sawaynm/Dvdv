@@ -2,7 +2,6 @@ package com.offsec.nethunter.AsyncTask;
 
 import android.os.AsyncTask;
 
-import com.offsec.nethunter.RecyclerViewData.NethunterData;
 import com.offsec.nethunter.SQL.NethunterSQL;
 import com.offsec.nethunter.models.NethunterModel;
 import com.offsec.nethunter.utils.ShellExecuter;

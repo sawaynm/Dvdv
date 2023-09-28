@@ -651,7 +651,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     }
 
     public void showWarningDialog(String title, String message, boolean NeedToExit) {
-        AlertDialog.Builder warningAD = new AlertDialog.Builder(this, R.style.DialogStyleCompat);
+        MaterialAlertDialogBuilder warningAD = new MaterialAlertDialogBuilder(this, R.style.DialogStyleCompat);
         warningAD.setCancelable(false);
         warningAD.setTitle(title);
         warningAD.setMessage(message);

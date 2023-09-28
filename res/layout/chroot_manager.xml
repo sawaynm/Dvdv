@@ -56,6 +56,8 @@
             android:background="@color/colorPrimaryDark"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
             android:gravity="center">
 
             <LinearLayout
@@ -73,7 +75,7 @@
                     android:layout_height="wrap_content"
                     android:text="[Selected]:"
                     android:textColor="@android:color/background_light"
-                    android:layout_marginEnd="8dp"
+                    android:layout_marginEnd="4dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"/>
@@ -83,7 +85,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_marginEnd="8dp"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="4dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
                     android:gravity="center"
@@ -107,9 +109,10 @@
                     android:id="@+id/f_chrootmanager_dummy_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
                     android:text="[Status]:"
                     android:textColor="@android:color/background_light"
-                    android:layout_marginEnd="8dp"
+                    android:layout_marginEnd="4dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"/>
@@ -121,7 +124,7 @@
                     android:text="Loading..."
                     android:textColor="@android:color/background_light"
                     android:layout_marginEnd="8dp"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="4dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"/>
 
@@ -140,7 +143,7 @@
         android:layout_marginTop="4dp"
         android:layout_marginEnd="4dp"
         android:alpha="100"
-        android:background="@android:color/black"
+        android:background="@color/colorPrimaryDark"
         android:fadeScrollbars="true"
         android:focusable="true"
         android:focusableInTouchMode="true"
