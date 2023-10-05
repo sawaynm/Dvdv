@@ -10,8 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.offsec.nethunter.R;
-import com.offsec.nethunter.RecyclerViewData.KaliServicesData;
-import com.offsec.nethunter.RecyclerViewData.NethunterData;
 import com.offsec.nethunter.models.NethunterModel;
 
 import java.util.List;

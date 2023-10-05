@@ -26,6 +26,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.offsec.nethunter.utils.NhPaths;
 
 import java.io.BufferedReader;
@@ -238,7 +239,7 @@ public class DuckHunterConvertFragment extends Fragment implements View.OnClickL
                 } catch (Exception e) {
                     NhPaths.showMessage(context, e.getMessage());
                 }
-                AlertDialog.Builder alert = new AlertDialog.Builder(activity);
+                MaterialAlertDialogBuilder alert = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
 
                 alert.setTitle("Name");
                 alert.setMessage("Please enter a name for your script.");

@@ -1,7 +1,5 @@
 package com.offsec.nethunter;
 
-import static com.offsec.nethunter.bridge.Runner.activity;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,10 +18,8 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
-import android.widget.Toast;
 
 import com.offsec.nethunter.bridge.Bridge;
-import com.offsec.nethunter.utils.NhPaths;
 
 import java.util.ArrayList;
 
@@ -439,8 +435,8 @@ public class NmapFragment extends Fragment {
     // Bridge side functions
     ////
 
-    public static void run_cmd(String cmd) {
+    public void run_cmd(String cmd) {
         Intent intent = Bridge.createExecuteIntent("/data/data/com.offsec.nhterm/files/usr/bin/kali", cmd);
-        activity.startActivity(intent);
+        getContext().startActivity(intent);
     }
 }

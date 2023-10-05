@@ -30,9 +30,9 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.offsec.nethunter.bridge.Bridge;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
@@ -483,7 +483,7 @@ public class SettingsFragment extends Fragment {
     }
 
     public void SetupDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getActivity(), R.style.DialogStyleCompat);
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
         builder.setTitle("Welcome to Settings!");
         builder.setMessage("In order to make sure everything is working, an initial setup needs to be done.");

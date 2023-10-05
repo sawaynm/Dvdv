@@ -113,7 +113,7 @@ public class ChrootManagerFragment extends Fragment {
         kaliFolderTextView.setClickable(true);
         kaliFolderTextView.setText(sharedPreferences.getString(SharePrefTag.CHROOT_ARCH_SHAREPREF_TAG, NhPaths.ARCH_FOLDER));
         final LinearLayoutCompat kaliViewFolderlinearLayout = view.findViewById(R.id.f_chrootmanager_viewholder);
-        kaliViewFolderlinearLayout.setOnClickListener(view1 -> new MaterialAlertDialogBuilder(activity)
+        kaliViewFolderlinearLayout.setOnClickListener(view1 -> new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat)
                 .setMessage(baseChrootPathTextView.getText().toString() +
                         kaliFolderTextView.getText().toString())
                 .create().show());
@@ -303,7 +303,9 @@ public class ChrootManagerFragment extends Fragment {
                         sharedPreferences.edit().putString(SharePrefTag.CHROOT_DEFAULT_STORE_DOWNLOAD_SHAREPREF_TAG, downloadDir.getAbsolutePath()).apply();
                         if (archSpinner.getSelectedItemPosition() == 0) {
                             ARCH = "arm64";
-                        } else ARCH = "armhf";
+                        } else if ((archSpinner.getSelectedItemPosition() == 1)) {
+                            ARCH = "armhf";
+                        }
                         if (minorfullSpinner.getSelectedItemPosition() == 0){
                             MINORFULL = "full";
                         } else MINORFULL = "minimal";
@@ -489,7 +491,7 @@ public class ChrootManagerFragment extends Fragment {
     private void setAddMetaPkgButton() {
         addMetaPkgButton.setOnClickListener(view -> {
             //for now, we'll hardcode packages in the dialog view.  At some point we'll want to grab them automatically.
-            MaterialAlertDialogBuilder adb = new MaterialAlertDialogBuilder(activity);
+            MaterialAlertDialogBuilder adb = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
             adb.setTitle("Metapackage Install & Upgrade");
             LayoutInflater inflater = activity.getLayoutInflater();
             @SuppressLint("InflateParams") final ScrollView sv = (ScrollView) inflater.inflate(R.layout.metapackagechooser, null);
@@ -604,6 +606,7 @@ public class ChrootManagerFragment extends Fragment {
     }
 
     private void showBanner() {
+        resultViewerLoggerTextView.setText("");
         chrootManagerAsynctask = new ChrootManagerAsynctask(ChrootManagerAsynctask.ISSUE_BANNER);
         chrootManagerAsynctask.execute(resultViewerLoggerTextView, getResources().getString(R.string.aboutchroot));
     }
@@ -628,23 +631,24 @@ public class ChrootManagerFragment extends Fragment {
                 context.startService(new Intent(context, CompatCheckService.class).putExtra("RESULTCODE", resultCode));
             }
         });
+        resultViewerLoggerTextView.setText("");
         chrootManagerAsynctask.execute(resultViewerLoggerTextView, sharedPreferences.getString(SharePrefTag.CHROOT_PATH_SHAREPREF_TAG, ""));
     }
 
     private void setMountStatsTextView(int MODE) {
         if (MODE == IS_MOUNTED) {
             mountStatsTextView.setTextColor(Color.GREEN);
-            mountStatsTextView.setText("Kali Chroot is now running!");
+            mountStatsTextView.setText("Running!");
         } else if  (MODE == IS_UNMOUNTED) {
-            mountStatsTextView.setTextColor(Color.CYAN);
-            mountStatsTextView.setText("Kali Chroot has not yet started!");
+            mountStatsTextView.setTextColor(Color.RED);
+            mountStatsTextView.setText("Stopped");
         } else if  (MODE == NEED_TO_INSTALL) {
             // Only show about banner if chroot is not installed + clear old logs when showing banner for new peeps
             resultViewerLoggerTextView.setText("");
             showBanner();
 
-            mountStatsTextView.setTextColor(Color.parseColor("#D81B60"));
-            mountStatsTextView.setText("Kali Chroot is not yet installed!");
+            mountStatsTextView.setTextColor(Color.RED);
+            mountStatsTextView.setText("Not yet installed!");
         }
     }
 

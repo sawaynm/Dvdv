@@ -1,7 +1,6 @@
 package com.offsec.nethunter.AsyncTask;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.offsec.nethunter.ChrootManagerFragment;
 import com.offsec.nethunter.SQL.KaliServicesSQL;

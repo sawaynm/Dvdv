@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.offsec.nethunter.AsyncTask.DuckHuntAsyncTask;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.SharePrefTag;
@@ -197,7 +198,7 @@ public class DuckHunterFragment extends Fragment {
 
     private void openLanguageDialog() {
         int keyboardLayoutIndex = sharedpreferences.getInt("DuckHunterLanguageIndex", 0);
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
         builder.setTitle("Language:");
         builder.setPositiveButton("OK", (dialog, which) -> {
             if (mViewPager.getCurrentItem() == 1) {
