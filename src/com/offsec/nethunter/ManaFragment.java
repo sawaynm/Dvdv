@@ -200,11 +200,11 @@ public class ManaFragment extends Fragment {
                     break;
                 case 4:
                     NhPaths.showMessage(context, "Starting HOSTAPD-WPE");
-                    run_cmd(NhPaths.makeTermTitle("HOSTAPD-WPE") + "ifconfig wlan1 up && /usr/sbin/hostapd-wpe /sdcard/nh_files/configs/hostapd-wpe.conf");
+                    run_cmd(NhPaths.makeTermTitle("HOSTAPD-WPE") + "ip link set wlan1 up && /usr/sbin/hostapd-wpe /sdcard/nh_files/configs/hostapd-wpe.conf");
                     break;
                 case 5:
                     NhPaths.showMessage(context, "Starting HOSTAPD-WPE with Karma");
-                    run_cmd(NhPaths.makeTermTitle("HOSTAPD-WPE-KARMA") + "ifconfig wlan1 up && /usr/sbin/hostapd-wpe -k /sdcard/nh_files/configs/hostapd-wpe.conf");
+                    run_cmd(NhPaths.makeTermTitle("HOSTAPD-WPE-KARMA") + "ip link set wlan1 up && /usr/sbin/hostapd-wpe -k /sdcard/nh_files/configs/hostapd-wpe.conf");
                     break;
                 default:
                     NhPaths.showMessage(context, "Invalid script!");

@@ -184,7 +184,7 @@ else
 
 	if [ "$1" == "wifite" ]; then
 		$BUSYBOX chroot $MNT sudo /bin/bash -c "chmod 777 /dev/null"
-		ifconfig wlan1 up
+		ip link set wlan1 up
 		sleep 3
 		LANG=C PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin $BUSYBOX chroot $MNT sudo /usr/bin/python3 /usr/bin/wifite
 	fi

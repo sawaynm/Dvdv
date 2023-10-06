@@ -14,7 +14,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,15 +23,16 @@ import com.offsec.nethunter.gps.LocationUpdateService;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import java.io.File;
 
 
 public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.Receiver {
-
     private static final String TAG = "KaliGpsServiceFragment";
     private static final String ARG_SECTION_NUMBER = "section_number";
     private KaliGPSUpdates.Provider gpsProvider = null;
@@ -42,8 +42,8 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
     private boolean wantKismet = false;
     private boolean wantHelpView = true;
     private boolean reattachedToRunningService = false;
-    private Switch switch_gps_provider = null;
-    private Switch switch_gpsd = null;
+    private SwitchCompat switch_gps_provider = null;
+    private SwitchCompat switch_gpsd = null;
     private Button button_launch_app = null;
     private String rtlsdr = "";
     private String rtlamr = "";
@@ -69,9 +69,7 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.gps, container, false);
-
-        return rootView;
+        return inflater.inflate(R.layout.gps, container, false);
     }
 
     private void setCheckedQuietly(CompoundButton button, boolean state) {
@@ -81,7 +79,7 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         gpsTextView = view.findViewById(R.id.gps_textview);
         TextView gpsHelpView = view.findViewById(R.id.gps_help);
@@ -109,80 +107,70 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
         // check if gpsd is already running
         check_gpsd();
 
-        switch_gps_provider.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                if(switch_gps_provider.getTag() != null)
-                    return;
-                Log.d(TAG, "switch_gps_provider clicked: " + isChecked);
-                if(isChecked) {
-                    startGpsProvider();
-                } else {
-                    stopGpsProvider();
-                }
+        switch_gps_provider.setOnCheckedChangeListener((compoundButton, isChecked) -> {
+            if(switch_gps_provider.getTag() != null)
+                return;
+            Log.d(TAG, "switch_gps_provider clicked: " + isChecked);
+            if(isChecked) {
+                startGpsProvider();
+            } else {
+                stopGpsProvider();
             }
         });
 
-        switch_gpsd.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                if(switch_gpsd.getTag() != null)
-                    return;
-                Log.d(TAG, "switch_gpsd clicked: " + isChecked);
-                if (isChecked) {
-                    startChrootGpsd();
-                } else {
-                    stopChrootGpsd();
-                }
+        switch_gpsd.setOnCheckedChangeListener((compoundButton, isChecked) -> {
+            if(switch_gpsd.getTag() != null)
+                return;
+            Log.d(TAG, "switch_gpsd clicked: " + isChecked);
+            if (isChecked) {
+                startChrootGpsd();
+            } else {
+                stopChrootGpsd();
             }
         });
 
-        button_launch_app.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!switch_gps_provider.isChecked()) {
-                    gpsTextView.append("Android GPS Provider not running!\n");
-                    switch_gps_provider.setChecked(true);
-                    startGpsProvider();
-                }
-                if (!switch_gpsd.isChecked()) {
-                    gpsTextView.append("chroot gpsd not running!\n");
-                    switch_gpsd.setChecked(true);
-                    startChrootGpsd();
-                }
-                //WLAN iinterface
-                String wlaniface = wlan_interface.getText().toString() ;
-                if (!wlaniface.equals("")) wlaniface = "source=" + wlaniface + "\n";
-
-                //BT interface
-                String btiface = bt_interface.getText().toString();
-                if (!btiface.equals("")) btiface = "source=" + btiface + "\n";
-
-                //SDR sensors interface
-                if (sdrcheckbox.isChecked()) rtlsdr = "source=rtl433-0\n";
-                else rtlsdr = "";
-
-                //SDR AMR interface
-                if (sdramrcheckbox.isChecked()) rtlamr = "source=rtlamr-0\n";
-                else rtlamr = "";
-
-                //SDR ADSB interface
-                if (sdradsbcheckbox.isChecked()) rtladsb = "source=rtladsb-0\n";
-                else rtladsb = "";
-
-                //Mousejack interface
-                if (mousejackcheckbox.isChecked()) mousejack = "source=mousejack:name=nRF,channel_hoprate=100/sec\n";
-                else mousejack = "";
-
-                String conf = "log_template=%p/%n\nlog_prefix=/captures/kismet/\ngps=gpsd:host=localhost,port=2947\n" + wlaniface + btiface + rtlsdr + rtlamr + rtladsb + mousejack;
-                exe.RunAsRoot(new String[]{"echo \"" + conf + "\" > " + NhPaths.SD_PATH + "/kismet_site.conf"});
-                exe.RunAsRoot(new String[]{"bootkali custom_cmd mv /sdcard/kismet_site.conf /etc/kismet/"});
-                Toast.makeText(getActivity().getApplicationContext(), "Starting Kismet.. Web UI will be available at localhost:2501\"", Toast.LENGTH_LONG).show();
-                wantKismet = true;
-                gpsTextView.append("Kismet will launch after next position received.  Waiting...\n");
+        button_launch_app.setOnClickListener(view1 -> {
+            if (!switch_gps_provider.isChecked()) {
+                gpsTextView.append("Android GPS Provider not running!\n");
+                switch_gps_provider.setChecked(true);
+                startGpsProvider();
             }
-        });
+            if (!switch_gpsd.isChecked()) {
+                gpsTextView.append("chroot gpsd not running!\n");
+                switch_gpsd.setChecked(true);
+                startChrootGpsd();
+            }
+            //WLAN interface
+            String wlaniface = wlan_interface.getText().toString() ;
+            if (!wlaniface.isEmpty()) wlaniface = "source=" + wlaniface + "\n";
 
+            //BT interface
+            String btiface = bt_interface.getText().toString();
+            if (!btiface.isEmpty()) btiface = "source=" + btiface + "\n";
+
+            //SDR sensors interface
+            if (sdrcheckbox.isChecked()) rtlsdr = "source=rtl433-0\n";
+            else rtlsdr = "";
+
+            //SDR AMR interface
+            if (sdramrcheckbox.isChecked()) rtlamr = "source=rtlamr-0\n";
+            else rtlamr = "";
+
+            //SDR ADSB interface
+            if (sdradsbcheckbox.isChecked()) rtladsb = "source=rtladsb-0\n";
+            else rtladsb = "";
+
+            //Mousejack interface
+            if (mousejackcheckbox.isChecked()) mousejack = "source=mousejack:name=nRF,channel_hoprate=100/sec\n";
+            else mousejack = "";
+
+            String conf = "log_template=%p/%n\nlog_prefix=/captures/kismet/\ngps=gpsd:host=localhost,port=2947\n" + wlaniface + btiface + rtlsdr + rtlamr + rtladsb + mousejack;
+            exe.RunAsRoot(new String[]{"echo \"" + conf + "\" > " + NhPaths.SD_PATH + "/kismet_site.conf"});
+            exe.RunAsRoot(new String[]{"bootkali custom_cmd mv /sdcard/kismet_site.conf /etc/kismet/"});
+            Toast.makeText(requireActivity().getApplicationContext(), "Starting Kismet.. Web UI will be available at localhost:2501\"", Toast.LENGTH_LONG).show();
+            wantKismet = true;
+            gpsTextView.append("Kismet will launch after next position received.  Waiting...\n");
+        });
     }
 
     private void startGpsProvider() {
@@ -205,7 +193,7 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
         // do this in a thread because it takes a second or two and lags the UI
         new Thread(() -> {
             ShellExecuter exe = new ShellExecuter();
-            String command = "su -c '" + NhPaths.APP_SCRIPTS_PATH + File.separator + "bootkali start_gpsd " + String.valueOf(NhPaths.GPS_PORT) + "'";
+            String command = "su -c '" + NhPaths.APP_SCRIPTS_PATH + File.separator + "bootkali start_gpsd " + NhPaths.GPS_PORT + "'";
             Log.d(TAG, command);
             String response = exe.RunAsRootOutput(command);
             Log.d(TAG, "Response = " + response);
@@ -247,20 +235,17 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
         Log.d(TAG, "command = " + command);
         String response = exe.RunAsRootOutput(command);
         Log.d(TAG, "response = '" + response + "'");
-        if(response.length() > 0)
-            setCheckedQuietly(switch_gpsd, true);
-        else
-            setCheckedQuietly(switch_gpsd, false);
+        setCheckedQuietly(switch_gpsd, !response.isEmpty());
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         if (context instanceof KaliGPSUpdates.Provider) {
             this.gpsProvider = (KaliGPSUpdates.Provider) context;
             reattachedToRunningService = this.gpsProvider.onReceiverReattach(this);
         }
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             // we've already granted permissions, make the nag message go away
             wantHelpView = false;

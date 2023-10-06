@@ -192,7 +192,7 @@ public class WPSFragment extends Fragment {
                 if (iswatch)
                     AsyncTask.execute(() -> {
                         getActivity().runOnUiThread(() -> {
-                            exe.RunAsRoot(new String[]{"sleep 12 && settings put system clockwork_wifi_setting off; sleep 2 && ifconfig wlan0 up"});
+                            exe.RunAsRoot(new String[]{"sleep 12 && settings put system clockwork_wifi_setting off; sleep 2 && ip link set wlan0 up"});
                         });
                     });
             }

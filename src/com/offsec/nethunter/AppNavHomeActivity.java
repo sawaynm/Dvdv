@@ -10,7 +10,6 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.text.SpannableString;
@@ -58,7 +57,6 @@ import androidx.fragment.app.FragmentManager;
 
 
 public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpdates.Provider {
-
     public final static String TAG = "AppNavHomeActivity";
     public static final String CHROOT_INSTALLED_TAG = "CHROOT_INSTALLED_TAG";
     public static final String GPS_BACKGROUND_FRAGMENT_TAG = "BG_FRAGMENT_TAG";
@@ -397,10 +395,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
             setupDrawerContent(navigationView);
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            // detail for android 5 devices
-            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.darkTitle));
-        }
+        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.darkTitle));
 
         getSupportFragmentManager()
                 .beginTransaction()
