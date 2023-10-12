@@ -191,7 +191,7 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
 
     public String backupData(String storedDBpath) {
         try {
-            String currentDBPath = Environment.getDataDirectory() + "/data/" + BuildConfig.APPLICATION_ID + "/databases/" + getDatabaseName();
+            String currentDBPath = NhPaths.APP_DATABASE_PATH + "/" + getDatabaseName();
             if (Environment.getExternalStorageDirectory().canWrite()) {
                 File currentDB = new File(currentDBPath);
                 File backupDB = new File(storedDBpath);
@@ -230,7 +230,7 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
             }
         }
         try {
-            String currentDBPath = Environment.getDataDirectory() + "/data/" + BuildConfig.APPLICATION_ID + "/databases/" + getDatabaseName();
+            String currentDBPath = NhPaths.APP_DATABASE_PATH + "/" + getDatabaseName();
             if (Environment.getExternalStorageDirectory().canWrite()) {
                 File currentDB = new File(currentDBPath);
                 File backupDB = new File(storedDBpath);

@@ -10,6 +10,7 @@ import android.text.TextUtils;
 
 import com.offsec.nethunter.BuildConfig;
 import com.offsec.nethunter.models.KaliServicesModel;
+import com.offsec.nethunter.utils.NhPaths;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -174,7 +175,7 @@ public class KaliServicesSQL extends SQLiteOpenHelper {
 
 	public String backupData(String storedDBpath) {
 		try {
-			String currentDBPath = Environment.getDataDirectory() + "/data/" + BuildConfig.APPLICATION_ID + "/databases/" + getDatabaseName();
+			String currentDBPath = NhPaths.APP_DATABASE_PATH + "/" + getDatabaseName();
 			if (Environment.getExternalStorageDirectory().canWrite()) {
 				File currentDB = new File(currentDBPath);
 				File backupDB = new File(storedDBpath);
@@ -201,7 +202,7 @@ public class KaliServicesSQL extends SQLiteOpenHelper {
 			return "invalid columns format.";
 		}
 		try {
-			String currentDBPath = Environment.getDataDirectory() + "/data/" + BuildConfig.APPLICATION_ID + "/databases/" + getDatabaseName();
+			String currentDBPath = NhPaths.APP_DATABASE_PATH + "/" + getDatabaseName();
 			if (Environment.getExternalStorageDirectory().canWrite()) {
 				File currentDB = new File(currentDBPath);
 				File backupDB = new File(storedDBpath);
