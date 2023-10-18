@@ -10,6 +10,7 @@ import com.offsec.nethunter.models.NethunterModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /*
     A singleton repository class for processing the data of nethunter fragment
@@ -26,12 +27,12 @@ import java.util.List;
 public class NethunterData {
     private static NethunterData instance;
     public static boolean isDataInitiated = false;
-    private ArrayList<NethunterModel> nethunterModelArrayList = new ArrayList<>();
-    private MutableLiveData<List<NethunterModel>> data = new MutableLiveData<>();
+    private final ArrayList<NethunterModel> nethunterModelArrayList = new ArrayList<>();
+    private final MutableLiveData<List<NethunterModel>> data = new MutableLiveData<>();
     public List<NethunterModel> nethunterModelListFull;
-    private List<NethunterModel> copyOfNethunterModelListFull = new ArrayList<>();
+    private final List<NethunterModel> copyOfNethunterModelListFull = new ArrayList<>();
 
-    public synchronized static NethunterData getInstance(){
+    public static synchronized NethunterData getInstance(){
         if (instance == null) {
             instance = new NethunterData();
         }
@@ -41,7 +42,7 @@ public class NethunterData {
     public MutableLiveData<List<NethunterModel>> getNethunterModels(Context context){
         if (!isDataInitiated) {
             data.setValue(NethunterSQL.getInstance(context).bindData(nethunterModelArrayList));
-            nethunterModelListFull = new ArrayList<>(data.getValue());
+            nethunterModelListFull = new ArrayList<>(Objects.requireNonNull(data.getValue()));
             isDataInitiated = true;
         }
         return data;
@@ -56,12 +57,12 @@ public class NethunterData {
         nethunterAsynctask.setListener(new NethunterAsynctask.NethunterAsynctaskListener() {
             @Override
             public void onAsyncTaskPrepare() {
-
+                // TODO document why this method is empty
             }
 
             @Override
             public void onAsyncTaskFinished(List<NethunterModel> nethunterModelList) {
-                getNethunterModels().getValue().clear();
+                Objects.requireNonNull(getNethunterModels().getValue()).clear();
                 getNethunterModels().getValue().addAll(nethunterModelList);
                 getNethunterModels().postValue(getNethunterModels().getValue());
             }
@@ -74,12 +75,12 @@ public class NethunterData {
         nethunterAsynctask.setListener(new NethunterAsynctask.NethunterAsynctaskListener() {
             @Override
             public void onAsyncTaskPrepare() {
-
+                // TODO document why this method is empty
             }
 
             @Override
             public void onAsyncTaskFinished(List<NethunterModel> nethunterModelList) {
-                getNethunterModels().getValue().clear();
+                Objects.requireNonNull(getNethunterModels().getValue()).clear();
                 getNethunterModels().getValue().addAll(nethunterModelList);
                 getNethunterModels().postValue(getNethunterModels().getValue());
             }
@@ -87,18 +88,18 @@ public class NethunterData {
         nethunterAsynctask.execute(getInitCopyOfNethunterModelListFull());
     }
 
-    public void editData(int position, ArrayList<String> dataArrayList, NethunterSQL nethunterSQL){
-        NethunterAsynctask nethunterAsynctask = new NethunterAsynctask(NethunterAsynctask.EDITDATA, position, dataArrayList, nethunterSQL);
+    public void editData(int position, List<String> dataArrayList, NethunterSQL nethunterSQL){
+        NethunterAsynctask nethunterAsynctask = new NethunterAsynctask(NethunterAsynctask.EDITDATA, position, (ArrayList<String>) dataArrayList, nethunterSQL);
         nethunterAsynctask.setListener(new NethunterAsynctask.NethunterAsynctaskListener() {
             @Override
             public void onAsyncTaskPrepare() {
-
+                // TODO document why this method is empty
             }
 
             @Override
             public void onAsyncTaskFinished(List<NethunterModel> nethunterModelList) {
                 updateNethunterModelListFull(nethunterModelList);
-                getNethunterModels().getValue().clear();
+                Objects.requireNonNull(getNethunterModels().getValue()).clear();
                 getNethunterModels().getValue().addAll(nethunterModelList);
                 getNethunterModels().postValue(getNethunterModels().getValue());
             }
@@ -106,18 +107,18 @@ public class NethunterData {
         nethunterAsynctask.execute(getInitCopyOfNethunterModelListFull());
     }
 
-    public void addData(int position, ArrayList<String> dataArrayList, NethunterSQL nethunterSQL){
-        NethunterAsynctask nethunterAsynctask = new NethunterAsynctask(NethunterAsynctask.ADDDATA, position, dataArrayList, nethunterSQL);
+    public void addData(int position, List<String> dataArrayList, NethunterSQL nethunterSQL){
+        NethunterAsynctask nethunterAsynctask = new NethunterAsynctask(NethunterAsynctask.ADDDATA, position, (ArrayList<String>) dataArrayList, nethunterSQL);
         nethunterAsynctask.setListener(new NethunterAsynctask.NethunterAsynctaskListener() {
             @Override
             public void onAsyncTaskPrepare() {
-
+                // TODO document why this method is empty
             }
 
             @Override
             public void onAsyncTaskFinished(List<NethunterModel> nethunterModelList) {
                 updateNethunterModelListFull(nethunterModelList);
-                getNethunterModels().getValue().clear();
+                Objects.requireNonNull(getNethunterModels().getValue()).clear();
                 getNethunterModels().getValue().addAll(nethunterModelList);
                 getNethunterModels().postValue(getNethunterModels().getValue());
             }
@@ -125,18 +126,18 @@ public class NethunterData {
         nethunterAsynctask.execute(getInitCopyOfNethunterModelListFull());
     }
 
-    public void deleteData(ArrayList<Integer> selectedPositionsIndex, ArrayList<Integer> selectedTargetIds, NethunterSQL nethunterSQL){
-        NethunterAsynctask nethunterAsynctask = new NethunterAsynctask(NethunterAsynctask.DELETEDATA, selectedPositionsIndex, selectedTargetIds, nethunterSQL);
+    public void deleteData(List<Integer> selectedPositionsIndex, List<Integer> selectedTargetIds, NethunterSQL nethunterSQL){
+        NethunterAsynctask nethunterAsynctask = new NethunterAsynctask(NethunterAsynctask.DELETEDATA, (ArrayList<Integer>) selectedPositionsIndex, (ArrayList<Integer>) selectedTargetIds, nethunterSQL);
         nethunterAsynctask.setListener(new NethunterAsynctask.NethunterAsynctaskListener() {
             @Override
             public void onAsyncTaskPrepare() {
-
+                // TODO document why this method is empty
             }
 
             @Override
             public void onAsyncTaskFinished(List<NethunterModel> nethunterModelList) {
                 updateNethunterModelListFull(nethunterModelList);
-                getNethunterModels().getValue().clear();
+                Objects.requireNonNull(getNethunterModels().getValue()).clear();
                 getNethunterModels().getValue().addAll(nethunterModelList);
                 getNethunterModels().postValue(getNethunterModels().getValue());
             }
@@ -149,13 +150,13 @@ public class NethunterData {
         nethunterAsynctask.setListener(new NethunterAsynctask.NethunterAsynctaskListener() {
             @Override
             public void onAsyncTaskPrepare() {
-
+                // TODO document why this method is empty
             }
 
             @Override
             public void onAsyncTaskFinished(List<NethunterModel> nethunterModelList) {
                 updateNethunterModelListFull(nethunterModelList);
-                getNethunterModels().getValue().clear();
+                Objects.requireNonNull(getNethunterModels().getValue()).clear();
                 getNethunterModels().getValue().addAll(nethunterModelList);
                 getNethunterModels().postValue(getNethunterModels().getValue());
             }
@@ -174,13 +175,13 @@ public class NethunterData {
             nethunterAsynctask.setListener(new NethunterAsynctask.NethunterAsynctaskListener() {
                 @Override
                 public void onAsyncTaskPrepare() {
-
+                    // TODO document why this method is empty
                 }
 
                 @Override
                 public void onAsyncTaskFinished(List<NethunterModel> nethunterModelList) {
                     updateNethunterModelListFull(nethunterModelList);
-                    getNethunterModels().getValue().clear();
+                    Objects.requireNonNull(getNethunterModels().getValue()).clear();
                     getNethunterModels().getValue().addAll(nethunterModelList);
                     getNethunterModels().postValue(getNethunterModels().getValue());
                     refreshData();
@@ -199,13 +200,13 @@ public class NethunterData {
         nethunterAsynctask.setListener(new NethunterAsynctask.NethunterAsynctaskListener() {
             @Override
             public void onAsyncTaskPrepare() {
-
+                // TODO document why this method is empty
             }
 
             @Override
             public void onAsyncTaskFinished(List<NethunterModel> nethunterModelList) {
                 updateNethunterModelListFull(nethunterModelList);
-                getNethunterModels().getValue().clear();
+                Objects.requireNonNull(getNethunterModels().getValue()).clear();
                 getNethunterModels().getValue().addAll(nethunterModelList);
                 getNethunterModels().postValue(getNethunterModels().getValue());
                 refreshData();
@@ -224,5 +225,4 @@ public class NethunterData {
         copyOfNethunterModelListFull.addAll(nethunterModelListFull);
         return copyOfNethunterModelListFull;
     }
-
 }

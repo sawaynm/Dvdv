@@ -10,16 +10,17 @@ import com.offsec.nethunter.models.CustomCommandsModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class CustomCommandsData {
 	private static CustomCommandsData instance;
 	public static boolean isDataInitiated = false;
-	private ArrayList<CustomCommandsModel> customCommandsModelArrayList = new ArrayList<>();
-	private MutableLiveData<List<CustomCommandsModel>> data = new MutableLiveData<>();
+	private final ArrayList<CustomCommandsModel> customCommandsModelArrayList = new ArrayList<>();
+	private final MutableLiveData<List<CustomCommandsModel>> data = new MutableLiveData<>();
 	public List<CustomCommandsModel> customCommandsModelListFull;
-	private List<CustomCommandsModel> copyOfCustomCommandsModelListFull = new ArrayList<>();
+	private final List<CustomCommandsModel> copyOfCustomCommandsModelListFull = new ArrayList<>();
 
-	public synchronized static CustomCommandsData getInstance(){
+	public static synchronized CustomCommandsData getInstance(){
 		if (instance == null) {
 			instance = new CustomCommandsData();
 		}
@@ -29,7 +30,7 @@ public class CustomCommandsData {
 	public MutableLiveData<List<CustomCommandsModel>> getCustomCommandsModels(Context context){
 		if (!isDataInitiated) {
 			data.setValue(CustomCommandsSQL.getInstance(context).bindData(customCommandsModelArrayList));
-			customCommandsModelListFull = new ArrayList<>(data.getValue());
+			customCommandsModelListFull = new ArrayList<>(Objects.requireNonNull(data.getValue()));
 			isDataInitiated = true;
 		}
 		return data;
@@ -44,13 +45,13 @@ public class CustomCommandsData {
 		customCommandsAsyncTask.setListener(new CustomCommandsAsyncTask.CustomCommandsAsyncTaskListener() {
 			@Override
 			public void onAsyncTaskPrepare() {
-
+				// TODO document why this method is empty
 			}
 
 			@Override
 			public void onAsyncTaskFinished(List<CustomCommandsModel> customCommandsModelList) {
 				updateCustomCommandsModelListFull(customCommandsModelList);
-				getCustomCommandsModels().getValue().clear();
+				Objects.requireNonNull(getCustomCommandsModels().getValue()).clear();
 				getCustomCommandsModels().getValue().addAll(customCommandsModelList);
 				getCustomCommandsModels().postValue(getCustomCommandsModels().getValue());
 			}
@@ -58,18 +59,18 @@ public class CustomCommandsData {
 		customCommandsAsyncTask.execute(getInitCopyOfCustomCommandsModelListFull());
 	}
 
-	public void editData(int position, ArrayList<String> dataArrayList, CustomCommandsSQL customCommandsSQL){
-		CustomCommandsAsyncTask customCommandsAsyncTask = new CustomCommandsAsyncTask(CustomCommandsAsyncTask.EDITDATA, position, dataArrayList, customCommandsSQL);
+	public void editData(int position, List<String> dataArrayList, CustomCommandsSQL customCommandsSQL){
+		CustomCommandsAsyncTask customCommandsAsyncTask = new CustomCommandsAsyncTask(CustomCommandsAsyncTask.EDITDATA, position, (ArrayList<String>) dataArrayList, customCommandsSQL);
 		customCommandsAsyncTask.setListener(new CustomCommandsAsyncTask.CustomCommandsAsyncTaskListener() {
 			@Override
 			public void onAsyncTaskPrepare() {
-
+				// TODO document why this method is empty
 			}
 
 			@Override
 			public void onAsyncTaskFinished(List<CustomCommandsModel> customCommandsModelList) {
 				updateCustomCommandsModelListFull(customCommandsModelList);
-				getCustomCommandsModels().getValue().clear();
+				Objects.requireNonNull(getCustomCommandsModels().getValue()).clear();
 				getCustomCommandsModels().getValue().addAll(customCommandsModelList);
 				getCustomCommandsModels().postValue(getCustomCommandsModels().getValue());
 			}
@@ -77,18 +78,18 @@ public class CustomCommandsData {
 		customCommandsAsyncTask.execute(getInitCopyOfCustomCommandsModelListFull());
 	}
 
-	public void addData(int position, ArrayList<String> dataArrayList, CustomCommandsSQL customCommandsSQL){
-		CustomCommandsAsyncTask customCommandsAsyncTask = new CustomCommandsAsyncTask(CustomCommandsAsyncTask.ADDDATA, position, dataArrayList, customCommandsSQL);
+	public void addData(int position, List<String> dataArrayList, CustomCommandsSQL customCommandsSQL){
+		CustomCommandsAsyncTask customCommandsAsyncTask = new CustomCommandsAsyncTask(CustomCommandsAsyncTask.ADDDATA, position, (ArrayList<String>) dataArrayList, customCommandsSQL);
 		customCommandsAsyncTask.setListener(new CustomCommandsAsyncTask.CustomCommandsAsyncTaskListener() {
 			@Override
 			public void onAsyncTaskPrepare() {
-
+				// TODO document why this method is empty
 			}
 
 			@Override
 			public void onAsyncTaskFinished(List<CustomCommandsModel> customCommandsModelList) {
 				updateCustomCommandsModelListFull(customCommandsModelList);
-				getCustomCommandsModels().getValue().clear();
+				Objects.requireNonNull(getCustomCommandsModels().getValue()).clear();
 				getCustomCommandsModels().getValue().addAll(customCommandsModelList);
 				getCustomCommandsModels().postValue(getCustomCommandsModels().getValue());
 			}
@@ -96,18 +97,18 @@ public class CustomCommandsData {
 		customCommandsAsyncTask.execute(getInitCopyOfCustomCommandsModelListFull());
 	}
 
-	public void deleteData(ArrayList<Integer> selectedPositionsIndex, ArrayList<Integer> selectedTargetIds, CustomCommandsSQL customCommandsSQL){
-		CustomCommandsAsyncTask customCommandsAsyncTask = new CustomCommandsAsyncTask(CustomCommandsAsyncTask.DELETEDATA, selectedPositionsIndex, selectedTargetIds, customCommandsSQL);
+	public void deleteData(List<Integer> selectedPositionsIndex, List<Integer> selectedTargetIds, CustomCommandsSQL customCommandsSQL){
+		CustomCommandsAsyncTask customCommandsAsyncTask = new CustomCommandsAsyncTask(CustomCommandsAsyncTask.DELETEDATA, (ArrayList<Integer>) selectedPositionsIndex, (ArrayList<Integer>) selectedTargetIds, customCommandsSQL);
 		customCommandsAsyncTask.setListener(new CustomCommandsAsyncTask.CustomCommandsAsyncTaskListener() {
 			@Override
 			public void onAsyncTaskPrepare() {
-
+				// TODO document why this method is empty
 			}
 
 			@Override
 			public void onAsyncTaskFinished(List<CustomCommandsModel> customCommandsModelList) {
 				updateCustomCommandsModelListFull(customCommandsModelList);
-				getCustomCommandsModels().getValue().clear();
+				Objects.requireNonNull(getCustomCommandsModels().getValue()).clear();
 				getCustomCommandsModels().getValue().addAll(customCommandsModelList);
 				getCustomCommandsModels().postValue(getCustomCommandsModels().getValue());
 			}
@@ -120,13 +121,13 @@ public class CustomCommandsData {
 		customCommandsAsyncTask.setListener(new CustomCommandsAsyncTask.CustomCommandsAsyncTaskListener() {
 			@Override
 			public void onAsyncTaskPrepare() {
-
+				// TODO document why this method is empty
 			}
 
 			@Override
 			public void onAsyncTaskFinished(List<CustomCommandsModel> customCommandsModelList) {
 				updateCustomCommandsModelListFull(customCommandsModelList);
-				getCustomCommandsModels().getValue().clear();
+				Objects.requireNonNull(getCustomCommandsModels().getValue()).clear();
 				getCustomCommandsModels().getValue().addAll(customCommandsModelList);
 				getCustomCommandsModels().postValue(getCustomCommandsModels().getValue());
 			}
@@ -145,13 +146,13 @@ public class CustomCommandsData {
 			customCommandsAsyncTask.setListener(new CustomCommandsAsyncTask.CustomCommandsAsyncTaskListener() {
 				@Override
 				public void onAsyncTaskPrepare() {
-
+					// TODO document why this method is empty
 				}
 
 				@Override
 				public void onAsyncTaskFinished(List<CustomCommandsModel> customCommandsModelList) {
 					updateCustomCommandsModelListFull(customCommandsModelList);
-					getCustomCommandsModels().getValue().clear();
+					Objects.requireNonNull(getCustomCommandsModels().getValue()).clear();
 					getCustomCommandsModels().getValue().addAll(customCommandsModelList);
 					getCustomCommandsModels().postValue(getCustomCommandsModels().getValue());
 				}
@@ -169,13 +170,13 @@ public class CustomCommandsData {
 		customCommandsAsyncTask.setListener(new CustomCommandsAsyncTask.CustomCommandsAsyncTaskListener() {
 			@Override
 			public void onAsyncTaskPrepare() {
-
+				// TODO document why this method is empty
 			}
 
 			@Override
 			public void onAsyncTaskFinished(List<CustomCommandsModel> customCommandsModelList) {
 				updateCustomCommandsModelListFull(customCommandsModelList);
-				getCustomCommandsModels().getValue().clear();
+				Objects.requireNonNull(getCustomCommandsModels().getValue()).clear();
 				getCustomCommandsModels().getValue().addAll(customCommandsModelList);
 				getCustomCommandsModels().postValue(getCustomCommandsModels().getValue());
 			}
@@ -193,5 +194,4 @@ public class CustomCommandsData {
 		copyOfCustomCommandsModelListFull.addAll(customCommandsModelListFull);
 		return copyOfCustomCommandsModelListFull;
 	}
-
 }
