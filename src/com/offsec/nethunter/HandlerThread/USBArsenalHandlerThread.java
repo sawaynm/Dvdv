@@ -10,12 +10,10 @@ import android.os.Process;
 import androidx.annotation.NonNull;
 
 import com.offsec.nethunter.SQL.USBArsenalSQL;
-import com.offsec.nethunter.models.USBArsenalUSBSwitchModel;
 import com.offsec.nethunter.utils.ShellExecuter;
 
 
 public class USBArsenalHandlerThread extends HandlerThread {
-
     private Handler handler;
     public static final int IS_INIT_EXIST = 1;
     public static final int RETRIEVE_USB_FUNCS = 2;
@@ -30,7 +28,7 @@ public class USBArsenalHandlerThread extends HandlerThread {
     public static final int GET_USBNETWORK_SQL_DATA = 11;
     private USBArsenalListener listener;
     private Object resultObject = new Object();
-    private ShellExecuter exe = new ShellExecuter();
+    private final ShellExecuter exe = new ShellExecuter();
 
     public USBArsenalHandlerThread() {
         super("USBArsenalHandlerThread", Process.THREAD_PRIORITY_DEFAULT);
@@ -78,6 +76,8 @@ public class USBArsenalHandlerThread extends HandlerThread {
                         break;
                     case GET_USBNETWORK_SQL_DATA:
                         resultObject = USBArsenalSQL.getInstance((Context) msg.obj).getUSBNetworkColumnData(msg.arg1);
+                        break;
+                    default:
                         break;
                 }
                 if (listener != null) {

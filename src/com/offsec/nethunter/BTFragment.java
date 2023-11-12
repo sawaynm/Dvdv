@@ -2,7 +2,6 @@ package com.offsec.nethunter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -12,7 +11,7 @@ import android.media.AudioTrack;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.preference.PreferenceManager;
+import androidx.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,6 +29,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
@@ -48,14 +48,15 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Objects;
+
 
 public class BTFragment extends Fragment {
-
     private ViewPager mViewPager;
     private SharedPreferences sharedpreferences;
     private NhPaths nh;
     private Context context;
-    private static Activity activity;
+    private Activity activity;
     private static final String ARG_SECTION_NUMBER = "section_number";
 
     public static BTFragment newInstance(int sectionNumber) {
@@ -91,11 +92,10 @@ public class BTFragment extends Fragment {
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
         setHasOptionsMenu(true);
         return rootView;
-
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater menuinflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater menuinflater) {
         menuinflater.inflate(R.menu.bt, menu);
     }
 
@@ -114,7 +114,7 @@ public class BTFragment extends Fragment {
     }
 
     public void SetupDialog() {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getActivity(), R.style.DialogStyleCompat);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireActivity(), R.style.DialogStyleCompat);
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
         builder.setTitle("Welcome to Bluetooth Arsenal!");
         builder.setMessage("In order to make sure everything is working, an initial setup needs to be done.");
@@ -123,14 +123,13 @@ public class BTFragment extends Fragment {
             sharedpreferences.edit().putBoolean("setup_done", true).apply();
         });
         builder.show();
-
     }
 
     public void RunSetup() {
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
         run_cmd("echo -ne \"\\033]0;BT Arsenal Setup\\007\" && clear;if [[ -f /usr/bin/hciconfig && -f /usr/bin/l2ping && " +
                         "-f /usr/bin/fang && -f /usr/bin/blueranger &&-f /usr/bin/bluelog && -f /usr/bin/sdptool && -f /usr/bin/spooftooph && -f /usr/bin/sox && -f /usr/include/bluetooth/bluetooth.h ]];then echo 'All packages are installed!'; else " +
-                        "apt-get update && apt-get install bluetooth bluez bluez-tools bluez-obexd libbluetooth3 sox spooftooph libglib2.0*-dev libsystemd-dev " +
+                        "apt update && apt install bluetooth bluez bluez-tools bluez-obexd libbluetooth3 sox spooftooph libglib2.0*-dev libsystemd-dev " +
                         "libbluetooth-dev redfang bluelog blueranger -y;fi;" +
                         "if [[ -f /usr/bin/carwhisperer && -f /usr/bin/rfcomm_scan ]];then echo 'All scripts are installed!'; else " +
                         "git clone https://github.com/yesimxev/carwhisperer-0.2 /root/carwhisperer;" +
@@ -147,7 +146,7 @@ public class BTFragment extends Fragment {
 
     public void RunUpdate() {
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-        run_cmd("echo -ne \"\\033]0;BT Arsenal Update\\007\" && clear;apt-get update && apt-get install bluetooth bluez bluez-tools bluez-obexd libbluetooth3 sox spooftooph " +
+        run_cmd("echo -ne \"\\033]0;BT Arsenal Update\\007\" && clear;apt update && apt install bluetooth bluez bluez-tools bluez-obexd libbluetooth3 sox spooftooph " +
                 "libbluetooth-dev redfang bluelog blueranger libglib2.0*-dev libsystemd-dev -y;if [[ -f /usr/bin/carwhisperer && -f /usr/bin/rfcomm_scan && -f /root/bluebinder && -f /root/libgbinder && -f /root/libglibutil ]];" +
                 "then cd /root/carwhisperer/;git pull && make && make install;cd /root/bluebinder/;git pull && make && make install;cd /root/libgbinder/;git pull && make && " +
                 "make install-dev;cd /root/libglibutil/;git pull && make && make install-dev;cd /root/bt_audit; git pull; cd src && make;" +
@@ -156,11 +155,11 @@ public class BTFragment extends Fragment {
     }
 
     public static class TabsPagerAdapter extends FragmentPagerAdapter {
-
         TabsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
+        @NonNull
         @Override
         public Fragment getItem(int i) {
             switch (i) {
@@ -242,19 +241,14 @@ public class BTFragment extends Fragment {
 
             //Bluetooth interfaces
             final String[] outputHCI = {""};
-            AsyncTask.execute(new Runnable() {
-                @Override
-                public void run() {
-                    outputHCI[0] = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig | grep hci | cut -d: -f1");
-                }
-            });
+            AsyncTask.execute(() -> outputHCI[0] = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig | grep hci | cut -d: -f1"));
             final ArrayList<String> hciIfaces = new ArrayList<>();
-            if (outputHCI[0].equals("")) {
+            if (outputHCI[0].isEmpty()) {
                 hciIfaces.add("None");
-                ifaces.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, hciIfaces));
+                ifaces.setAdapter(new ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, hciIfaces));
             } else {
                 final String[] ifacesArray = outputHCI[0].split("\n");
-                ifaces.setAdapter(new ArrayAdapter(getContext(),android.R.layout.simple_list_item_1, ifacesArray));
+                ifaces.setAdapter(new ArrayAdapter(requireContext(),android.R.layout.simple_list_item_1, ifacesArray));
             }
 
             ifaces.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -265,20 +259,14 @@ public class BTFragment extends Fragment {
                 }
                 @Override
                 public void onNothingSelected(AdapterView<?> parentView) {
+                    // TODO document why this method is empty
                 }
             });
 
             //Refresh Status
             ImageButton RefreshStatus = rootView.findViewById(R.id.refreshStatus);
-            RefreshStatus.setOnClickListener(v -> {
-                refresh(rootView);
-            });
-            AsyncTask.execute(new Runnable() {
-                @Override
-                public void run() {
-                    refresh(rootView);
-                }
-            });
+            RefreshStatus.setOnClickListener(v -> refresh(rootView));
+            AsyncTask.execute(() -> refresh(rootView));
 
             //Internal bluetooth support
             final Button bluebinderButton = rootView.findViewById(R.id.bluebinder_button);
@@ -291,23 +279,15 @@ public class BTFragment extends Fragment {
             bluebinderButton.setOnClickListener( v -> {
                 if (bluebinderButton.getText().equals("Start")) {
                     if (!bt_smd.exists() && !hwbinder.exists() && !vhci.exists()) {
-                        final MaterialAlertDialogBuilder confirmbuilder = new MaterialAlertDialogBuilder(getActivity(), R.style.DialogStyleCompat);
+                        final MaterialAlertDialogBuilder confirmbuilder = new MaterialAlertDialogBuilder(requireActivity(), R.style.DialogStyleCompat);
                         confirmbuilder.setTitle("Internal bluetooth support disabled");
                         confirmbuilder.setMessage("Your device does not support hwbinder, vhci, or bt_smd. Make sure your kernel config has the recommended drivers enabled in order to use internal bluetooth.");
-                        confirmbuilder.setPositiveButton("Sure", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                bluebinderButton.setEnabled(false);
-                                bluebinderButton.setTextColor(Color.parseColor("#40FFFFFF"));
-                                dialogInterface.cancel();
-                            }
+                        confirmbuilder.setPositiveButton("Sure", (dialogInterface, i) -> {
+                            bluebinderButton.setEnabled(false);
+                            bluebinderButton.setTextColor(Color.parseColor("#40FFFFFF"));
+                            dialogInterface.cancel();
                         });
-                        confirmbuilder.setNegativeButton("Try anyway", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.cancel();
-                            }
-                        });
+                        confirmbuilder.setNegativeButton("Try anyway", (dialogInterface, i) -> dialogInterface.cancel());
                         final AlertDialog alert = confirmbuilder.create();
                         alert.show();
                     } else {
@@ -322,9 +302,9 @@ public class BTFragment extends Fragment {
                             if (bluebinder.exists()) {
                                 exe.RunAsRoot(new String[]{"svc bluetooth disable"});
                                 run_cmd("echo -ne \"\\033]0;Bluebinder\\007\" && clear;bluebinder || bluebinder;exit");
-                                Toast.makeText(getActivity().getApplicationContext(), "Starting bluebinder.. Please refresh in NetHunter app to check the status", Toast.LENGTH_LONG).show();
+                                Toast.makeText(requireActivity().getApplicationContext(), "Starting bluebinder.. Please refresh in NetHunter app to check the status", Toast.LENGTH_LONG).show();
                             } else {
-                                Toast.makeText(getActivity().getApplicationContext(), "Bluebinder is not installed. Launching setup..", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(requireActivity().getApplicationContext(), "Bluebinder is not installed. Launching setup..", Toast.LENGTH_SHORT).show();
                                 RunSetup();
                             }
                         }
@@ -364,14 +344,14 @@ public class BTFragment extends Fragment {
                         refresh(rootView);
                     }
                 } else {
-                    Toast.makeText(getActivity().getApplicationContext(), "Enable dbus service first!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireActivity().getApplicationContext(), "Enable dbus service first!", Toast.LENGTH_SHORT).show();
                 }
             });
 
             hciButton.setOnClickListener( v -> {
                 if (hciButton.getText().equals("Start")) {
                     if (selected_iface.equals("None")) {
-                        Toast.makeText(getActivity().getApplicationContext(), "No interface, please refresh or check connections!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireActivity().getApplicationContext(), "No interface, please refresh or check connections!", Toast.LENGTH_SHORT).show();
                     } else {
                         exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig " + selected_iface + " up noscan"});
                         refresh(rootView);
@@ -393,67 +373,54 @@ public class BTFragment extends Fragment {
                     String hci_current = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig "+ selected_iface + " | grep 'UP RUNNING' | cut -f2 -d$'\\t'");
                     if (hci_current.equals("UP RUNNING ")) {
                         final String scantime = BTtime.getText().toString();
-                        AsyncTask.execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                getActivity().runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        final ArrayList<String> scanning = new ArrayList<>();
-                                        scanning.add("Scanning..");
-                                        targets.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, scanning));
-                                    }
-                                });
-                                exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd rm /root/blue.log"});
-                                exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd timeout " + scantime + " bluelog -i " + selected_iface + " -ncqo /root/blue.log;hciconfig " + selected_iface + " noscan"});
-                                 getActivity().runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        String outputScanLog = exe.RunAsRootOutput("cat " + ScanLog);
-                                        final String[] targetsArray = outputScanLog.split("\n");
-                                        ArrayAdapter targetsadapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, targetsArray);
-                                        if (!outputScanLog.equals("")) {
-                                            targets.setAdapter(targetsadapter);
-                                        } else {
-                                            final ArrayList<String> notargets = new ArrayList<>();
-                                            notargets.add("No devices found");
-                                            targets.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, notargets));
-                                        }
-                                    }
-                                });
-                            }
+                        AsyncTask.execute(() -> {
+                            requireActivity().runOnUiThread(() -> {
+                                final ArrayList<String> scanning = new ArrayList<>();
+                                scanning.add("Scanning..");
+                                targets.setAdapter(new ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, scanning));
+                            });
+                            exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd rm /root/blue.log"});
+                            exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd timeout " + scantime + " bluelog -i " + selected_iface + " -ncqo /root/blue.log;hciconfig " + selected_iface + " noscan"});
+                             requireActivity().runOnUiThread(() -> {
+                                 String outputScanLog = exe.RunAsRootOutput("cat " + ScanLog);
+                                 final String[] targetsArray = outputScanLog.split("\n");
+                                 ArrayAdapter targetsadapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, targetsArray);
+                                 if (!outputScanLog.isEmpty()) {
+                                     targets.setAdapter(targetsadapter);
+                                 } else {
+                                     final ArrayList<String> notargets = new ArrayList<>();
+                                     notargets.add("No devices found");
+                                     targets.setAdapter(new ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, notargets));
+                                 }
+                             });
                         });
                     } else
-                        Toast.makeText(getActivity().getApplicationContext(), "Interface is down!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireActivity().getApplicationContext(), "Interface is down!", Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    Toast.makeText(getActivity().getApplicationContext(), "No interface selected!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireActivity().getApplicationContext(), "No interface selected!", Toast.LENGTH_SHORT).show();
                 }
             });
 
             //Target selection
-            targets.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    String selected_target = targets.getItemAtPosition(i).toString();
-                    if (selected_target.equals("No devices found"))
-                        Toast.makeText(getActivity().getApplicationContext(), "No target!", Toast.LENGTH_SHORT).show();
-                    else {
-                        selected_addr = exe.RunAsRootOutput("echo " + selected_target + " | cut -d , -f 1");
-                        selected_class = exe.RunAsRootOutput("echo " + selected_target + " | cut -d , -f 2");
-                        selected_name = exe.RunAsRootOutput("echo " + selected_target + " | cut -d , -f 3");
-                        PreferencesData.saveString(context, "selected_address", selected_addr);
-                        PreferencesData.saveString(context, "selected_class", selected_class);
-                        PreferencesData.saveString(context, "selected_name", selected_name);
-                        Toast.makeText(getActivity().getApplicationContext(), "Target selected!", Toast.LENGTH_SHORT).show();
-                    }
+            targets.setOnItemClickListener((adapterView, view, i, l) -> {
+                String selected_target = targets.getItemAtPosition(i).toString();
+                if (selected_target.equals("No devices found"))
+                    Toast.makeText(requireActivity().getApplicationContext(), "No target!", Toast.LENGTH_SHORT).show();
+                else {
+                    selected_addr = exe.RunAsRootOutput("echo " + selected_target + " | cut -d , -f 1");
+                    selected_class = exe.RunAsRootOutput("echo " + selected_target + " | cut -d , -f 2");
+                    selected_name = exe.RunAsRootOutput("echo " + selected_target + " | cut -d , -f 3");
+                    PreferencesData.saveString(context, "selected_address", selected_addr);
+                    PreferencesData.saveString(context, "selected_class", selected_class);
+                    PreferencesData.saveString(context, "selected_name", selected_name);
+                    Toast.makeText(requireActivity().getApplicationContext(), "Target selected!", Toast.LENGTH_SHORT).show();
                 }
             });
             return rootView;
         }
 
         private void refresh(View BTFragment) {
-
             final TextView Binderstatus = BTFragment.findViewById(R.id.BinderStatus);
             final TextView DBUSstatus = BTFragment.findViewById(R.id.DBUSstatus);
             final TextView BTstatus = BTFragment.findViewById(R.id.BTstatus);
@@ -465,67 +432,64 @@ public class BTFragment extends Fragment {
             final Spinner ifaces = BTFragment.findViewById(R.id.hci_interface);
             SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
 
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    String outputHCI = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig | grep hci | cut -d: -f1");
-                    final ArrayList<String> hciIfaces = new ArrayList<>();
-                    if (outputHCI.equals("")) {
-                        hciIfaces.add("None");
-                        ifaces.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, hciIfaces));
+            requireActivity().runOnUiThread(() -> {
+                String outputHCI = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig | grep hci | cut -d: -f1");
+                final ArrayList<String> hciIfaces = new ArrayList<>();
+                if (outputHCI.isEmpty()) {
+                    hciIfaces.add("None");
+                    ifaces.setAdapter(new ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, hciIfaces));
+                } else {
+                    final String[] ifacesArray = outputHCI.split("\n");
+                    ifaces.setAdapter(new ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, ifacesArray));
+                    int lastiface = sharedpreferences.getInt("selected_iface", 0);
+                    ifaces.setSelection(lastiface);
+                }
+                String binder_statusCMD = exe.RunAsRootOutput("pidof bluebinder");
+                File bt_smd = new File("/sys/module/hci_smd/parameters/hcismd_set");
+                if (!bt_smd.exists()) {
+                    if (binder_statusCMD.isEmpty()) {
+                        Binderstatus.setText("Stopped");
+                        bluebinderButton.setText("Start");
+                    }
+                    else {
+                        Binderstatus.setText("Running");
+                        bluebinderButton.setText("Stop");
+                    }
+                } else {
+                    if (outputHCI.contains("hci0")) {
+                        Binderstatus.setText("Enabled");
+                        bluebinderButton.setText("Stop");
                     } else {
-                        final String[] ifacesArray = outputHCI.split("\n");
-                        ifaces.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, ifacesArray));
-                        Integer lastiface = sharedpreferences.getInt("selected_iface", 0);
-                        ifaces.setSelection(lastiface);
+                        Binderstatus.setText("Disabled");
+                        bluebinderButton.setText("Start");
                     }
-                    String binder_statusCMD = exe.RunAsRootOutput("pidof bluebinder");
-                    File bt_smd = new File("/sys/module/hci_smd/parameters/hcismd_set");
-                    if (!bt_smd.exists()) {
-                        if (binder_statusCMD.equals("")) {
-                            Binderstatus.setText("Stopped");
-                            bluebinderButton.setText("Start");
-                        }
-                        else {
-                            Binderstatus.setText("Running");
-                            bluebinderButton.setText("Stop");
-                        }
-                    } else {
-                        if (outputHCI.contains("hci0")) {
-                            Binderstatus.setText("Enabled");
-                            bluebinderButton.setText("Stop");
-                        } else {
-                            Binderstatus.setText("Disabled");
-                            bluebinderButton.setText("Start");
-                        }
-                    }
-                    String dbus_statusCMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service dbus status | grep dbus");
-                    if (dbus_statusCMD.equals("dbus is running.")) {
-                        DBUSstatus.setText("Running");
-                        dbusButton.setText("Stop");
-                    }
-                    else {
-                        DBUSstatus.setText("Stopped");
-                        dbusButton.setText("Start");
-                    }
-                    String bt_statusCMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service bluetooth status | grep bluetooth");
-                    if (bt_statusCMD.equals("bluetooth is running.")) {
-                        BTstatus.setText("Running");
-                        btButton.setText("Stop");
-                    }
-                    else {
-                        BTstatus.setText("Stopped");
-                        btButton.setText("Start");
-                    }
-                    String hci_statusCMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig "+ selected_iface + " | grep 'UP RUNNING' | cut -f2 -d$'\\t'");
-                    if (hci_statusCMD.equals("UP RUNNING ")) {
-                        HCIstatus.setText("Up");
-                        hciButton.setText("Stop");
-                    }
-                    else {
-                        HCIstatus.setText("Down");
-                        hciButton.setText("Start");
-                    }
+                }
+                String dbus_statusCMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service dbus status | grep dbus");
+                if (dbus_statusCMD.equals("dbus is running.")) {
+                    DBUSstatus.setText("Running");
+                    dbusButton.setText("Stop");
+                }
+                else {
+                    DBUSstatus.setText("Stopped");
+                    dbusButton.setText("Start");
+                }
+                String bt_statusCMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service bluetooth status | grep bluetooth");
+                if (bt_statusCMD.equals("bluetooth is running.")) {
+                    BTstatus.setText("Running");
+                    btButton.setText("Stop");
+                }
+                else {
+                    BTstatus.setText("Stopped");
+                    btButton.setText("Start");
+                }
+                String hci_statusCMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig "+ selected_iface + " | grep 'UP RUNNING' | cut -f2 -d$'\\t'");
+                if (hci_statusCMD.equals("UP RUNNING ")) {
+                    HCIstatus.setText("Up");
+                    hciButton.setText("Stop");
+                }
+                else {
+                    HCIstatus.setText("Down");
+                    hciButton.setText("Start");
                 }
             });
         }
@@ -593,7 +557,7 @@ public class BTFragment extends Fragment {
                     String l2ping_interface = hci_interface.getText().toString();
                     run_cmd("echo -ne \"\\033]0;Pinging BT device\\007\" && clear;l2ping -i " + l2ping_interface + " -s " + l2ping_size + " -c " + l2ping_count + flood + reverse + " " + l2ping_target + " && echo \"\nPinging done, closing in 3 secs..\";sleep 3 && exit");
                 } else {
-                    Toast.makeText(getActivity().getApplicationContext(), "No target address!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireActivity().getApplicationContext(), "No target address!", Toast.LENGTH_SHORT).show();
                 }
             });
 
@@ -602,10 +566,10 @@ public class BTFragment extends Fragment {
 
             StartRFCommscan.setOnClickListener( v -> {
                 String sdp_target = sdp_address.getText().toString();
-                if (!sdp_target.equals(""))
+                if (!sdp_target.isEmpty())
                     run_cmd("echo -ne \"\\033]0;RFComm Scan\\007\" && clear;rfcomm_scan " + sdp_target);
                 else
-                    Toast.makeText(getActivity().getApplicationContext(), "No target address!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireActivity().getApplicationContext(), "No target address!", Toast.LENGTH_SHORT).show();
             });
 
             //Redfang
@@ -614,10 +578,10 @@ public class BTFragment extends Fragment {
             StartRedfang.setOnClickListener( v -> {
                 String redfang_range = redfang_Range.getText().toString();
                 String redfang_logfile = redfang_Log.getText().toString();
-                if (!redfang_range.equals(""))
+                if (!redfang_range.isEmpty())
                     run_cmd("echo -ne \"\\033]0;Redfang\\007\" && clear;fang -r " + redfang_range + " -o " + redfang_logfile);
                 else
-                    Toast.makeText(getActivity().getApplicationContext(), "No target range!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireActivity().getApplicationContext(), "No target range!", Toast.LENGTH_SHORT).show();
             });
 
             //Blueranger
@@ -625,28 +589,22 @@ public class BTFragment extends Fragment {
             StartBlueranger.setOnClickListener( v -> {
                 String blueranger_target = sdp_address.getText().toString();
                 String blueranger_interface = hci_interface.getText().toString();
-                if (!blueranger_target.equals(""))
+                if (!blueranger_target.isEmpty())
                     run_cmd("echo -ne \"\\033]0;Blueranger\\007\" && clear;blueranger " + blueranger_interface + " " + blueranger_target);
                 else
-                    Toast.makeText(getActivity().getApplicationContext(), "No target address!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireActivity().getApplicationContext(), "No target address!", Toast.LENGTH_SHORT).show();
             });
 
             //Start SDP Tool
             Button StartSDPButton = rootView.findViewById(R.id.start_sdp);
             StartSDPButton.setOnClickListener( v -> {
                 Toast.makeText(getContext(), "Discovery started..\nCheck the output below", Toast.LENGTH_SHORT).show();
-                AsyncTask.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        startSDPtool(rootView);
-                    }
-                });
+                AsyncTask.execute(() -> startSDPtool(rootView));
             });
             return rootView;
         }
 
         private void startSDPtool(View BTFragment) {
-
             final EditText sdp_address = BTFragment.findViewById(R.id.sdp_address);
             final EditText hci_interface = BTFragment.findViewById(R.id.hci_interface);
             final TextView output = BTFragment.findViewById(R.id.SDPoutput);
@@ -654,18 +612,14 @@ public class BTFragment extends Fragment {
             String sdp_target = sdp_address.getText().toString();
             String sdp_interface = hci_interface.getText().toString();
 
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (!sdp_target.equals("")) {
-                        String CMDout = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd sdptool -i " + sdp_interface + " browse " + sdp_target + " | sed '/^\\[/d' | sed '/^Linux/d'");
-                        output.setText(CMDout);
-                    } else
-                        Toast.makeText(getActivity().getApplicationContext(), "No target address!", Toast.LENGTH_SHORT).show();
-                }
+            requireActivity().runOnUiThread(() -> {
+                if (!sdp_target.isEmpty()) {
+                    String CMDout = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd sdptool -i " + sdp_interface + " browse " + sdp_target + " | sed '/^\\[/d' | sed '/^Linux/d'");
+                    output.setText(CMDout);
+                } else
+                    Toast.makeText(requireActivity().getApplicationContext(), "No target address!", Toast.LENGTH_SHORT).show();
             });
         }
-
     }
 
     public static class SpoofFragment extends BTFragment {
@@ -708,9 +662,7 @@ public class BTFragment extends Fragment {
 
             //Refresh
             Button RefreshStatus = rootView.findViewById(R.id.refreshSpoof);
-            RefreshStatus.setOnClickListener(v -> {
-                refreshSpoof(rootView);
-            });
+            RefreshStatus.setOnClickListener(v -> refreshSpoof(rootView));
 
             //Apply
             Button ApplySpoof = rootView.findViewById(R.id.apply_spoof);
@@ -722,8 +674,8 @@ public class BTFragment extends Fragment {
                 String target_name = " -n \"" + targetName.getText().toString() + "\"";
                 if (target_class.equals(" -c ")) target_class = "";
                 if (target_name.equals(" -n \"\"")) target_name = "";
-                if (target_address.equals(" -a ") && target_name.equals("") && target_class.equals("")) {
-                    Toast.makeText(getActivity().getApplicationContext(), "Please enter at least one parameter!", Toast.LENGTH_SHORT).show();
+                if (target_address.equals(" -a ") && target_name.isEmpty() && target_class.isEmpty()) {
+                    Toast.makeText(requireActivity().getApplicationContext(), "Please enter at least one parameter!", Toast.LENGTH_SHORT).show();
                 } else {
                     final String target_classname = target_class + target_name;
                     if (!target_address.equals(" -a ")) {
@@ -738,7 +690,6 @@ public class BTFragment extends Fragment {
         }
 
         private void refreshSpoof(View BTFragment) {
-
             ShellExecuter exe = new ShellExecuter();
             final EditText spoof_interface = BTFragment.findViewById(R.id.spoof_interface);
             final TextView currentAddress = BTFragment.findViewById(R.id.currentAddress);
@@ -746,25 +697,22 @@ public class BTFragment extends Fragment {
             final TextView currentClassType = BTFragment.findViewById(R.id.currentClassType);
             final TextView currentName = BTFragment.findViewById(R.id.currentName);
 
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    String selectedIface = spoof_interface.getText().toString();
-                    String currentAddress_CMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig " + selectedIface + " | awk '/Address/ { print $3 }'");
-                    if (!currentAddress_CMD.equals("")) {
-                        currentAddress.setText(currentAddress_CMD);
+            requireActivity().runOnUiThread(() -> {
+                String selectedIface = spoof_interface.getText().toString();
+                String currentAddress_CMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig " + selectedIface + " | awk '/Address/ { print $3 }'");
+                if (!currentAddress_CMD.isEmpty()) {
+                    currentAddress.setText(currentAddress_CMD);
 
-                        String currentClassCMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig " + selectedIface + " -a | awk '/Class:/ { print $2 }' | sed '/^Class:/d'");
-                        currentClass.setText(currentClassCMD);
+                    String currentClassCMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig " + selectedIface + " -a | awk '/Class:/ { print $2 }' | sed '/^Class:/d'");
+                    currentClass.setText(currentClassCMD);
 
-                        String currentClassTypeCMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig " + selectedIface + " -a | awk '/Device Class:/ { print $3, $4, $5 }'");
-                        currentClassType.setText(currentClassTypeCMD);
+                    String currentClassTypeCMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig " + selectedIface + " -a | awk '/Device Class:/ { print $3, $4, $5 }'");
+                    currentClassType.setText(currentClassTypeCMD);
 
-                        String currentNameCMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig " + selectedIface + " -a | grep Name | cut -d\\\' -f2");
-                        currentName.setText(currentNameCMD);
-                    } else
-                        Toast.makeText(getActivity().getApplicationContext(), "Interface is down!", Toast.LENGTH_SHORT).show();
-                }
+                    String currentNameCMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig " + selectedIface + " -a | grep Name | cut -d\\\' -f2");
+                    currentName.setText(currentNameCMD);
+                } else
+                    Toast.makeText(requireActivity().getApplicationContext(), "Interface is down!", Toast.LENGTH_SHORT).show();
             });
         }
     }
@@ -808,7 +756,7 @@ public class BTFragment extends Fragment {
             final ArrayList<String> modes = new ArrayList<>();
             modes.add("Listen");
             modes.add("Inject");
-            cwmode.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, modes));
+            cwmode.setAdapter(new ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, modes));
             cwmode.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int pos, long id) {
@@ -816,6 +764,7 @@ public class BTFragment extends Fragment {
                 }
                 @Override
                 public void onNothingSelected(AdapterView<?> parentView) {
+                    // TODO document why this method is empty
                 }
             });
 
@@ -852,14 +801,14 @@ public class BTFragment extends Fragment {
                                 "carwhisperer " + cw_iface + " tempi.raw tempo.raw " + cw_target + " " + cw_channel + "; rm tempi.raw && rm tempo.raw;echo '\nInjection done, closing in 3 secs..';sleep 3 && exit");
                     }
                 } else
-                    Toast.makeText(getActivity().getApplicationContext(), "No target address!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireActivity().getApplicationContext(), "No target address!", Toast.LENGTH_SHORT).show();
             });
 
             //Kill
             Button StopCWButton = rootView.findViewById(R.id.stop_cw);
             StopCWButton.setOnClickListener( v -> {
                     exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd pkill carwhisperer"});
-                    Toast.makeText(getActivity().getApplicationContext(), "Killed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireActivity().getApplicationContext(), "Killed", Toast.LENGTH_SHORT).show();
                     });
 
             //Stream or play audio
@@ -871,26 +820,23 @@ public class BTFragment extends Fragment {
                 if (cw_listenfile.length() == 0) {
                     Toast.makeText(getContext(), "File not found!", Toast.LENGTH_SHORT).show();
                 } else {
-                    AsyncTask.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            InputStream s = null;
-                            try {
-                                s = new FileInputStream(cw_listenfile);
-                            } catch (NullPointerException | FileNotFoundException e) {
-                                e.printStackTrace();
-                            }
-                            audioTrack.play();
-                            // Reading data.
-                            byte[] data = new byte[200];
-                            int n = 0;
-                            try {
-                                while ((n = s.read(data)) != -1)
-                                    synchronized (audioTrack) {
-                                        audioTrack.write(data, 0, n);
-                                    }
-                            } catch (IOException e) {
-                            }
+                    AsyncTask.execute(() -> {
+                        InputStream s = null;
+                        try {
+                            s = new FileInputStream(cw_listenfile);
+                        } catch (NullPointerException | FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                        audioTrack.play();
+                        // Reading data.
+                        byte[] data = new byte[200];
+                        int n = 0;
+                        try {
+                            while ((n = s.read(data)) != -1)
+                                synchronized (audioTrack) {
+                                    audioTrack.write(data, 0, n);
+                                }
+                        } catch (IOException ignored) {
                         }
                     });
                 }
@@ -906,19 +852,16 @@ public class BTFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode,
                                  Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-            if (requestCode == 1001) {
-                if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == 1001 && (resultCode == Activity.RESULT_OK)) {
                     ShellExecuter exe = new ShellExecuter();
-                    EditText injectfilename = getActivity().findViewById(R.id.injectfilename);
-                    String FilePath = data.getData().getPath();
+                    EditText injectfilename = requireActivity().findViewById(R.id.injectfilename);
+                    String FilePath = Objects.requireNonNull(data.getData()).getPath();
                     FilePath = exe.RunAsRootOutput("echo " + FilePath + " | sed -e 's/\\/document\\/primary:/\\/sdcard\\//g' ");
                     injectfilename.setText(FilePath);
-                }
             }
         }
 
     public static class PreferencesData {
-
         public static void saveString(Context context, String key, String value) {
             SharedPreferences sharedPrefs = PreferenceManager
                     .getDefaultSharedPreferences(context);
@@ -936,7 +879,7 @@ public class BTFragment extends Fragment {
     // Bridge side functions
     ////
 
-    public static void run_cmd(String cmd) {
+    public void run_cmd(String cmd) {
         Intent intent = Bridge.createExecuteIntent("/data/data/com.offsec.nhterm/files/usr/bin/kali", cmd);
         activity.startActivity(intent);
     }

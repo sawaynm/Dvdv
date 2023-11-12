@@ -9,7 +9,6 @@ import android.util.Log;
 import com.offsec.nethunter.service.RunAtBootService;
 
 public class BootCompletedReceiver extends BroadcastReceiver{
-
     private static final String TAG = "BootCompletedReceiver";
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -21,9 +20,8 @@ public class BootCompletedReceiver extends BroadcastReceiver{
                 RunAtBootService.enqueueWork(context, (intent.setComponent(comp)));
                 //Intent serviceIntent = new Intent(context, RunAtBootService.class);
                 //context.startService(serviceIntent);
-                Log.d(TAG, "Nethunter receive boot_completed intent!!");
+                Log.d(TAG, "NetHunter receive boot_completed intent!!");
             }
         }
-
     }
 }

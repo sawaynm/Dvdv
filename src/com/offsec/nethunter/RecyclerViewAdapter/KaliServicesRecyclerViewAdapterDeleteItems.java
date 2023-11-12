@@ -15,10 +15,9 @@ import com.offsec.nethunter.models.KaliServicesModel;
 import java.util.List;
 
 public class KaliServicesRecyclerViewAdapterDeleteItems extends RecyclerView.Adapter<KaliServicesRecyclerViewAdapterDeleteItems.ItemViewHolder>{
-
-	private static final String TAG = "KaliServiceRecycleViewChild";
-	private Context context;
-	private List<KaliServicesModel> kaliServicesModelList;
+	public static final String TAG = "KaliServiceRecycleViewChild";
+	private final Context context;
+	private final List<KaliServicesModel> kaliServicesModelList;
 
 	public KaliServicesRecyclerViewAdapterDeleteItems(Context context, List<KaliServicesModel> kaliServicesModelList){
 		this.context = context;
@@ -29,7 +28,7 @@ public class KaliServicesRecyclerViewAdapterDeleteItems extends RecyclerView.Ada
 	@Override
 	public KaliServicesRecyclerViewAdapterDeleteItems.ItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
 		View view = LayoutInflater.from(context).inflate(R.layout.kaliservices_recyclerview_dialog_delete, viewGroup, false);
-		return new KaliServicesRecyclerViewAdapterDeleteItems.ItemViewHolder(view);
+		return new ItemViewHolder(view);
 	}
 
 	@Override
@@ -42,12 +41,11 @@ public class KaliServicesRecyclerViewAdapterDeleteItems extends RecyclerView.Ada
 		return kaliServicesModelList.size();
 	}
 
-	class ItemViewHolder extends RecyclerView.ViewHolder{
-		private CheckBox runOnChrootStartCheckBox;
+	static class ItemViewHolder extends RecyclerView.ViewHolder{
+		private final CheckBox runOnChrootStartCheckBox;
 		private ItemViewHolder(View view){
 			super(view);
 			runOnChrootStartCheckBox = view.findViewById(R.id.f_kaliservices_recyclerview_dialog_chkbox);
 		}
 	}
-
 }
