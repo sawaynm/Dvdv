@@ -930,7 +930,7 @@ public class BTFragment extends Fragment {
             badbtServerButton.setOnClickListener( v -> {
                 if (badbtServerButton.getText().equals("Start")) {
                     if (iswatch) {
-                        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getActivity(), R.style.DialogStyleCompat);
+                        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireActivity(), R.style.DialogStyleCompat);
                         builder.setTitle("Warning!");
                         builder.setMessage("Running BadBT on a smartwatch may dispair your watch from phone/wearos app.");
                         builder.setPositiveButton("Ok", (dialog, which) -> {});
