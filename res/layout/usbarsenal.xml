@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -282,14 +283,16 @@
                 android:id="@+id/f_usbarsenal_ll_imageMounter_sub2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:layout_margin="16dp"
+                android:orientation="vertical"
                 android:visibility="gone">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="@string/usbarsenal_hint1_imagemounter"/>
+                    android:text="@string/usbarsenal_hint1_imagemounter" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -297,15 +300,17 @@
                     android:text="Select an .img or .iso file to mount"
                     android:textSize="16sp"
                     android:textStyle="bold" />
+
                 <Spinner
                     android:id="@+id/f_usbarsenal_spr_img_files"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
+
                     <Button
                         android:id="@+id/f_usbarsenal_btn_mountImage"
                         style="?android:attr/buttonStyleSmall"
@@ -313,6 +318,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="0.3"
                         android:text="Mount Image" />
+
                     <Button
                         android:id="@+id/f_usbarsenal_btn_unmountImage"
                         style="?android:attr/buttonStyleSmall"
@@ -320,48 +326,121 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="0.3"
                         android:text="Unmount Image" />
+
                     <CheckBox
                         android:id="@+id/f_usbarsenal_chkbox_ReadOrWrite"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Read Only"
                         android:layout_weight="0.4"
                         android:paddingTop="5dp"
-                        android:paddingBottom="5dp" />
+                        android:paddingBottom="5dp"
+                        android:text="Read Only" />
                 </LinearLayout>
+
+                <androidx.legacy.widget.Space
+                    android:layout_width="match_parent"
+                    android:layout_height="14dp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
+
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.8"
                         android:orientation="vertical">
+
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Mounted Image:"
                             android:textSize="18sp" />
+
                         <TextView
                             android:id="@+id/f_usbarsenal_tv_mount_state"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textSize="18sp"
-                            android:text="No image is mounted."/>
+                            android:text="No image is mounted."
+                            android:textSize="18sp" />
                     </LinearLayout>
+
                     <ImageButton
                         android:id="@+id/f_usbarsenal_imgbtn_reloadMountStatus"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="0.2"
                         android:adjustViewBounds="false"
                         android:baselineAlignBottom="false"
                         android:cropToPadding="false"
-                        android:layout_weight="0.2"
                         android:src="@drawable/ic_action_refresh" />
+
                 </LinearLayout>
+
+                <androidx.legacy.widget.Space
+                    android:layout_width="match_parent"
+                    android:layout_height="14dp"
+                    android:layout_weight="1" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:text="Inquiry string:"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="(empty to reset)" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal">
+
+                        <EditText
+                            android:id="@+id/f_usbarsenal_et_inquiryString"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:ems="10"
+                            android:inputType="text" />
+
+                        <Button
+                            android:id="@+id/f_usbarsenal_btn_changeInquiryString"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="3"
+                            android:text="Change" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Current inquiry string:"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/f_usbarsenal_tv_current_inquiry_string"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Linux File-CD/Stor gadget (kernel default)" />
+
             </LinearLayout>
+
         </LinearLayout>
 
         <!-- USB Network Tethering -->

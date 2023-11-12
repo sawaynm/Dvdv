@@ -69,7 +69,7 @@ public class EditSourceActivity extends AppCompatActivity {
     public void updateSource(View view) {
         EditText source = findViewById(R.id.source);
         String newSource = source.getText().toString();
-        Boolean isSaved = exe.SaveFileContents(newSource, configFilePath);
+        boolean isSaved = exe.SaveFileContents(newSource, configFilePath);
         if (isSaved) {
             NhPaths.showMessage(activity,"Source updated");
         } else {

@@ -1,5 +1,7 @@
 package com.offsec.nethunter.bridge;
 
+import androidx.annotation.NonNull;
+
 import java.util.Objects;
 
 /**
@@ -26,6 +28,7 @@ public class SessionId {
     return sessionId;
   }
 
+  @NonNull
   @Override
   public String toString() {
     return "TerminalSession { id = " + sessionId + " }";

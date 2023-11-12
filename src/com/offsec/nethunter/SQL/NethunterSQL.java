@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.offsec.nethunter.BuildConfig;
 import com.offsec.nethunter.models.NethunterModel;
@@ -171,7 +172,7 @@ public class NethunterSQL extends SQLiteOpenHelper {
 
     public String backupData(String storedDBpath) {
         try {
-            String currentDBPath = Environment.getDataDirectory() + "/data/" + BuildConfig.APPLICATION_ID + "/databases/" + getDatabaseName();
+            String currentDBPath = NhPaths.APP_DATABASE_PATH + "/" + getDatabaseName();
             if (Environment.getExternalStorageDirectory().canWrite()) {
                 File currentDB = new File(currentDBPath);
                 File backupDB = new File(storedDBpath);
@@ -203,7 +204,7 @@ public class NethunterSQL extends SQLiteOpenHelper {
             return "invalid columns format.";
         }
         try {
-            String currentDBPath = Environment.getDataDirectory() + "/data/" + BuildConfig.APPLICATION_ID + "/databases/" + getDatabaseName();
+            String currentDBPath = NhPaths.APP_DATABASE_PATH + "/" + getDatabaseName();
             if (Environment.getExternalStorageDirectory().canWrite()) {
                 File currentDB = new File(currentDBPath);
                 File backupDB = new File(storedDBpath);

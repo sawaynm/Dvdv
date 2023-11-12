@@ -15,12 +15,10 @@ import com.offsec.nethunter.models.NethunterModel;
 import java.util.List;
 
 
-//Define recycleView adapter for listing different textView content.
 public class NethunterRecyclerViewAdapterDeleteItems extends RecyclerView.Adapter<NethunterRecyclerViewAdapterDeleteItems.ItemViewHolder>{
-
-	private static final String TAG = "NethunterRecyclerView";
-	private Context context;
-	private List<NethunterModel> nethunterModelList;
+	public static final String TAG = "NethunterRecyclerView";
+	private final Context context;
+	private final List<NethunterModel> nethunterModelList;
 
 	public NethunterRecyclerViewAdapterDeleteItems(Context context, List<NethunterModel> nethunterModelList){
 		this.context = context;
@@ -31,7 +29,7 @@ public class NethunterRecyclerViewAdapterDeleteItems extends RecyclerView.Adapte
 	@Override
 	public NethunterRecyclerViewAdapterDeleteItems.ItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
 		View view = LayoutInflater.from(context).inflate(R.layout.nethunter_recyclerview_dialog_delete, viewGroup, false);
-		return new NethunterRecyclerViewAdapterDeleteItems.ItemViewHolder(view);
+		return new ItemViewHolder(view);
 	}
 
 	@Override
@@ -44,12 +42,11 @@ public class NethunterRecyclerViewAdapterDeleteItems extends RecyclerView.Adapte
 		return nethunterModelList.size();
 	}
 
-	class ItemViewHolder extends RecyclerView.ViewHolder{
-		private CheckBox checkBox;
+	static class ItemViewHolder extends RecyclerView.ViewHolder{
+		private final CheckBox checkBox;
 		private ItemViewHolder(View view){
 			super(view);
 			checkBox = view.findViewById(R.id.f_nethunter_recyclerview_dialog_chkbox);
 		}
 	}
-
 }

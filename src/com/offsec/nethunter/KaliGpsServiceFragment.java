@@ -38,7 +38,6 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
     private KaliGPSUpdates.Provider gpsProvider = null;
     private TextView gpsTextView;
     private Context context;
-    private static Activity activity;
     private boolean wantKismet = false;
     private boolean wantHelpView = true;
     private boolean reattachedToRunningService = false;
@@ -290,9 +289,9 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
         }
     }
 
-    public static void run_cmd(String cmd) {
+    public void run_cmd(String cmd) {
         Intent intent = Bridge.createExecuteIntent("/data/data/com.offsec.nhterm/files/usr/bin/kali", cmd);
-        activity.startActivity(intent);
+        context.startActivity(intent);
     }
 }
 

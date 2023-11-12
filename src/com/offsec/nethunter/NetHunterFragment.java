@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -45,11 +44,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import static com.offsec.nethunter.R.id.container;
 import static com.offsec.nethunter.R.id.f_nethunter_action_search;
-import static com.offsec.nethunter.R.id.f_nethunter_recyclerview;
-import static com.offsec.nethunter.R.id.nethunter_item;
-import static com.offsec.nethunter.R.id.viewSource;
 
 
 public class NetHunterFragment extends Fragment {
@@ -160,6 +155,7 @@ public class NetHunterFragment extends Fragment {
         final View promptView = inflater.inflate(R.layout.nethunter_custom_dialog_view, null);
         final TextView titleTextView = promptView.findViewById(R.id.f_nethunter_adb_tv_title1);
         final EditText storedpathEditText = promptView.findViewById(R.id.f_nethunter_adb_et_storedpath);
+
         switch (item.getItemId()) {
             case R.id.f_nethunter_menu_backupDB:
                 titleTextView.setText("Full path to where you want to save the database:");
@@ -177,7 +173,7 @@ public class NetHunterFragment extends Fragment {
                             NhPaths.showMessage(context, "db is successfully backup to " + storedpathEditText.getText().toString());
                         } else {
                             dialog.dismiss();
-                            new MaterialAlertDialogBuilder(context).setTitle("Failed to backup the DB.").setMessage(returnedResult).create().show();
+                            new MaterialAlertDialogBuilder(context, R.style.DialogStyleCompat).setTitle("Failed to backup the DB.").setMessage(returnedResult).create().show();
                         }
                         dialog.dismiss();
                     });
@@ -200,7 +196,7 @@ public class NetHunterFragment extends Fragment {
                             NhPaths.showMessage(context, "db is successfully restored to " + storedpathEditText.getText().toString());
                         } else {
                             dialog.dismiss();
-                            new MaterialAlertDialogBuilder(context).setTitle("Failed to restore the DB.").setMessage(returnedResult).create().show();
+                            new MaterialAlertDialogBuilder(context, R.style.DialogStyleCompat).setTitle("Failed to restore the DB.").setMessage(returnedResult).create().show();
                         }
                         dialog.dismiss();
                     });

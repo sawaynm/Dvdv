@@ -26,11 +26,12 @@ import com.offsec.nethunter.utils.NhPaths;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class CustomCommandsRecyclerViewAdapter extends RecyclerView.Adapter<CustomCommandsRecyclerViewAdapter.ItemViewHolder> implements Filterable {
-	private static final String TAG = "KaliServiceRecycleView";
-	private Context context;
-	private List<CustomCommandsModel> customCommandsModelList;
+	public static final String TAG = "KaliServiceRecycleView";
+	private final Context context;
+	private final List<CustomCommandsModel> customCommandsModelList;
 
 	public CustomCommandsRecyclerViewAdapter(Context context, List<CustomCommandsModel> customCommandsModelList){
 		this.context = context;
@@ -41,7 +42,7 @@ public class CustomCommandsRecyclerViewAdapter extends RecyclerView.Adapter<Cust
 	@Override
 	public CustomCommandsRecyclerViewAdapter.ItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
 		View view = LayoutInflater.from(context).inflate(R.layout.customcommands_recyclerview_main, viewGroup, false);
-		return new CustomCommandsRecyclerViewAdapter.ItemViewHolder(view);
+		return new ItemViewHolder(view);
 	}
 
 	@Override
@@ -122,8 +123,7 @@ public class CustomCommandsRecyclerViewAdapter extends RecyclerView.Adapter<Cust
 		return CustomCommandsModelListFilter;
 	}
 
-	private Filter CustomCommandsModelListFilter = new Filter() {
-
+	private final Filter CustomCommandsModelListFilter = new Filter() {
 		@Override
 		protected FilterResults performFiltering(CharSequence constraint) {
 			FilterResults results = new FilterResults();
@@ -144,19 +144,19 @@ public class CustomCommandsRecyclerViewAdapter extends RecyclerView.Adapter<Cust
 
 		@Override
 		protected void publishResults(CharSequence constraint, FilterResults results) {
-			CustomCommandsData.getInstance().getCustomCommandsModels().getValue().clear();
+			Objects.requireNonNull(CustomCommandsData.getInstance().getCustomCommandsModels().getValue()).clear();
 			CustomCommandsData.getInstance().getCustomCommandsModels().getValue().addAll((List<CustomCommandsModel>) results.values);
 			CustomCommandsData.getInstance().getCustomCommandsModels().postValue(CustomCommandsData.getInstance().getCustomCommandsModels().getValue());
 		}
 	};
 
-	class ItemViewHolder extends RecyclerView.ViewHolder{
-		private TextView commandLabelTextView;
-		private TextView execEnvTextView;
-        private TextView execModeTextView;
-        private TextView runOnBootTextView;
+	static class ItemViewHolder extends RecyclerView.ViewHolder{
+		private final TextView commandLabelTextView;
+		private final TextView execEnvTextView;
+        private final TextView execModeTextView;
+        private final TextView runOnBootTextView;
 		//private Button editButton;
-        private Button runButton;
+        private final Button runButton;
 
 		private ItemViewHolder(View view){
 			super(view);
