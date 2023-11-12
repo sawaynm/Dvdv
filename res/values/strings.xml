@@ -221,6 +221,7 @@
     <string name="bt_carwhisperer">Carwhisperer script from the way back. Listen to, or inject audio to various devices like speakers, headsets, watches or even cars. Note that target needs to be disconnected from original source. Live stream will have some delay. The sampling has to be 8kHz as we\'re injecting into SCO protocol.</string>
     <string name="bt_spoof">Spoof your BT adapters.\nWill play essential role in upcoming attacks.</string>
     <string name="bt_tools">Brute force BT device addresses, ping, and discover their services.</string>
+    <string name="bt_badbt">Inspired by the Mr.Robot police car scene and the Flipper XFW Team, you can now create a Bluetooth keyboard server and send keystrokes straight from NetHunter. If you read this first, you may need to run setup again in the top right menu to patch bluetooth service.</string>
 
     <!-- SET -->
     <string name="set_description">Social Engineering Toolkit email template builder by yesimxev. Please note you need to have a working Gmail or email relay configuration for SET in order to use these templates. It is recommended not to have account picture if you use Gmail.</string>
