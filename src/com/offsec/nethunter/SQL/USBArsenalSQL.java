@@ -11,6 +11,7 @@ import android.util.Log;
 import com.offsec.nethunter.BuildConfig;
 import com.offsec.nethunter.models.USBArsenalUSBNetworkModel;
 import com.offsec.nethunter.models.USBArsenalUSBSwitchModel;
+import com.offsec.nethunter.utils.NhPaths;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -221,7 +222,7 @@ public class USBArsenalSQL extends SQLiteOpenHelper {
 
     public String backupData(String storedDBpath) {
         try {
-            String currentDBPath = Environment.getDataDirectory() + "/data/" + BuildConfig.APPLICATION_ID + "/databases/" + getDatabaseName();
+            String currentDBPath = NhPaths.APP_DATABASE_PATH + "/" + getDatabaseName();
             if (Environment.getExternalStorageDirectory().canWrite()) {
                 File currentDB = new File(currentDBPath);
                 File backupDB = new File(storedDBpath);
@@ -257,7 +258,7 @@ public class USBArsenalSQL extends SQLiteOpenHelper {
         }
 
         try {
-            String currentDBPath = Environment.getDataDirectory() + "/data/" + BuildConfig.APPLICATION_ID + "/databases/" + getDatabaseName();
+            String currentDBPath = NhPaths.APP_DATABASE_PATH + "/" + getDatabaseName();
             if (Environment.getExternalStorageDirectory().canWrite()) {
                 File currentDB = new File(currentDBPath);
                 File backupDB = new File(storedDBpath);
