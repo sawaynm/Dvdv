@@ -21,11 +21,13 @@ public class USBArsenalHandlerThread extends HandlerThread {
     public static final int RETRIEVE_USB_FUNCS = 2;
     public static final int SETUSBIFACE = 3;
     public static final int RELOAD_USBIFACE = 4;
-    public static final int RELOAD_MOUNTSTATUS = 5;
-    public static final int MOUNT_IMAGE = 6;
-    public static final int UNMOUNT_IMAGE = 7;
-    public static final int GET_USBSWITCH_SQL_DATA = 8;
-    public static final int GET_USBNETWORK_SQL_DATA = 9;
+    public static final int GET_STORAGE_FUNC_FOLDER_NAME = 5;
+    public static final int RELOAD_MOUNTSTATUS = 6;
+    public static final int MOUNT_IMAGE = 7;
+    public static final int UNMOUNT_IMAGE = 8;
+    public static final int CHANGE_INQUIRY_STRING = 9;
+    public static final int GET_USBSWITCH_SQL_DATA = 10;
+    public static final int GET_USBNETWORK_SQL_DATA = 11;
     private USBArsenalListener listener;
     private Object resultObject = new Object();
     private ShellExecuter exe = new ShellExecuter();
@@ -54,6 +56,9 @@ public class USBArsenalHandlerThread extends HandlerThread {
                     case RELOAD_USBIFACE:
                         resultObject = exe.RunAsRootOutput(msg.obj.toString());
                         break;
+                    case GET_STORAGE_FUNC_FOLDER_NAME:
+                        resultObject = exe.RunAsRootOutput(msg.obj.toString());
+                        break;
                     case RELOAD_MOUNTSTATUS:
                         resultObject = exe.RunAsRootOutput(msg.obj.toString());
                         break;
@@ -61,6 +66,9 @@ public class USBArsenalHandlerThread extends HandlerThread {
                         resultObject = exe.RunAsRootReturnValue(msg.obj.toString());
                         break;
                     case UNMOUNT_IMAGE:
+                        resultObject = exe.RunAsRootReturnValue(msg.obj.toString());
+                        break;
+                    case CHANGE_INQUIRY_STRING:
                         resultObject = exe.RunAsRootReturnValue(msg.obj.toString());
                         break;
                     case GET_USBSWITCH_SQL_DATA:

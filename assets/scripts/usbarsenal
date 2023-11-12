@@ -118,14 +118,16 @@ function prepare_hid_mouse(){
 }
 
 function prepare_mass_storage(){
-    if [ ! -d $DIR_ALL_FUNCS/mass_storage.0 ]; then
-        if ! mkdir $DIR_ALL_FUNCS/mass_storage.0 > /dev/null 2>&1; then
-            bklog "[-] MASS_STORAGE is not supported on you device. Make sure your kernel has MASS_STORAGE feature patched and enabled."
-            return 1
-        else
-            return 0
-        fi
+    REAL_MASS_STORAGE_NAME=$(find /config/usb_gadget/g1/functions/ -name "mass_storage.*" -maxdepth 1 -type d -exec basename {} \; | head -n1)
+    if [ "$REAL_MASS_STORAGE_NAME" ]; then
+      return 0
+    fi
+
+    if ! mkdir $DIR_ALL_FUNCS/mass_storage.0 > /dev/null 2>&1; then
+        bklog "[-] MASS_STORAGE is not supported on you device. Make sure your kernel has MASS_STORAGE feature patched and enabled."
+        return 1
     else
+        REAL_MASS_STORAGE_NAME=mass_storage.0
         return 0
     fi
 }
@@ -299,7 +301,7 @@ function switch_funcs(){
                 ;;
             mass_storage)
                 IS_MASS_SELECTED=0
-                ln -s $DIR_ALL_FUNCS/mass_storage.0 $DIR_CUR_FUNCS/$SYMLINK_FUNC_NAME
+                ln -s $DIR_ALL_FUNCS/$REAL_MASS_STORAGE_NAME $DIR_CUR_FUNCS/$SYMLINK_FUNC_NAME
                 inc_funcs_order
                 FUNCS_DESC+=('mass_storage')
                 ;;
