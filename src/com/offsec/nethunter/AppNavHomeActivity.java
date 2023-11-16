@@ -360,9 +360,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         boolean iswatch = getBaseContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
         if(iswatch){
             navigationView.getMenu().getItem(2).setVisible(false);
-            navigationView.getMenu().getItem(6).setVisible(false);
             navigationView.getMenu().getItem(11).setVisible(false);
-            navigationView.getMenu().getItem(13).setVisible(false);
             navigationView.getMenu().getItem(14).setVisible(false);
             navigationView.getMenu().getItem(15).setVisible(false);
             navigationView.getMenu().getItem(17).setVisible(false);

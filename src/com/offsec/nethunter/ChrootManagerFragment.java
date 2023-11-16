@@ -128,7 +128,7 @@ public class ChrootManagerFragment extends Fragment {
         SharedPreferences sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
         Boolean iswatch = sharedpreferences.getBoolean("running_on_wearos", false);
         if(iswatch) {
-            ChrootDesc.setVisibility(View.GONE);
+            kaliViewFolderlinearLayout.setVisibility(View.GONE);
         }
     }
 
