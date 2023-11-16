@@ -234,7 +234,7 @@
                     android:layout_margin="16dp"
                     android:orientation="vertical"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintGuide_percent="0.50"
+                    app:layout_constraintGuide_percent="0.5013193"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -292,7 +292,7 @@
                     android:layout_margin="16dp"
                     android:orientation="vertical"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintGuide_percent="0.50"
+                    app:layout_constraintGuide_percent="0.5013193"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
