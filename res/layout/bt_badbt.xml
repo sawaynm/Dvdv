@@ -12,6 +12,7 @@
         android:focusableInTouchMode="true">
 
         <TextView
+            android:id="@+id/badbt_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/bt_badbt"
@@ -106,7 +107,7 @@
                 android:id="@+id/badbt_server"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
+                android:layout_margin="10dp"
                 android:layout_weight="1"
                 android:text="Server:"
                 android:textAppearance="?android:attr/textAppearanceMedium"
@@ -118,8 +119,7 @@
                 android:id="@+id/BadBTServerStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginBottom="11dp"
+                android:layout_margin="10dp"
                 android:layout_weight="1"
                 android:hint="Loading.."
                 android:maxLength="50"
@@ -134,74 +134,20 @@
                 android:layout_marginTop="16dp"
                 android:orientation="vertical"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintGuide_begin="181dp"
+                app:layout_constraintGuide_percent="0.50"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/badbtserver_button"
-                android:text="Start"
-                android:textColor="#ffffffff"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent" />
-
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!--<androidx.constraintlayout.widget.ConstraintLayout
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/badbtserver_button"
+            android:text="Start"
+            android:textColor="#ffffffff"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:gravity="center_horizontal">
+            app:layout_constraintEnd_toEndOf="parent" />
 
-            <TextView
-                android:id="@+id/textView11"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:text="Agent:"
-                android:layout_weight="1"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:layout_marginBottom="11dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/guideline_2"
-                />
-
-            <TextView
-                android:id="@+id/BadBTAgentStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginBottom="11dp"
-                android:layout_weight="1"
-                android:hint="Loading.."
-                android:maxLength="50"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/guideline_2" />
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideline_2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:orientation="vertical"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintGuide_percent="0.5013193"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/badbtagent_button"
-                android:text="Start"
-                android:textColor="#ffffffff"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
--->
         <View
             android:id="@+id/divider3"
             android:layout_width="match_parent"
@@ -210,23 +156,23 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="Mode"
+                android:padding="4dp"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 />
 
             <Spinner
                 android:id="@+id/badbtmode"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1" />
+                android:prompt="@string/payload_select" />
 
         </LinearLayout>
 
@@ -239,70 +185,69 @@
         <LinearLayout
             android:id="@+id/badbtprefix_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="Prefix"
+                android:padding="4dp"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 />
 
             <Spinner
                 android:id="@+id/badbtprefix"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1" />
+                android:prompt="@string/payload_select" />
 
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/badbtpreset_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="Preset"
+                android:padding="4dp"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 />
 
             <Spinner
                 android:id="@+id/badbtpresets"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1" />
+                android:prompt="@string/payload_select" />
 
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/badbtuac_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:padding="4dp">
 
             <CheckBox
                 android:id="@+id/uac_bypass"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:checked="false"
                 android:text="UAC Bypass" />
 
             <Spinner
                 android:id="@+id/badbtpresets_uac"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"/>
 
         </LinearLayout>
 

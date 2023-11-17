@@ -12,7 +12,7 @@ import android.media.AudioTrack;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
-import androidx.preference.PreferenceManager;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -134,16 +134,16 @@ public class BTFragment extends Fragment {
     }
 
     public void SetupDialogWatch() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Welcome!");
-        builder.setMessage("In order to make sure everything is working, an initial setup needs to be done. You may need to disable bluetooth if your watch doesn't have an active WiFi connection.");
-        builder.setPositiveButton("Check & Install", new DialogInterface.OnClickListener(){
-            public void onClick(DialogInterface dialog, int which) {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireActivity(), R.style.DialogStyleCompat);
+        builder.setMessage("This seems to be the first run. Install the Bluetooth tools?");
+        builder.setPositiveButton("Yes", (dialog, which) -> {
                 RunSetupWatch();
-            }
+                sharedpreferences.edit().putBoolean("setup_done", true).apply();
+        });
+        builder.setNegativeButton("No", (dialog, which) -> {
+                sharedpreferences.edit().putBoolean("setup_done", true).apply();
         });
         builder.show();
-
     }
 
     public void RunSetupWatch() {
@@ -163,6 +163,9 @@ public class BTFragment extends Fragment {
                 "if [[ -f /usr/bin/carwhisperer ]]; then echo 'carwhisperer is installed!'; else wget https://raw.githubusercontent.com/yesimxev/carwhisperer-0.2/master/prebuilt/armhf/carwhisperer -P /usr/bin/ && chmod +x /usr/bin/carwhisperer;fi;" +
                 "if [[ -f /usr/bin/rfcomm_scan ]]; then echo 'rfcomm_scan is installed!'; else wget https://raw.githubusercontent.com/yesimxev/bt_audit/master/prebuilt/armhf/rfcomm_scan -P /usr/bin/ && chmod +x /usr/bin/rfcomm_scan;fi;" +
                 "if [[ -d /root/carwhisperer ]]; then echo '/root/carwhisperer is installed!'; else git clone https://github.com/yesimxev/carwhisperer-0.2 /root/carwhisperer;fi;" +
+                "if [[ -f /root/badbt/btk_server.py ]]; then echo 'BadBT is installed!'; else git clone https://github.com/yesimxev/badbt /root/badbt && cp /root/badbt/org.thanhle.btkbservice.conf /etc/dbus-1/system.d/;fi;" +
+                "if [[ ! \"`grep 'noplugin=input' /etc/init.d/bluetooth`\" == \"\" ]]; then echo 'Bluetooth service is patched!'; else echo 'Patching Bluetooth service..' && " +
+                "sed -i -e 's/# NOPLUGIN_OPTION=.*/NOPLUGIN_OPTION=\"--noplugin=input\"/g' /etc/init.d/bluetooth;fi;" +
                 "echo 'Everything is installed! Closing in 3secs..'; sleep 3 && exit ");
         sharedpreferences.edit().putBoolean("setup_done", true).apply();
     }
@@ -254,6 +257,7 @@ public class BTFragment extends Fragment {
         private Context context;
         final ShellExecuter exe = new ShellExecuter();
         private String selected_iface;
+        private Boolean iswatch;
         String selected_addr;
         String selected_class;
         String selected_name;
@@ -963,6 +967,12 @@ public class BTFragment extends Fragment {
             SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
             boolean iswatch = getContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
 
+            //Watch optimisation
+            final TextView BadBTdesc = rootView.findViewById(R.id.badbt_desc);
+            if (iswatch) {
+                BadBTdesc.setVisibility(View.GONE);
+            }
+
             //Selected iface, name, bdaddr
             final EditText badbt_interface = rootView.findViewById(R.id.badbt_interface);
             final EditText badbt_name = rootView.findViewById(R.id.badbt_name);
@@ -1050,8 +1060,11 @@ public class BTFragment extends Fragment {
             });
 
             //Prefix
-            Spinner badbtprefix = rootView.findViewById(R.id.badbtprefix);
+            CheckBox uacCheckBox = rootView.findViewById(R.id.uac_bypass);
             View BadBTUACView = rootView.findViewById(R.id.badbtuac_layout);
+            Spinner badbtprefix = rootView.findViewById(R.id.badbtprefix);
+            Spinner badbtpresets_uac = rootView.findViewById(R.id.badbtpresets_uac);
+            final ArrayList<String> presets_uac = new ArrayList<>();
             final ArrayList<String> prefixes = new ArrayList<>();
             prefixes.add("Mobile Home");
             prefixes.add("Mobile Browser");
@@ -1067,25 +1080,45 @@ public class BTFragment extends Fragment {
                     if (selected_prefix.equals("Mobile Home")) {
                         BadBTUACView.setVisibility(View.GONE);
                         prefixCMD = "mobile";
+                        uacCheckBox.setChecked(false);
+                        presets_uac.clear();
+                        presets_uac.add("None");
+                        badbtpresets_uac.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, presets_uac));
                         uacCMD = "-";
                     } else if (selected_prefix.equals("Mobile Browser")) {
                         BadBTUACView.setVisibility(View.GONE);
                         prefixCMD = "mobilewww";
+                        uacCheckBox.setChecked(false);
+                        presets_uac.clear();
+                        presets_uac.add("None");
+                        badbtpresets_uac.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, presets_uac));
                         uacCMD = "-";
                     } else if (selected_prefix.equals("Windows CMD")) {
                         BadBTUACView.setVisibility(View.VISIBLE);
                         prefixCMD = "windows";
-                    } else if (selected_prefix.equals("MAC Terminal")) {
+                    } else if (selected_prefix.equals("Mac Terminal")) {
                         BadBTUACView.setVisibility(View.GONE);
                         prefixCMD = "mac";
+                        uacCheckBox.setChecked(false);
+                        presets_uac.clear();
+                        presets_uac.add("None");
+                        badbtpresets_uac.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, presets_uac));
                         uacCMD = "-";
                     } else if (selected_prefix.equals("Linux Terminal")) {
                         BadBTUACView.setVisibility(View.GONE);
                         prefixCMD = "linux";
+                        uacCheckBox.setChecked(false);
+                        presets_uac.clear();
+                        presets_uac.add("None");
+                        badbtpresets_uac.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, presets_uac));
                         uacCMD = "-";
                     } else if (selected_prefix.equals("None")) {
                         BadBTUACView.setVisibility(View.GONE);
-                        prefixCMD = "-";
+                        uacCMD = "-";
+                        uacCheckBox.setChecked(false);
+                        presets_uac.clear();
+                        presets_uac.add("None");
+                        badbtpresets_uac.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, presets_uac));
                         uacCMD = "-";
                     }
                 }
@@ -1120,13 +1153,24 @@ public class BTFragment extends Fragment {
             });
 
             //UAC
-            Spinner badbtpresets_uac = rootView.findViewById(R.id.badbtpresets_uac);
-            final ArrayList<String> presets_uac = new ArrayList<>();
-            presets_uac.add("Windows 7");
-            presets_uac.add("Windows 8");
-            presets_uac.add("Windows 10");
-            presets_uac.add("Windows 11");
-            badbtpresets_uac.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, presets_uac));
+            uacCheckBox.setOnClickListener( v -> {
+                if (uacCheckBox.isChecked()) {
+                    badbtpresets_uac.setVisibility(View.VISIBLE);
+                    presets_uac.clear();
+                    presets_uac.add("Windows 7");
+                    presets_uac.add("Windows 8");
+                    presets_uac.add("Windows 10");
+                    presets_uac.add("Windows 11");
+                    badbtpresets_uac.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, presets_uac));
+                }
+                else {
+                    presets_uac.clear();
+                    presets_uac.add("None");
+                    badbtpresets_uac.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, presets_uac));
+                    badbtpresets_uac.setVisibility(View.GONE);
+                    uacCMD = "-";
+                }
+            });
             badbtpresets_uac.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int pos, long id) {
