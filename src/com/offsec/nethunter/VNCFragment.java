@@ -68,6 +68,7 @@ public class VNCFragment extends Fragment {
     private static final int MAX_UID = 101000;
     NhPaths nh; //= new NhPaths();
     String BUSYBOX_NH= nh.getBusyboxPath();
+    private Boolean iswatch;
 
     public VNCFragment() {
     }
@@ -138,6 +139,18 @@ public class VNCFragment extends Fragment {
         } else {
             xwidth = Integer.toString(screen_width);
             xheight = Integer.toString(screen_height);
+        }
+
+
+        //Detecting watch
+        final TextView KexDesc = rootView.findViewById(R.id.kexdesc);
+        final TextView KexStatus = rootView.findViewById(R.id.status);
+        final TextView KexSessions = rootView.findViewById(R.id.sessions);
+        iswatch = sharedpreferences.getBoolean("running_on_wearos", false);
+        if (iswatch) {
+            KexDesc.setVisibility(View.GONE);
+            KexStatus.setText("Status:");
+            KexSessions.setText("Sessions:");
         }
 
         Button StartAudioButton = rootView.findViewById(R.id.vnc_audio);
@@ -271,7 +284,7 @@ public class VNCFragment extends Fragment {
         //Immersion switch
         final SwitchCompat immersionSwitch = rootView.findViewById(R.id.immersionSwitch);
         final String immersion = exe.RunAsRootOutput("settings get global policy_control");
-        if (immersion.equals("null*"))
+        if (immersion.equals("null"))
             immersionSwitch.setChecked(false);
         else
             immersionSwitch.setChecked(true);
@@ -281,7 +294,7 @@ public class VNCFragment extends Fragment {
                 if (isChecked) {
                     exe.RunAsRoot(new String[]{"settings put global policy_control immersive.full=*"});
                 } else {
-                    exe.RunAsRoot(new String[]{"settings put global policy_control null*"});
+                    exe.RunAsRoot(new String[]{"settings put global policy_control null"});
                 }
             }
         });

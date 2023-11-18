@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.text.SpannableString;
@@ -21,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -357,10 +359,11 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         navigationView = findViewById(R.id.navigation_view);
 
         //WearOS optimisation
-        boolean iswatch = getBaseContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
+        Boolean iswatch = getBaseContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
+        String model = Build.HARDWARE;
         if(iswatch){
             navigationView.getMenu().getItem(2).setVisible(false);
-            navigationView.getMenu().getItem(6).setVisible(false);
+            if (model.equals("catfish") || model.equals("catshark") || model.equals("catshark-4g")) navigationView.getMenu().getItem(6).setVisible(false);
             navigationView.getMenu().getItem(11).setVisible(false);
             navigationView.getMenu().getItem(14).setVisible(false);
             navigationView.getMenu().getItem(15).setVisible(false);
