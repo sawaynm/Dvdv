@@ -159,6 +159,10 @@
                 app:layout_constraintStart_toEndOf="@+id/f_chrootmanager_install_btn"
                 app:layout_constraintBottom_toBottomOf="parent"
                 android:text="Add Metapackge"
+                android:layout_marginStart="2dp"
+                android:layout_marginBottom="2dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginEnd="2dp"
                 android:visibility="gone"/>
 
             <Button
