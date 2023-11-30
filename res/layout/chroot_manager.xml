@@ -91,7 +91,8 @@
                     android:layout_height="wrap_content"
                     android:text="Loading..."
                     android:textColor="@android:color/background_light"
-                    android:layout_margin="8dp"/>
+                    android:layout_margin="8dp"
+                    android:gravity="center"/>
 
             </LinearLayout>
 
