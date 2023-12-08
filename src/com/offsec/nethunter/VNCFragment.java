@@ -399,7 +399,10 @@ public class VNCFragment extends Fragment {
             }
         });
         addClickListener(SetupVNCButton, v -> {
-            run_cmd("echo -ne \"\\033]0;Setting up Server\\007\" && clear;chmod +x ~/.vnc/xstartup && clear;echo $'\n'\"Please enter your new VNC server password\"$'\n' && sudo -u " + selected_user + " vncpasswd && sleep 2 && exit"); // since is a kali command we can send it as is
+            String desktop = exe.RunAsRootOutput(nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd dkpg -l | grep kali-desktop");
+            if (desktop.equals("")) {
+                desktopDialog();
+            } else run_cmd("echo -ne \"\\033]0;Setting up Server\\007\" && clear;chmod +x ~/.vnc/xstartup && clear;echo $'\n'\"Please enter your new VNC server password\"$'\n' && sudo -u " + selected_user + " vncpasswd && sleep 2 && exit"); // since is a kali command we can send it as is
         });
         addClickListener(StartVNCButton, v -> {
             if(selected_user.equals("root")) {
@@ -437,7 +440,7 @@ public class VNCFragment extends Fragment {
                 exe.RunAsRoot(new String[]{nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd sudo -u " + selected_user + " vncserver -kill :" + selected_display}); // since is a kali command we can send it as is
                 dbusDialog();
                 refreshVNC(rootView);
-                Toast.makeText(getActivity().getApplicationContext(), "Stopped display :" + selected_display + " for " + selected_user , Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity().getApplicationContext(), "Stopping display :" + selected_display + " for " + selected_user , Toast.LENGTH_LONG).show();
                 }
             });
         addClickListener(OpenVNCButton, v -> {
@@ -691,12 +694,27 @@ public class VNCFragment extends Fragment {
 
         final MaterialAlertDialogBuilder dbusbuilder = new MaterialAlertDialogBuilder(getActivity(), R.style.DialogStyleCompat);
         ShellExecuter exe = new ShellExecuter();
-        dbusbuilder.setTitle("DBUS service");
         dbusbuilder.setMessage("Do you want to stop dbus service? If you have no more sessions opened, press Yes.");
         dbusbuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 exe.RunAsRoot(new String[]{nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd service dbus stop"});
+            }
+        });
+        dbusbuilder.setNegativeButton("No", (dialog, whichButton) -> {
+        });
+        dbusbuilder.show();
+    }
+
+    private void desktopDialog() {
+
+        final MaterialAlertDialogBuilder dbusbuilder = new MaterialAlertDialogBuilder(getActivity(), R.style.DialogStyleCompat);
+        ShellExecuter exe = new ShellExecuter();
+        dbusbuilder.setMessage("There's no desktop environment installed. Would you like to install kali-desktop-xfce?");
+        dbusbuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                run_cmd("echo -ne \"\\033]0;Installing XFCE\\007\" && clear;apt update && apt install kali-desktop-xfce tigervnc-standalone-server dbus-x11");
             }
         });
         dbusbuilder.setNegativeButton("No", (dialog, whichButton) -> {
