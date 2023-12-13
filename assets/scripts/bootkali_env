@@ -25,8 +25,8 @@ if [ -z "$BUSYBOX" ]; then
         BUSYBOX="/system/xbin/busybox_nh"
     elif [ -x "/system/bin/busybox_nh" ]; then
         BUSYBOX="/system/bin/busybox_nh"
-    elif [ -x "/data/data/$APP_PGK_NAME/files/scripts/bin/busybox_nh" ]; then
-        BUSYBOX="/data/data/$APP_PGK_NAME/files/scripts/bin/busybox_nh"
+    elif [ -x "/data/data/$APP_PGK_NAME/scripts/bin/busybox_nh" ]; then
+        BUSYBOX="/data/data/$APP_PGK_NAME/scripts/bin/busybox_nh"
     fi
 fi
 
@@ -37,4 +37,4 @@ if [ -z "$MNT" ]; then
 fi
 
 ## Define the path of xz tool
-XZ=/data/data/$APP_PGK_NAME/files/scripts/bin/xz
+XZ=/data/data/$APP_PGK_NAME/scripts/bin/xz
