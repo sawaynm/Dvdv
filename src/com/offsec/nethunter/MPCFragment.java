@@ -1,7 +1,5 @@
 package com.offsec.nethunter;
 
-import static com.offsec.nethunter.bridge.Runner.activity;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,11 +14,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.offsec.nethunter.bridge.Bridge;
-import com.offsec.nethunter.bridge.Runner;
-import com.offsec.nethunter.utils.NhPaths;
 
 import java.util.Locale;
 
@@ -286,8 +281,8 @@ public class MPCFragment extends Fragment {
     // Bridge side functions
     ////
 
-    public static void run_cmd(String cmd) {
+    public void run_cmd(String cmd) {
         Intent intent = Bridge.createExecuteIntent("/data/data/com.offsec.nhterm/files/usr/bin/kali", cmd);
-        activity.startActivity(intent);
+        getContext().startActivity(intent);
     }
 }
