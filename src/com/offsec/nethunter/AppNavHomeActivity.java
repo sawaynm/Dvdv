@@ -361,9 +361,10 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
 
         //WearOS optimisation
         Boolean iswatch = getBaseContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
+        Boolean snowfall;
         String model = Build.HARDWARE;
         if(iswatch){
-            prefs.edit().putBoolean("snowfall_enabled", false).apply();
+            snowfall = prefs.getBoolean("snowfall_enabled", false);
             navigationView.getMenu().getItem(2).setVisible(false);
             if (model.equals("catfish") || model.equals("catshark") || model.equals("catshark-4g")) navigationView.getMenu().getItem(6).setVisible(false);
             navigationView.getMenu().getItem(11).setVisible(false);
@@ -374,11 +375,12 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
             navigationView.getMenu().getItem(19).setVisible(false);
             navigationView.getMenu().getItem(20).setVisible(false);
             navigationView.getMenu().getItem(21).setVisible(false);
+        } else {
+            snowfall = prefs.getBoolean("snowfall_enabled", true);
         }
 
         //Snowfall
         View SnowfallView = findViewById(R.id.snowfall);
-        Boolean snowfall = prefs.getBoolean("snowfall_enabled", true);
         if (snowfall) SnowfallView.setVisibility(View.VISIBLE);
         else SnowfallView.setVisibility(View.GONE);
 
