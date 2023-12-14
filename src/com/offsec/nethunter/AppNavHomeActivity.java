@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -362,6 +363,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         Boolean iswatch = getBaseContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
         String model = Build.HARDWARE;
         if(iswatch){
+            prefs.edit().putBoolean("snowfall_enabled", false).apply();
             navigationView.getMenu().getItem(2).setVisible(false);
             if (model.equals("catfish") || model.equals("catshark") || model.equals("catshark-4g")) navigationView.getMenu().getItem(6).setVisible(false);
             navigationView.getMenu().getItem(11).setVisible(false);
@@ -373,6 +375,13 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
             navigationView.getMenu().getItem(20).setVisible(false);
             navigationView.getMenu().getItem(21).setVisible(false);
         }
+
+        //Snowfall
+        View SnowfallView = findViewById(R.id.snowfall);
+        Boolean snowfall = prefs.getBoolean("snowfall_enabled", true);
+        if (snowfall) SnowfallView.setVisibility(View.VISIBLE);
+        else SnowfallView.setVisibility(View.GONE);
+
         //Disable USB arsenal for devices without ConfigFS support
         if (!new File("/config/usb_gadget/g1").exists())
             navigationView.getMenu().getItem(7).setVisible(false);
