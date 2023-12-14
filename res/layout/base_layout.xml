@@ -10,10 +10,11 @@ view using match_parent for both width and height to consume the full space avai
          space available using match_parent in both dimensions. -->
 
 
-    <!--//SnowfallSnowfall
+    <!--//Snowfall-->
         <com.jetradarmobile.snowfall.SnowfallView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:id="@+id/snowfall"
         app:snowflakesNum="250"
         app:snowflakeAlphaMin="150"
         app:snowflakeAlphaMax="255"
@@ -24,7 +25,7 @@ view using match_parent for both width and height to consume the full space avai
         app:snowflakeSpeedMax="3"
         app:snowflakesFadingEnabled="true"
         app:snowflakesAlreadyFalling="false"
-        app:snowflakeImage="@drawable/snowflake"/>-->
+        app:snowflakeImage="@drawable/snowflake"/>
 
     <FrameLayout
         android:id="@+id/container"
