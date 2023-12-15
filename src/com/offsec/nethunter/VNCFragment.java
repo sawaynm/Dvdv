@@ -714,7 +714,7 @@ public class VNCFragment extends Fragment {
         dbusbuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                run_cmd("echo -ne \"\\033]0;Installing XFCE\\007\" && clear;apt update && apt install kali-desktop-xfce tigervnc-standalone-server dbus-x11");
+                run_cmd("echo -ne \"\\033]0;Installing XFCE\\007\" && clear;apt update && apt install -y kali-desktop-xfce tigervnc-standalone-server dbus-x11");
             }
         });
         dbusbuilder.setNegativeButton("No", (dialog, whichButton) -> {
