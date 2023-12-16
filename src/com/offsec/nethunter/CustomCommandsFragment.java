@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,7 +18,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.HorizontalScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -42,20 +42,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class CustomCommandsFragment extends Fragment {
     private static final String ARG_SECTION_NUMBER = "section_number";
-    private static final String TAG = "CustomCommandsFragment";
+    public static final String TAG = "CustomCommandsFragment";
     private CustomCommandsRecyclerViewAdapter customCommandsRecyclerViewAdapter;
     private Context context;
     private Activity activity;
     private Button addButton;
     private Button deleteButton;
     private Button moveButton;
-    private TextView customBanner;
-    private static int targetPositionId;
+    public static int targetPositionId;
 
     public CustomCommandsFragment() {
-
+        Log.d(TAG, "CustomCommandsFragment: init ");
     }
 
     public static CustomCommandsFragment newInstance(int sectionNumber) {
@@ -75,16 +75,19 @@ public class CustomCommandsFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {//this runs BEFORE the ui is available
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.customcommands, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        TextView customBanner;
         super.onViewCreated(view, savedInstanceState);
         CustomCommandsViewModel customCommandsViewModel = new ViewModelProvider(this).get(CustomCommandsViewModel.class);
         customCommandsViewModel.init(context);
-        customCommandsViewModel.getLiveDataCustomCommandsModelList().observe(getViewLifecycleOwner(), customCommandsModelList -> customCommandsRecyclerViewAdapter.notifyDataSetChanged());
+        customCommandsViewModel.getLiveDataCustomCommandsModelList().observe(getViewLifecycleOwner(), customCommandsModelList -> {
+            customCommandsRecyclerViewAdapter.notifyDataSetChanged();
+        });
 
         customCommandsRecyclerViewAdapter = new CustomCommandsRecyclerViewAdapter(context, customCommandsViewModel.getLiveDataCustomCommandsModelList().getValue());
         RecyclerView recyclerView = view.findViewById(R.id.f_customcommands_recyclerview);
@@ -103,8 +106,8 @@ public class CustomCommandsFragment extends Fragment {
 
         //WearOS optimisation
         SharedPreferences sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-        Boolean iswatch = sharedpreferences.getBoolean("running_on_wearos", false);
-        if(iswatch) {
+        boolean iswatch = sharedpreferences.getBoolean("running_on_wearos", false);
+        if (iswatch) {
             customBanner.setVisibility(View.GONE);
         }
     }
@@ -115,10 +118,11 @@ public class CustomCommandsFragment extends Fragment {
         final MenuItem searchItem = menu.findItem(R.id.f_customcommands_action_search);
         final SearchView searchView = (SearchView) searchItem.getActionView();
         //WearOS optimisation
-        boolean iswatch = getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
+        boolean iswatch = requireActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
         if(iswatch) {
             searchItem.setVisible(false);
         }
+        assert searchView != null;
         searchView.setOnSearchClickListener(v -> menu.setGroupVisible(R.id.f_customcommands_menu_group1, false));
         searchView.setOnCloseListener(() -> {
             menu.setGroupVisible(R.id.f_customcommands_menu_group1, true);
@@ -126,7 +130,8 @@ public class CustomCommandsFragment extends Fragment {
         });
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
+            public boolean onQueryTextSubmit(String query) { //when you press the search button
+                customCommandsRecyclerViewAdapter.getFilter().filter(query);
                 return false;
             }
 
@@ -141,9 +146,8 @@ public class CustomCommandsFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        final ViewGroup nullParent = null;
         final LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View promptView = inflater.inflate(R.layout.customcommands_custom_dialog_view, nullParent);
+        final View promptView = inflater.inflate(R.layout.customcommands_custom_dialog_view, null);
         final TextView titleTextView = promptView.findViewById(R.id.f_customcommands_adb_tv_title1);
         final EditText storedpathEditText = promptView.findViewById(R.id.f_customcommands_adb_et_storedpath);
 
@@ -164,13 +168,14 @@ public class CustomCommandsFragment extends Fragment {
                             NhPaths.showMessage(context, "db is successfully backup to " + storedpathEditText.getText().toString());
                         } else {
                             dialog.dismiss();
-                            new MaterialAlertDialogBuilder(context).setTitle("Failed to backup the DB.").setMessage(returnedResult).create().show();
+                            new MaterialAlertDialogBuilder(context, R.style.DialogStyleCompat).setTitle("Failed to backup the DB.").setMessage(returnedResult).create().show();
                         }
                         dialog.dismiss();
                     });
                 });
                 adBackup.show();
                 break;
+            default:
             case R.id.f_customcommands_menu_restoreDB:
                 titleTextView.setText("Full path of the db file from where you want to restore:");
                 storedpathEditText.setText(NhPaths.APP_SD_SQLBACKUP_PATH + "/FragmentCustomCommands");
@@ -187,7 +192,7 @@ public class CustomCommandsFragment extends Fragment {
                             NhPaths.showMessage(context, "db is successfully restored to " + storedpathEditText.getText().toString());
                         } else {
                             dialog.dismiss();
-                            new MaterialAlertDialogBuilder(context).setTitle("Failed to restore the DB.").setMessage(returnedResult).create().show();
+                            new MaterialAlertDialogBuilder(context, R.style.DialogStyleCompat).setTitle("Failed to restore the DB.").setMessage(returnedResult).create().show();
                         }
                         dialog.dismiss();
                     });
@@ -212,11 +217,10 @@ public class CustomCommandsFragment extends Fragment {
 
     private void onAddItemSetup() {
         addButton.setOnClickListener(v -> {
-            final ViewGroup nullParent = null;
             List<CustomCommandsModel> customCommandsModelList = CustomCommandsData.getInstance().customCommandsModelListFull;
             if (customCommandsModelList == null) return;
             final LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            final View promptViewAdd = inflater.inflate(R.layout.customcommands_add_dialog_view, nullParent);
+            final View promptViewAdd = inflater.inflate(R.layout.customcommands_add_dialog_view, null);
             final EditText commandLabelEditText = promptViewAdd.findViewById(R.id.f_customcommands_add_adb_et_label);
             final EditText commandEditText = promptViewAdd.findViewById(R.id.f_customcommands_add_adb_et_command);
             final Spinner sendToSpinner = promptViewAdd.findViewById(R.id.f_customcommands_add_adb_spr_sendto);
@@ -224,7 +228,6 @@ public class CustomCommandsFragment extends Fragment {
             final CheckBox runOnBootCheckbox = promptViewAdd.findViewById(R.id.f_customcommands_add_adb_checkbox_runonboot);
             final Spinner insertPositions = promptViewAdd.findViewById(R.id.f_customcommands_add_adb_spr_positions);
             final Spinner insertLabels = promptViewAdd.findViewById(R.id.f_customcommands_add_adb_spr_labels);
-
 
             ArrayList<String> commandLabelArrayList = new ArrayList<>();
             for (CustomCommandsModel customCommandsModel: customCommandsModelList){
@@ -235,7 +238,6 @@ public class CustomCommandsFragment extends Fragment {
             arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
             insertPositions.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     //if Insert to Top
@@ -257,7 +259,7 @@ public class CustomCommandsFragment extends Fragment {
                             }
                             @Override
                             public void onNothingSelected(AdapterView<?> parent) {
-
+                                Log.d(TAG, "onNothingSelected: Nothing selected.");
                             }
                         });
                         //if Insert After
@@ -271,14 +273,14 @@ public class CustomCommandsFragment extends Fragment {
                             }
                             @Override
                             public void onNothingSelected(AdapterView<?> parent) {
-
+                                Log.d(TAG, "onNothingSelected: Nothing selected.");
                             }
                         });
                     }
                 }
                 @Override
                 public void onNothingSelected(AdapterView<?> parent) {
-
+                    Log.d(TAG, "onNothingSelected: Nothing Selected");
                 }
             });
 
@@ -313,11 +315,10 @@ public class CustomCommandsFragment extends Fragment {
 
     private void onDeleteItemSetup() {
         deleteButton.setOnClickListener(v -> {
-            final ViewGroup nullParent = null;
             List<CustomCommandsModel> customCommandsModelList = CustomCommandsData.getInstance().customCommandsModelListFull;
             if (customCommandsModelList == null) return;
             final LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            final View promptViewDelete = inflater.inflate(R.layout.customcommands_delete_dialog_view, nullParent, false);
+            final View promptViewDelete = inflater.inflate(R.layout.customcommands_delete_dialog_view, null, false);
             final RecyclerView recyclerViewDeleteItem = promptViewDelete.findViewById(R.id.f_customcommands_delete_recyclerview);
             CustomCommandsRecyclerViewAdapterDeleteItems customCommandsRecyclerViewAdapterDeleteItems = new CustomCommandsRecyclerViewAdapterDeleteItems(context, customCommandsModelList);
 
@@ -349,7 +350,7 @@ public class CustomCommandsFragment extends Fragment {
                             }
                         }
                     }
-                    if (selectedPosition.size() != 0) {
+                    if (!selectedPosition.isEmpty()) {
                         CustomCommandsData.getInstance().deleteData(selectedPosition, selectedTargetIds, CustomCommandsSQL.getInstance(context));
                         NhPaths.showMessage(context, "Successfully deleted " + selectedPosition.size() + " items.");
                         adDelete.dismiss();
@@ -364,11 +365,10 @@ public class CustomCommandsFragment extends Fragment {
 
     private void onMoveItemSetup() {
         moveButton.setOnClickListener(v -> {
-            final ViewGroup nullParent = null;
             List<CustomCommandsModel> customCommandsModelList = CustomCommandsData.getInstance().customCommandsModelListFull;
             if (customCommandsModelList == null) return;
             final LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            final View promptViewMove = inflater.inflate(R.layout.customcommands_move_dialog_view, nullParent, false);
+            final View promptViewMove = inflater.inflate(R.layout.customcommands_move_dialog_view, null, false);
             final Spinner titlesBefore = promptViewMove.findViewById(R.id.f_customcommands_move_adb_spr_labelsbefore);
             final Spinner titlesAfter = promptViewMove.findViewById(R.id.f_customcommands_move_adb_spr_labelsafter);
             final Spinner actions = promptViewMove.findViewById(R.id.f_customcommands_move_adb_spr_actions);

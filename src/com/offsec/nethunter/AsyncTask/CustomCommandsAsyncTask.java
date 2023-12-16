@@ -1,6 +1,5 @@
 package com.offsec.nethunter.AsyncTask;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;

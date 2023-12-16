@@ -28,6 +28,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.offsec.nethunter.bridge.Bridge;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
@@ -97,7 +98,7 @@ public class SETFragment extends Fragment {
     }
 
     public void SetupDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getActivity(), R.style.DialogStyleCompat);
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
         builder.setTitle("Welcome to SET!");
         builder.setMessage("In order to make sure everything is working, an initial setup needs to be done.");

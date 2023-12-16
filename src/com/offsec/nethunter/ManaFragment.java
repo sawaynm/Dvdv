@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.offsec.nethunter.bridge.Bridge;
@@ -37,9 +38,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
-
-//import android.app.Fragment;
-//import android.support.v4.app.FragmentActivity;
 
 public class ManaFragment extends Fragment {
 
@@ -139,7 +137,7 @@ public class ManaFragment extends Fragment {
         if (!iptables_ver.equals("iptables v1.6.2")) {
             Toast.makeText(getActivity().getApplicationContext(), iptables_ver, Toast.LENGTH_LONG).show();
             if (arch_path.equals("aarch64-linux-gnu")) arch = "arm64"; else arch = "armhf";
-            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
             builder.setTitle("Mana is deprecated!");
             builder.setMessage("Until we find a perfect replacement, you can downgrade iptables in order to use Mana.");
             builder.setPositiveButton("Downgrade", (dialog, which) -> {
@@ -159,7 +157,7 @@ public class ManaFragment extends Fragment {
     }
 
     private void startMana() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
         builder.setTitle("Script to execute:");
         builder.setPositiveButton("Start", (dialog, which) -> {
             switch (selectedScriptIndex) {
@@ -202,11 +200,11 @@ public class ManaFragment extends Fragment {
                     break;
                 case 4:
                     NhPaths.showMessage(context, "Starting HOSTAPD-WPE");
-                    run_cmd(NhPaths.makeTermTitle("HOSTAPD-WPE") + "ifconfig wlan1 up && /usr/sbin/hostapd-wpe /sdcard/nh_files/configs/hostapd-wpe.conf");
+                    run_cmd(NhPaths.makeTermTitle("HOSTAPD-WPE") + "ip link set wlan1 up && /usr/sbin/hostapd-wpe /sdcard/nh_files/configs/hostapd-wpe.conf");
                     break;
                 case 5:
                     NhPaths.showMessage(context, "Starting HOSTAPD-WPE with Karma");
-                    run_cmd(NhPaths.makeTermTitle("HOSTAPD-WPE-KARMA") + "ifconfig wlan1 up && /usr/sbin/hostapd-wpe -k /sdcard/nh_files/configs/hostapd-wpe.conf");
+                    run_cmd(NhPaths.makeTermTitle("HOSTAPD-WPE-KARMA") + "ip link set wlan1 up && /usr/sbin/hostapd-wpe -k /sdcard/nh_files/configs/hostapd-wpe.conf");
                     break;
                 default:
                     NhPaths.showMessage(context, "Invalid script!");

@@ -326,10 +326,8 @@ public class LocationUpdateService extends Service implements
     }
 
     private void initTimers() {
-
         timerTaskHandler = new Handler();
         resetListenersTimerTaskHandler = new Handler();
-
     }
 
     private void startTimers() {
@@ -560,14 +558,14 @@ public class LocationUpdateService extends Service implements
 
     private String nmeaSentenceFromLocation(Location location) {
 
-//       from: https://github.com/ya-isakov/blue-nmea-mirror/blob/master/src/Source.java
+        // from: https://github.com/ya-isakov/blue-nmea-mirror/blob/master/src/Source.java
         String time = formatTime(location);
         String position = formatPosition(location);
         String accuracy = String.format("%.4f", location.getAccuracy()/19.0); // why 19.0?  see https://gitlab.com/gpsd/gpsd/-/blob/master/libgpsd_core.c, P_UERE_NO_DGPS
         String innerSentence = String.format("GPGGA,%s,%s,1,%s,%s,%s,,,,", time, position, formatSatellites(location),
                                              accuracy, formatAltitude(location));
 
-//        Adds checksum and initial $
+        // Adds checksum and initial $
         String checksum = checksum(innerSentence);
         return "$" + innerSentence + checksum;
     }
@@ -578,7 +576,7 @@ public class LocationUpdateService extends Service implements
         // unregister our NmeaListener
         LocationManager locationManager = (LocationManager) getSystemService(Service.LOCATION_SERVICE);
         try { // reference: https://stackoverflow.com/questions/57975969/accessing-nmea-on-android-api-level-24-when-compiled-for-target-api-level-29
-            //noinspection JavaReflectionMemberAccess
+              //noinspection JavaReflectionMemberAccess
             Method removeNmeaListener =
                     LocationManager.class.getMethod("removeNmeaListener", GpsStatus.NmeaListener.class);
             removeNmeaListener.invoke(locationManager, nmeaListener);

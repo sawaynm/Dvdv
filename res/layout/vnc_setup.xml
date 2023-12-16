@@ -1,7 +1,7 @@
 <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
@@ -17,6 +17,7 @@
             android:paddingRight="@dimen/base_listItem_LR">
 
             <TextView
+                android:id="@+id/kexdesc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal|center"
@@ -37,15 +38,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:orientation="horizontal">
+                android:orientation="vertical"
+                android:layout_margin="10dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:orientation="horizontal">
 
                 <CheckBox
                     android:id="@+id/vnc_checkBox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
                     android:checked="false"
                     android:onClick="vncLocalClick"
                     android:text="Localhost Only" />
@@ -72,8 +78,6 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
                     android:checked="false"
                     android:text="Start Delay" />
 
@@ -82,8 +86,6 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
                     android:text="20"
                     android:inputType="number"
                     android:enabled="false"
@@ -91,12 +93,13 @@
 
             </LinearLayout>
 
+        </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/textView4"
@@ -105,41 +108,11 @@
                     android:layout_weight="1"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"
-                    android:paddingTop="10dp"
                     android:text="USER:"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
 
-                <TextView
-                    android:id="@+id/textView5"
-                    android:layout_height="match_parent"
-                    android:layout_width="match_parent"
-                    android:layout_weight="1"
-                    android:paddingTop="10dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"
-                    android:text="DISPLAY:"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:orientation="horizontal">
-
                 <Spinner
                     android:id="@+id/user"
-                    android:layout_width="fill_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="5dp"
-                    android:dropDownWidth="match_parent"
-                    android:saveEnabled="false" />
-
-                <Spinner
-                    android:id="@+id/display"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -149,6 +122,36 @@
                     android:saveEnabled="false" />
 
             </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textView5"
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:text="DISPLAY:"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                <Spinner
+                    android:id="@+id/display"
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:dropDownWidth="match_parent"
+                    android:saveEnabled="false" />
+
+            </LinearLayout>
+
+
 
             <Button
                 android:id="@+id/vnc_audio"
@@ -191,7 +194,7 @@
                 android:gravity="center_horizontal">
 
                 <TextView
-                    android:id="@+id/textView11"
+                    android:id="@+id/status"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="10dp"
@@ -242,7 +245,7 @@
                 android:gravity="center_horizontal">
 
                 <TextView
-                    android:id="@+id/textView7"
+                    android:id="@+id/sessions"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="10dp"
@@ -300,6 +303,70 @@
                 android:visibility="gone">
 
                 <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:paddingTop="10dp"
+                    android:text="KEX SERVER RESOLUTION (OPTIONAL)"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                <Spinner
+                    android:id="@+id/vncresolution"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:dropDownWidth="wrap_content"
+                    android:saveEnabled="false" />
+
+                <Button
+                    android:id="@+id/DelVncResolutionButton"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Remove selected resolution"
+                    android:textColor="#ffffffff" />
+
+                <Button
+                    android:id="@+id/AddVncResolutionButton"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="New resolution"
+                    android:textColor="#ffffffff" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/BackupVncResolutions"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Backup"
+                        android:textColor="#ffffffff"
+                        android:textSize="13sp" />
+
+                    <Button
+                        android:id="@+id/RestoreVncResolutions"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Restore"
+                        android:textColor="#ffffffff"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/divider3"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?android:attr/listDivider" />
+
+                <TextView
                     android:id="@+id/textView6"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
@@ -351,11 +418,11 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="vertical">
 
                     <Spinner
                         android:id="@+id/resolution"
-                        android:layout_width="fill_parent"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:dropDownWidth="wrap_content"
@@ -363,7 +430,7 @@
 
                     <Button
                         android:id="@+id/ApplyResolutionButton"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Apply"
                         android:textColor="#ffffffff" />
@@ -422,70 +489,6 @@
 
                     <Button
                         android:id="@+id/RestoreResolutions"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Restore"
-                        android:textColor="#ffffffff"
-                        android:textSize="13sp" />
-
-                </LinearLayout>
-
-                <View
-                    android:id="@+id/divider3"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="?android:attr/listDivider" />
-
-                <TextView
-                    android:id="@+id/textView3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:paddingTop="10dp"
-                    android:text="KEX SERVER RESOLUTION (OPTIONAL)"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                <Spinner
-                    android:id="@+id/vncresolution"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:dropDownWidth="wrap_content"
-                    android:saveEnabled="false" />
-
-                <Button
-                    android:id="@+id/DelVncResolutionButton"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Remove selected resolution"
-                    android:textColor="#ffffffff" />
-
-                <Button
-                    android:id="@+id/AddVncResolutionButton"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="New resolution"
-                    android:textColor="#ffffffff" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:orientation="horizontal">
-
-                    <Button
-                        android:id="@+id/BackupVncResolutions"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Backup"
-                        android:textColor="#ffffffff"
-                        android:textSize="13sp" />
-
-                    <Button
-                        android:id="@+id/RestoreVncResolutions"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"

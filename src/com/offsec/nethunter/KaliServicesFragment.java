@@ -39,7 +39,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -82,7 +82,7 @@ public class KaliServicesFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        KaliServicesViewModel kaliServicesViewModel = ViewModelProviders.of(this).get(KaliServicesViewModel.class);
+        KaliServicesViewModel kaliServicesViewModel = new ViewModelProvider(this).get(KaliServicesViewModel.class);
         kaliServicesViewModel.init(context);
         kaliServicesViewModel.getLiveDataKaliServicesModelList().observe(getViewLifecycleOwner(), kaliServicesModelList -> kaliServicesRecyclerViewAdapter.notifyDataSetChanged());
 
@@ -169,7 +169,7 @@ public class KaliServicesFragment extends Fragment {
                             NhPaths.showMessage(context, "db is successfully backup to " + storedpathEditText.getText().toString());
                         } else {
                             dialog.dismiss();
-                            new MaterialAlertDialogBuilder(context).setTitle("Failed to backup the DB.").setMessage(returnedResult).create().show();
+                            new MaterialAlertDialogBuilder(context, R.style.DialogStyleCompat).setTitle("Failed to backup the DB.").setMessage(returnedResult).create().show();
                         }
                         dialog.dismiss();
                     });
@@ -192,7 +192,7 @@ public class KaliServicesFragment extends Fragment {
                             NhPaths.showMessage(context, "db is successfully restored to " + storedpathEditText.getText().toString());
                         } else {
                             dialog.dismiss();
-                            new MaterialAlertDialogBuilder(context).setTitle("Failed to restore the DB.").setMessage(returnedResult).create().show();
+                            new MaterialAlertDialogBuilder(context, R.style.DialogStyleCompat).setTitle("Failed to restore the DB.").setMessage(returnedResult).create().show();
                         }
                         dialog.dismiss();
                     });

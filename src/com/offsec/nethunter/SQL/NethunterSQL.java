@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.offsec.nethunter.BuildConfig;
 import com.offsec.nethunter.models.NethunterModel;
@@ -30,7 +31,7 @@ public class NethunterSQL extends SQLiteOpenHelper {
     private static ArrayList<String> COLUMNS = new ArrayList<>();
     private static final String[][] nethunterData = {
             {"1", "Kernel Version", "uname -a", "\\n", "1"},
-            {"2", "Busybox Version", NhPaths.BUSYBOX + " | head -n1", "\\n", "1"},
+            {"2", "Busybox Version", "`which busybox_nh` | head -n1", "\\n", "1"},
             {"3", "Root Status", "su -v", "\\n", "1"},
             {"4", "HID status", "ls /dev/hidg* || { echo \"HID interface not found.\" && if [[ $(uname -r) == 4.* || 5.* ]]; then echo \"Please enable in USB Arsenal\";fi }", "\\n", "1"},
             {"5", "Nethunter Terminal Status", "[ \"$(pm list packages | grep 'com.offsec.nhterm')\" ] && echo \"Nethunter Terminal is installed.\" || echo \"Nethunter Terminal is NOT yet installed.\"", "\\n", "1"},
@@ -171,7 +172,7 @@ public class NethunterSQL extends SQLiteOpenHelper {
 
     public String backupData(String storedDBpath) {
         try {
-            String currentDBPath = Environment.getDataDirectory() + "/data/" + BuildConfig.APPLICATION_ID + "/databases/" + getDatabaseName();
+            String currentDBPath = NhPaths.APP_DATABASE_PATH + "/" + getDatabaseName();
             if (Environment.getExternalStorageDirectory().canWrite()) {
                 File currentDB = new File(currentDBPath);
                 File backupDB = new File(storedDBpath);
@@ -203,7 +204,7 @@ public class NethunterSQL extends SQLiteOpenHelper {
             return "invalid columns format.";
         }
         try {
-            String currentDBPath = Environment.getDataDirectory() + "/data/" + BuildConfig.APPLICATION_ID + "/databases/" + getDatabaseName();
+            String currentDBPath = NhPaths.APP_DATABASE_PATH + "/" + getDatabaseName();
             if (Environment.getExternalStorageDirectory().canWrite()) {
                 File currentDB = new File(currentDBPath);
                 File backupDB = new File(storedDBpath);

@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,6 +21,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -41,28 +41,26 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import static com.offsec.nethunter.R.id.container;
 import static com.offsec.nethunter.R.id.f_nethunter_action_search;
-import static com.offsec.nethunter.R.id.f_nethunter_recyclerview;
-import static com.offsec.nethunter.R.id.nethunter_item;
-import static com.offsec.nethunter.R.id.viewSource;
+import static com.offsec.nethunter.R.id.f_nethunter_action_snowfall;
 
 
 public class NetHunterFragment extends Fragment {
-
     private static final String ARG_SECTION_NUMBER = "section_number";
     private Context context;
     private Activity activity;
     private NethunterRecyclerViewAdapter nethunterRecyclerViewAdapter;
     private Button refreshButton;
+    private MenuItem snowfallButton;
     private Button addButton;
     private Button deleteButton;
     private Button moveButton;
     private static int targetPositionId;
+    private SharedPreferences sharedpreferences;
 
     public static NetHunterFragment newInstance(int sectionNumber) {
         NetHunterFragment fragment = new NetHunterFragment();
@@ -89,9 +87,8 @@ public class NetHunterFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        NethunterViewModel nethunterViewModel = ViewModelProviders.of(this).get(NethunterViewModel.class);
+        NethunterViewModel nethunterViewModel = new ViewModelProvider(this).get(NethunterViewModel.class);
         nethunterViewModel.init(context);
-        SharedPreferences sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
 
         nethunterViewModel.getLiveDataNethunterModelList().observe(getViewLifecycleOwner(), nethunterModelList -> {
             nethunterRecyclerViewAdapter.notifyDataSetChanged();
@@ -117,6 +114,8 @@ public class NetHunterFragment extends Fragment {
         TextView NHDesc = view.findViewById(R.id.f_nethunter_banner2);
         LinearLayout NHButtons = view.findViewById(R.id.f_nethunter_linearlayoutBtn);
         boolean iswatch = getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
+
+        sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
         sharedpreferences.edit().putBoolean("running_on_wearos", iswatch).apply();
         if(iswatch) {
             NHDesc.setVisibility(View.GONE);
@@ -129,9 +128,13 @@ public class NetHunterFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.nethunter, menu);
         final MenuItem searchItem = menu.findItem(f_nethunter_action_search);
+
+        sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+
         //WearOS optimisation
         boolean iswatch = getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
         if(iswatch) {
+            sharedpreferences.edit().putBoolean("snowfall_enabled", false).apply();
             searchItem.setVisible(false);
         }
         final SearchView searchView = (SearchView) searchItem.getActionView();
@@ -140,6 +143,13 @@ public class NetHunterFragment extends Fragment {
             menu.setGroupVisible(R.id.f_nethunter_menu_group1, true);
             return false;
         });
+
+        //Snowfall
+        snowfallButton = menu.findItem(f_nethunter_action_snowfall);
+        Boolean snowfall = sharedpreferences.getBoolean("snowfall_enabled", true);
+        if (snowfall) snowfallButton.setIcon(R.drawable.snowflake_trigger);
+        else snowfallButton.setIcon(R.drawable.snowflake_trigger_bw);
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -161,6 +171,7 @@ public class NetHunterFragment extends Fragment {
         final View promptView = inflater.inflate(R.layout.nethunter_custom_dialog_view, null);
         final TextView titleTextView = promptView.findViewById(R.id.f_nethunter_adb_tv_title1);
         final EditText storedpathEditText = promptView.findViewById(R.id.f_nethunter_adb_et_storedpath);
+
         switch (item.getItemId()) {
             case R.id.f_nethunter_menu_backupDB:
                 titleTextView.setText("Full path to where you want to save the database:");
@@ -178,7 +189,7 @@ public class NetHunterFragment extends Fragment {
                             NhPaths.showMessage(context, "db is successfully backup to " + storedpathEditText.getText().toString());
                         } else {
                             dialog.dismiss();
-                            new MaterialAlertDialogBuilder(context).setTitle("Failed to backup the DB.").setMessage(returnedResult).create().show();
+                            new MaterialAlertDialogBuilder(context, R.style.DialogStyleCompat).setTitle("Failed to backup the DB.").setMessage(returnedResult).create().show();
                         }
                         dialog.dismiss();
                     });
@@ -201,7 +212,7 @@ public class NetHunterFragment extends Fragment {
                             NhPaths.showMessage(context, "db is successfully restored to " + storedpathEditText.getText().toString());
                         } else {
                             dialog.dismiss();
-                            new MaterialAlertDialogBuilder(context).setTitle("Failed to restore the DB.").setMessage(returnedResult).create().show();
+                            new MaterialAlertDialogBuilder(context, R.style.DialogStyleCompat).setTitle("Failed to restore the DB.").setMessage(returnedResult).create().show();
                         }
                         dialog.dismiss();
                     });
@@ -210,6 +221,10 @@ public class NetHunterFragment extends Fragment {
                 break;
             case R.id.f_nethunter_menu_ResetToDefault:
                 NethunterData.getInstance().resetData(NethunterSQL.getInstance(context));
+                break;
+            //Snowfall Trigger
+            case f_nethunter_action_snowfall:
+                trigger_snowfall();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -233,6 +248,20 @@ public class NetHunterFragment extends Fragment {
 
     private void onRefreshItemSetup(){
         refreshButton.setOnClickListener(v -> NethunterData.getInstance().refreshData());
+    }
+
+    private void trigger_snowfall(){
+        sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+        Boolean snowfall = sharedpreferences.getBoolean("snowfall_enabled", true);
+        if (snowfall) {
+            sharedpreferences.edit().putBoolean("snowfall_enabled", false).apply();
+            snowfallButton.setIcon(R.drawable.snowflake_trigger_bw);
+            Toast.makeText(getActivity().getApplicationContext(), "Snowfall disabled. Restart app to take effect.", Toast.LENGTH_SHORT).show();
+        } else {
+            sharedpreferences.edit().putBoolean("snowfall_enabled", true).apply();
+            snowfallButton.setIcon(R.drawable.snowflake_trigger);
+            Toast.makeText(getActivity().getApplicationContext(), "Snowfall enabled. Restart app to take effect.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void onAddItemSetup(){

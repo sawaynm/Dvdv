@@ -163,7 +163,7 @@ public class ShellExecuter {
         int resultCode = 0;
         String line;
         try {
-            viewLogger.post(() -> viewLogger.append("\n\n ------------ \n\n\n"));
+            //viewLogger.post(() -> viewLogger.append("\n\n ------------ \n\n\n"));
             Process process = Runtime.getRuntime().exec("su -mm");
             OutputStream stdin = process.getOutputStream();
             InputStream stderr = process.getErrorStream();
@@ -183,7 +183,7 @@ public class ShellExecuter {
                     viewLogger.append(tempText);
                 });
             }
-            viewLogger.post(() -> viewLogger.append("\n\n ------------ \n\n"));
+            //viewLogger.post(() -> viewLogger.append("\n\n ------------ \n\n"));
             br.close();
             br = new BufferedReader(new InputStreamReader(stderr));
             while ((line = br.readLine()) != null) {

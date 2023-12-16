@@ -26,6 +26,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.offsec.nethunter.bridge.Bridge;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
@@ -67,6 +68,7 @@ public class VNCFragment extends Fragment {
     private static final int MAX_UID = 101000;
     NhPaths nh; //= new NhPaths();
     String BUSYBOX_NH= nh.getBusyboxPath();
+    private Boolean iswatch;
 
     public VNCFragment() {
     }
@@ -137,6 +139,18 @@ public class VNCFragment extends Fragment {
         } else {
             xwidth = Integer.toString(screen_width);
             xheight = Integer.toString(screen_height);
+        }
+
+
+        //Detecting watch
+        final TextView KexDesc = rootView.findViewById(R.id.kexdesc);
+        final TextView KexStatus = rootView.findViewById(R.id.status);
+        final TextView KexSessions = rootView.findViewById(R.id.sessions);
+        iswatch = sharedpreferences.getBoolean("running_on_wearos", false);
+        if (iswatch) {
+            KexDesc.setVisibility(View.GONE);
+            KexStatus.setText("Status:");
+            KexSessions.setText("Sessions:");
         }
 
         Button StartAudioButton = rootView.findViewById(R.id.vnc_audio);
@@ -270,7 +284,7 @@ public class VNCFragment extends Fragment {
         //Immersion switch
         final SwitchCompat immersionSwitch = rootView.findViewById(R.id.immersionSwitch);
         final String immersion = exe.RunAsRootOutput("settings get global policy_control");
-        if (immersion.equals("null*"))
+        if (immersion.equals("null"))
             immersionSwitch.setChecked(false);
         else
             immersionSwitch.setChecked(true);
@@ -280,7 +294,7 @@ public class VNCFragment extends Fragment {
                 if (isChecked) {
                     exe.RunAsRoot(new String[]{"settings put global policy_control immersive.full=*"});
                 } else {
-                    exe.RunAsRoot(new String[]{"settings put global policy_control null*"});
+                    exe.RunAsRoot(new String[]{"settings put global policy_control null"});
                 }
             }
         });
@@ -385,7 +399,10 @@ public class VNCFragment extends Fragment {
             }
         });
         addClickListener(SetupVNCButton, v -> {
-            run_cmd("echo -ne \"\\033]0;Setting up Server\\007\" && clear;chmod +x ~/.vnc/xstartup && clear;echo $'\n'\"Please enter your new VNC server password\"$'\n' && sudo -u " + selected_user + " vncpasswd && sleep 2 && exit"); // since is a kali command we can send it as is
+            String desktop = exe.RunAsRootOutput(nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd dkpg -l | grep kali-desktop");
+            if (desktop.equals("")) {
+                desktopDialog();
+            } else run_cmd("echo -ne \"\\033]0;Setting up Server\\007\" && clear;chmod +x ~/.vnc/xstartup && clear;echo $'\n'\"Please enter your new VNC server password\"$'\n' && sudo -u " + selected_user + " vncpasswd && sleep 2 && exit"); // since is a kali command we can send it as is
         });
         addClickListener(StartVNCButton, v -> {
             if(selected_user.equals("root")) {
@@ -423,7 +440,7 @@ public class VNCFragment extends Fragment {
                 exe.RunAsRoot(new String[]{nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd sudo -u " + selected_user + " vncserver -kill :" + selected_display}); // since is a kali command we can send it as is
                 dbusDialog();
                 refreshVNC(rootView);
-                Toast.makeText(getActivity().getApplicationContext(), "Stopped display :" + selected_display + " for " + selected_user , Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity().getApplicationContext(), "Stopping display :" + selected_display + " for " + selected_user , Toast.LENGTH_LONG).show();
                 }
             });
         addClickListener(OpenVNCButton, v -> {
@@ -565,7 +582,7 @@ public class VNCFragment extends Fragment {
     }
 
     private void openResolutionDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getActivity(), R.style.DialogStyleCompat);
         LayoutInflater inflater = this.getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.resolutiondialog, null);
         builder.setView(dialogView);
@@ -584,7 +601,7 @@ public class VNCFragment extends Fragment {
                     Toast.makeText(getActivity().getApplicationContext(), "Please enter the values!", Toast.LENGTH_SHORT).show();
                     openResolutionDialog();
                 } else if (Integer.parseInt(width.getText().toString()) > Integer.parseInt(height.getText().toString())){
-                    AlertDialog.Builder builder2 = new AlertDialog.Builder(getActivity());
+                    MaterialAlertDialogBuilder builder2 = new MaterialAlertDialogBuilder(getActivity(), R.style.DialogStyleCompat);
                     builder2.setTitle("Width is bigger than height!");
                     builder2.setMessage("Bigger width is usually only for tablets. Misconfiguration can render the device unresponsive");
                     builder2.setPositiveButton("Keep", new DialogInterface.OnClickListener() {
@@ -609,7 +626,7 @@ public class VNCFragment extends Fragment {
     }
 
     private void openVNCResolutionDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getActivity(), R.style.DialogStyleCompat);
         LayoutInflater inflater = this.getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.vncresolutiondialog, null);
         builder.setView(dialogView);
@@ -639,7 +656,7 @@ public class VNCFragment extends Fragment {
     private void confirmDialog() {
 
         SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-        final AlertDialog.Builder confirmbuilder = new AlertDialog.Builder(getActivity());
+        final MaterialAlertDialogBuilder confirmbuilder = new MaterialAlertDialogBuilder(getActivity(), R.style.DialogStyleCompat);
         confirmbuilder.setTitle("Do you want to keep the resolution?");
         confirmbuilder.setMessage("Loading..");
         confirmbuilder.setPositiveButton("Keep resolution", new DialogInterface.OnClickListener() {
@@ -675,14 +692,29 @@ public class VNCFragment extends Fragment {
 
     private void dbusDialog() {
 
-        final AlertDialog.Builder dbusbuilder = new AlertDialog.Builder(getActivity());
+        final MaterialAlertDialogBuilder dbusbuilder = new MaterialAlertDialogBuilder(getActivity(), R.style.DialogStyleCompat);
         ShellExecuter exe = new ShellExecuter();
-        dbusbuilder.setTitle("DBUS service");
         dbusbuilder.setMessage("Do you want to stop dbus service? If you have no more sessions opened, press Yes.");
         dbusbuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 exe.RunAsRoot(new String[]{nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd service dbus stop"});
+            }
+        });
+        dbusbuilder.setNegativeButton("No", (dialog, whichButton) -> {
+        });
+        dbusbuilder.show();
+    }
+
+    private void desktopDialog() {
+
+        final MaterialAlertDialogBuilder dbusbuilder = new MaterialAlertDialogBuilder(getActivity(), R.style.DialogStyleCompat);
+        ShellExecuter exe = new ShellExecuter();
+        dbusbuilder.setMessage("There's no desktop environment installed. Would you like to install kali-desktop-xfce?");
+        dbusbuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                run_cmd("echo -ne \"\\033]0;Installing XFCE\\007\" && clear;apt update && apt install kali-desktop-xfce tigervnc-standalone-server dbus-x11");
             }
         });
         dbusbuilder.setNegativeButton("No", (dialog, whichButton) -> {
