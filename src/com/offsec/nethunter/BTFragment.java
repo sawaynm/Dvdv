@@ -128,6 +128,7 @@ public class BTFragment extends Fragment {
             sharedpreferences.edit().putBoolean("setup_done", true).apply();
         });
         builder.setNegativeButton("Disable message", (dialog, which) -> {
+            dialog.dismiss();
             sharedpreferences.edit().putBoolean("setup_done", true).apply();
         });
         builder.show();
@@ -141,6 +142,7 @@ public class BTFragment extends Fragment {
                 sharedpreferences.edit().putBoolean("setup_done", true).apply();
         });
         builder.setNegativeButton("No", (dialog, which) -> {
+                dialog.dismiss();
                 sharedpreferences.edit().putBoolean("setup_done", true).apply();
         });
         builder.show();
@@ -154,7 +156,6 @@ public class BTFragment extends Fragment {
                 " ln -s libgbinder.so.1.1.25 /usr/lib/libgbinder.so.1.1 && ln -s libgbinder.so.1.1 /usr/lib/libgbinder.so.1 && ln -s libgbinder.so.1 /usr/lib/libgbinder.so;fi;" +
                 "if [[ -f /usr/lib/libglibutil.so.1.0.67 ]]; then echo 'libglibutil.so.1.0.67 is installed!'; else wget https://raw.githubusercontent.com/yesimxev/libglibutil/master/prebuilt/armhf/libglibutil.so.1.0.67 -P /usr/lib/ &&" +
                 " ln -s libglibutil.so.1.0.67 /usr/lib/libglibutil.so.1.0 && ln -s libglibutil.so.1.0 /usr/lib/libglibutil.so.1 && ln -s libglibutil.so.1 /usr/lib/libglibutil.so;fi;" +
-                //ln -s /usr/lib/libglibutil.so.1 /usr/lib/libglibutil.so
                 "if [[ -f /usr/bin/carwhisperer ]]; then echo 'carwhisperer is installed!'; else wget https://raw.githubusercontent.com/yesimxev/carwhisperer-0.2/master/prebuilt/armhf/carwhisperer -P /usr/bin/ && chmod +x /usr/bin/carwhisperer;fi;" +
                 "if [[ -f /usr/bin/rfcomm_scan ]]; then echo 'rfcomm_scan is installed!'; else wget https://raw.githubusercontent.com/yesimxev/bt_audit/master/prebuilt/armhf/rfcomm_scan -P /usr/bin/ && chmod +x /usr/bin/rfcomm_scan;fi;" +
                 "if [[ -d /root/carwhisperer ]]; then echo '/root/carwhisperer is installed!'; else git clone https://github.com/yesimxev/carwhisperer-0.2 /root/carwhisperer;fi;" +
@@ -994,13 +995,6 @@ public class BTFragment extends Fragment {
             //Services
             badbtServerButton.setOnClickListener( v -> {
                 if (badbtServerButton.getText().equals("Start")) {
-                    if (iswatch) {
-                        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireActivity(), R.style.DialogStyleCompat);
-                        builder.setTitle("Warning!");
-                        builder.setMessage("Running BadBT on a smartwatch may dispair your watch from phone/wearos app.");
-                        builder.setPositiveButton("Ok", (dialog, which) -> {});
-                        builder.show();
-                    }
                     String BadBT_name = badbt_name.getText().toString();
                     String BadBT_iface = badbt_interface.getText().toString();
                     String BadBT_bdaddr = badbt_bdaddr.getText().toString();
