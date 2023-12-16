@@ -1,20 +1,14 @@
 package com.offsec.nethunter.service;
 
 import android.app.IntentService;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.IBinder;
-import android.provider.Settings;
-import android.text.TextUtils;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 
 import com.offsec.nethunter.AppNavHomeActivity;
 import com.offsec.nethunter.BuildConfig;
-import com.offsec.nethunter.ChrootManagerFragment;
 import com.offsec.nethunter.R;
 import com.offsec.nethunter.utils.CheckForRoot;
 import com.offsec.nethunter.utils.NhPaths;
@@ -23,8 +17,7 @@ import com.offsec.nethunter.utils.ShellExecuter;
 
 // IntentService class for keep checking the campatibaility every time user switch back to the app.
 public class CompatCheckService extends IntentService {
-
-    private static final String TAG = "CompatCheckService";
+    public static final String TAG = "CompatCheckService";
     private String message = "";
     private int RESULTCODE = -1;
     private SharedPreferences sharedPreferences;
@@ -97,7 +90,7 @@ public class CompatCheckService extends IntentService {
         if (sharedPreferences.getString(SharePrefTag.CHROOT_ARCH_SHAREPREF_TAG, null) == null) {
             String[] chrootDirs = new ShellExecuter().RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/chrootmgr -c \"findchroot\"").split("\\n");
             // if findchroot returns empty string then default the chroot arch to kali-arm64, else default to the first valid chroot arch.
-            if (chrootDirs[0].equals("")) {
+            if (chrootDirs[0].isEmpty()) {
                 sharedPreferences.edit().putString(SharePrefTag.CHROOT_ARCH_SHAREPREF_TAG, "kali-arm64").apply();
                 sharedPreferences.edit().putString(SharePrefTag.CHROOT_PATH_SHAREPREF_TAG, NhPaths.NH_SYSTEM_PATH + "/kali-arm64").apply();
                 new ShellExecuter().RunAsRootOutput("ln -sfn " + NhPaths.NH_SYSTEM_PATH + "/kali-arm64 " + NhPaths.CHROOT_SYMLINK_PATH);
@@ -142,7 +135,6 @@ public class CompatCheckService extends IntentService {
                         .setAction(AppNavHomeActivity.NethunterReceiver.CHECKCHROOT));
             }
         }
-
         /* End of the other compat checks */
         return true;
     }

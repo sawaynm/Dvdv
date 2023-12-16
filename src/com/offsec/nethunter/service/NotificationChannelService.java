@@ -1,10 +1,12 @@
 package com.offsec.nethunter.service;
 
+import android.Manifest;
 import android.app.IntentService;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.IBinder;
 
@@ -13,6 +15,7 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.app.TaskStackBuilder;
+import androidx.core.content.ContextCompat;
 
 import com.offsec.nethunter.AsyncTask.CustomCommandsAsyncTask;
 import com.offsec.nethunter.BuildConfig;
@@ -33,7 +36,7 @@ public class NotificationChannelService extends IntentService {
     public static final String CUSTOMCOMMAND_START = BuildConfig.APPLICATION_ID + ".CUSTOMCOMMAND_START";
     public static final String CUSTOMCOMMAND_FINISH = BuildConfig.APPLICATION_ID + ".CUSTOMCOMMAND_FINISH";
 
-    public NotificationChannelService(){
+    public NotificationChannelService() {
         super("NotificationChannelService");
     }
 
@@ -55,8 +58,8 @@ public class NotificationChannelService extends IntentService {
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        if (intent != null){
-            if (intent.getAction() != null){
+        if (intent != null) {
+            if (intent.getAction() != null) {
                 NotificationCompat.Builder builder;
                 NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(getApplicationContext());
                 notificationManagerCompat.cancelAll();
@@ -64,7 +67,7 @@ public class NotificationChannelService extends IntentService {
                 stackBuilder = TaskStackBuilder.create(this);
                 stackBuilder.addNextIntentWithParentStack(resultIntent);
                 resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-                switch (intent.getAction()){
+                switch (intent.getAction()) {
                     case REMINDMOUNTCHROOT:
                         builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                                 .setAutoCancel(true)
@@ -86,6 +89,16 @@ public class NotificationChannelService extends IntentService {
                                 .setContentText("Happy hunting!")
                                 .setPriority(NotificationCompat.PRIORITY_MAX)
                                 .setContentIntent(resultPendingIntent);
+                        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                            // TODO: Consider calling
+                            //    ActivityCompat#requestPermissions
+                            // here to request the missing permissions, and then overriding
+                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                            //                                          int[] grantResults)
+                            // to handle the case where the user grants the permission. See the documentation
+                            // for ActivityCompat#requestPermissions for more details.
+                            return;
+                        }
                         notificationManagerCompat.notify(NOTIFY_ID, builder.build());
                         break;
                     case DOWNLOADING:

@@ -20,8 +20,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -58,7 +60,6 @@ import androidx.fragment.app.FragmentManager;
 
 
 public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpdates.Provider {
-
     public final static String TAG = "AppNavHomeActivity";
     public static final String CHROOT_INSTALLED_TAG = "CHROOT_INSTALLED_TAG";
     public static final String GPS_BACKGROUND_FRAGMENT_TAG = "BG_FRAGMENT_TAG";
@@ -359,12 +360,13 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         navigationView = findViewById(R.id.navigation_view);
 
         //WearOS optimisation
-        boolean iswatch = getBaseContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
+        Boolean iswatch = getBaseContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
+        String model = Build.HARDWARE;
         if(iswatch){
+            prefs.edit().putBoolean("snowfall_enabled", false).apply();
             navigationView.getMenu().getItem(2).setVisible(false);
-            navigationView.getMenu().getItem(6).setVisible(false);
+            if (model.equals("catfish") || model.equals("catshark") || model.equals("catshark-4g")) navigationView.getMenu().getItem(6).setVisible(false);
             navigationView.getMenu().getItem(11).setVisible(false);
-            navigationView.getMenu().getItem(13).setVisible(false);
             navigationView.getMenu().getItem(14).setVisible(false);
             navigationView.getMenu().getItem(15).setVisible(false);
             navigationView.getMenu().getItem(17).setVisible(false);
@@ -373,6 +375,13 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
             navigationView.getMenu().getItem(20).setVisible(false);
             navigationView.getMenu().getItem(21).setVisible(false);
         }
+
+        //Snowfall
+        View SnowfallView = findViewById(R.id.snowfall);
+        Boolean snowfall = prefs.getBoolean("snowfall_enabled", true);
+        if (snowfall) SnowfallView.setVisibility(View.VISIBLE);
+        else SnowfallView.setVisibility(View.GONE);
+
         //Disable USB arsenal for devices without ConfigFS support
         if (!new File("/config/usb_gadget/g1").exists())
             navigationView.getMenu().getItem(7).setVisible(false);
@@ -397,10 +406,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
             setupDrawerContent(navigationView);
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            // detail for android 5 devices
-            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.darkTitle));
-        }
+        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.darkTitle));
 
         getSupportFragmentManager()
                 .beginTransaction()
@@ -651,7 +657,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     }
 
     public void showWarningDialog(String title, String message, boolean NeedToExit) {
-        AlertDialog.Builder warningAD = new AlertDialog.Builder(this, R.style.DialogStyleCompat);
+        MaterialAlertDialogBuilder warningAD = new MaterialAlertDialogBuilder(this, R.style.DialogStyleCompat);
         warningAD.setCancelable(false);
         warningAD.setTitle(title);
         warningAD.setMessage(message);

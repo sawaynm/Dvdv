@@ -27,12 +27,12 @@ import com.offsec.nethunter.utils.NhPaths;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class NethunterRecyclerViewAdapter extends RecyclerView.Adapter<NethunterRecyclerViewAdapter.ItemViewHolder> implements Filterable {
-
-    private static final String TAG = "NethunterRecyclerView";
-    private Context context;
-    private List<NethunterModel> nethunterModelList;
+    public static final String TAG = "NethunterRecyclerView";
+    private final Context context;
+    private final List<NethunterModel> nethunterModelList;
 
     public NethunterRecyclerViewAdapter(Context context, List<NethunterModel> nethunterModelList) {
         this.context = context;
@@ -43,7 +43,7 @@ public class NethunterRecyclerViewAdapter extends RecyclerView.Adapter<Nethunter
     @Override
     public NethunterRecyclerViewAdapter.ItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.nethunter_recyclerview_main, parent, false);
-        return new NethunterRecyclerViewAdapter.ItemViewHolder(view);
+        return new ItemViewHolder(view);
     }
 
     @Override
@@ -152,8 +152,7 @@ public class NethunterRecyclerViewAdapter extends RecyclerView.Adapter<Nethunter
         return NethunterModelListFilter;
     }
 
-    private Filter NethunterModelListFilter = new Filter() {
-
+    private final Filter NethunterModelListFilter = new Filter() {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             FilterResults results = new FilterResults();
@@ -174,16 +173,16 @@ public class NethunterRecyclerViewAdapter extends RecyclerView.Adapter<Nethunter
 
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
-            NethunterData.getInstance().getNethunterModels().getValue().clear();
+            Objects.requireNonNull(NethunterData.getInstance().getNethunterModels().getValue()).clear();
             NethunterData.getInstance().getNethunterModels().getValue().addAll((List<NethunterModel>) results.values);
             NethunterData.getInstance().getNethunterModels().postValue(NethunterData.getInstance().getNethunterModels().getValue());
         }
     };
 
-    class ItemViewHolder extends RecyclerView.ViewHolder{
-        private TextView titleTextView;
-        private RecyclerView resultRecyclerView;
-        private Button runButton;
+    static class ItemViewHolder extends RecyclerView.ViewHolder{
+        private final TextView titleTextView;
+        private final RecyclerView resultRecyclerView;
+        private final Button runButton;
         //private Button editButton;
         private ItemViewHolder(View view) {
             super(view);

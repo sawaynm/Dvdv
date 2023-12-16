@@ -8,6 +8,8 @@ SCRIPT_PATH=$(readlink -f $0)
 #### Define default global variables ####
 #########################################
 DNS_SERVER1=$(getprop net.dns1)
+
+
 TIMEOUT=120
 DEPS=(isc-dhcp-server isc-dhcp-common)
 
@@ -57,7 +59,7 @@ function kill_proc() {
     ## Bringing down the usb interface ##
     ip link set $USB_IFACE down
     ip addr flush dev $USB_IFACE
-    $BUSYBOX ifconfig $USB_IFACE down
+    $BUSYBOX ip link set $USB_IFACE down
 
     bklog "[+] Done."
     exit 0
@@ -275,6 +277,13 @@ bklog "[!] IP_END: $IP_END"
 bklog "[!] IP_GW: $IP_GW"
 bklog "[!] IP_SUB_OCTET: $IP_SUB_OCTET"
 bklog "[!] IP_NET_ADDR: $IP_NET_ADDR"
+
+# Check DNS_SERVER1
+# fallback to 8.8.8.8 if net.dns1 is empty
+if [ -z "$DNS_SERVER1" ]; then
+  bklog "[!] net.dns1 not set. Falling back to 8.8.8.8"
+  DNS_SERVER1=8.8.8.8
+fi
 
 ## Let's get party! ##
 dep_check

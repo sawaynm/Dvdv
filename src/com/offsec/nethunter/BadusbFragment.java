@@ -21,11 +21,12 @@ import com.offsec.nethunter.utils.ShellExecuter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-public class BadusbFragment extends Fragment {
 
+public class BadusbFragment extends Fragment {
     private String sourcePath;
     private static final String ARG_SECTION_NUMBER = "section_number";
     private final ShellExecuter exe = new ShellExecuter();
@@ -47,7 +48,7 @@ public class BadusbFragment extends Fragment {
         activity = getActivity();
         if (Build.VERSION.SDK_INT >= 21) {
             sourcePath = NhPaths.APP_SD_FILES_PATH + "/configs/startbadusb-lollipop.sh";
-        } else {
+        } else if (Build.VERSION.SDK_INT >= 19) {
             sourcePath = NhPaths.APP_SD_FILES_PATH + "/configs/startbadusb-kitkat.sh";
         }
     }
@@ -60,7 +61,6 @@ public class BadusbFragment extends Fragment {
         button.setOnClickListener(v -> updateOptions());
         setHasOptionsMenu(true);
         return rootView;
-
     }
 
     @Override
@@ -88,12 +88,12 @@ public class BadusbFragment extends Fragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.badusb, menu);
         //WearOS optimisation
         final MenuItem sourceItem = menu.findItem(R.id.source_button);
-        boolean iswatch = getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
-        if(iswatch) {
+        boolean iswatch = requireActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
+        if (iswatch) {
             sourceItem.setVisible(false);
         }
     }
@@ -121,7 +121,7 @@ public class BadusbFragment extends Fragment {
         String sourceFile = exe.ReadFile_SYNC(sourcePath);
         EditText ifc = activity.findViewById(R.id.ifc);
         sourceFile = sourceFile.replaceAll("(?m)^INTERFACE=(.*)$", "INTERFACE=" + ifc.getText().toString());
-        Boolean r = exe.SaveFileContents(sourceFile, sourcePath);// 1st arg contents, 2nd arg filepath
+        boolean r = exe.SaveFileContents(sourceFile, sourcePath);// 1st arg contents, 2nd arg filepath
         if (r) {
             NhPaths.showMessage(context,"Options updated!");
         } else {
@@ -134,7 +134,7 @@ public class BadusbFragment extends Fragment {
         String[] command = new String[1];
         if (Build.VERSION.SDK_INT >= 21) {
             command[0] = NhPaths.APP_SCRIPTS_PATH + "/start-badusb-lollipop &> " + NhPaths.APP_SD_FILES_PATH + "/badusb.log &";
-        } else {
+        } else if (Build.VERSION.SDK_INT >= 19) {
             command[0] = NhPaths.APP_SCRIPTS_PATH + "/start-badusb-kitkat &> " + NhPaths.APP_SD_FILES_PATH + "/badusb.log &";
         }
         exe.RunAsRoot(command);
@@ -146,7 +146,7 @@ public class BadusbFragment extends Fragment {
         String[] command = new String[1];
         if (Build.VERSION.SDK_INT >= 21) {
             command[0] = NhPaths.APP_SCRIPTS_PATH + "/stop-badusb-lollipop";
-        } else {
+        } else if (Build.VERSION.SDK_INT >= 19) {
             command[0] = NhPaths.APP_SCRIPTS_PATH + "/stop-badusb-kitkat";
         }
         exe.RunAsRoot(command);

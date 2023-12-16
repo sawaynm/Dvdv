@@ -35,13 +35,13 @@ cat /sys/devices/virtual/android_usb/android0/functions
 cat /sys/devices/virtual/android_usb/android0/enable
 
 # Wait until the interface actually exists
-while ! busybox ifconfig $INTERFACE > /dev/null 2>&1;do
+while ! busybox ip link set $INTERFACE > /dev/null 2>&1;do
     echo Waiting for interface $INTERFACE
     busybox sleep 1
 done
 
 # Configure interface, firewall and packet forwarding
-#busybox ifconfig $INTERFACE inet 10.0.0.1 netmask 255.255.255.0 up
+#busybox ip link set $INTERFACE inet 10.0.0.1 netmask 255.255.255.0 up
 
 ip addr flush dev $INTERFACE
 ip addr add 10.0.0.1/24 dev $INTERFACE

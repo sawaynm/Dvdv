@@ -13,15 +13,14 @@ buildscript {
 repositories {
     mavenCentral()
     maven { url "https://maven.google.com" }
+    //Snowfall
     maven { url 'https://jitpack.io' }
-
     google()
 }
 
 android {
-
-    compileSdkVersion 33
-    buildToolsVersion '33.0.2'
+    namespace "com.offsec.nethunter"
+    compileSdk 33
 
     buildFeatures {
         dataBinding true
@@ -36,11 +35,11 @@ android {
 
     defaultConfig {
         minSdk 21
-//noinspection ExpiredTargetSdkVersion
+        //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 28
         //noinspection HighAppVersionCode
-        versionCode 2023030400
-        versionName "2023.3"
+        versionCode 2023040300
+        versionName "2023.4"
         multiDexEnabled true
     }
 
@@ -62,16 +61,13 @@ android {
             res.srcDirs = ['res']
             assets.srcDirs = ['assets']
         }
-
     }
 
     buildTypes {
-
         debug {
             minifyEnabled false
             buildConfigField "java.util.Date", "BUILD_TIME", "new java.util.Date(" + System.currentTimeMillis() + "L)"
             buildConfigField "String", "BUILD_NAME", "\"" + System.getenv("USER") + "\""
-
             return true
         }
 
@@ -82,10 +78,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt')
             debuggable false
             jniDebuggable false
-            zipAlignEnabled true
             buildConfigField "java.util.Date", "BUILD_TIME", "new java.util.Date(" + System.currentTimeMillis() + "L)"
             buildConfigField "String", "BUILD_NAME", "\"" + System.getenv("USER") + "\""
-
             return true
         }
     }
@@ -97,17 +91,14 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'org.thoughtcrime.ssl.pinning:AndroidPinning:1.0.0'
     implementation 'com.google.android.gms:play-services-location:21.0.1'
-    implementation 'joda-time:joda-time:2.10.13'
+    implementation 'joda-time:joda-time:2.12.5'
     implementation 'com.google.guava:guava:29.0-jre'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-
-    implementation 'androidx.appcompat:appcompat:1.6.0'
-    implementation 'com.google.android.material:material:1.5.0'
-
-    //implementation 'com.github.techinessoverloaded:progress-dialog:1.4.1'
-
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.6.0'
+    implementation 'androidx.preference:preference:1.2.1'
     //Snowfall
-    //implementation 'com.github.jetradarmobile:android-snowfall:1.2.1'
+    implementation 'com.github.jetradarmobile:android-snowfall:1.2.1'
 }
 
 java {

@@ -2,7 +2,6 @@ package com.offsec.nethunter;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -14,9 +13,10 @@ import java.util.Locale;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+
 
 public class DeAuthWhitelistActivity extends AppCompatActivity {
-
     private Activity activity;
     private final ShellExecuter exe = new ShellExecuter();
 
@@ -26,10 +26,7 @@ public class DeAuthWhitelistActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         activity = this;
         setContentView(R.layout.deauth_whitelist);
-        if (Build.VERSION.SDK_INT >= 21) {
-            // detail for android 5 devices
-            getWindow().setStatusBarColor(getResources().getColor(R.color.darkTitle));
-        }
+        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.darkTitle));
 
         EditText whitelist = findViewById(R.id.deauth_modify);
         whitelist.setText(String.format(Locale.getDefault(),getString(R.string.loading_file), "/sdcard/nh_files/deauth/whitelist.txt"));

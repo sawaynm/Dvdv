@@ -15,7 +15,6 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -33,11 +32,12 @@ import com.offsec.nethunter.utils.NhPaths;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class KaliServicesRecyclerViewAdapter extends RecyclerView.Adapter<KaliServicesRecyclerViewAdapter.ItemViewHolder> implements Filterable {
-	private static final String TAG = "KaliServiceRecycleView";
-	private Context context;
-	private List<KaliServicesModel> kaliServicesModelList;
+	public static final String TAG = "KaliServiceRecycleView";
+	private final Context context;
+	private final List<KaliServicesModel> kaliServicesModelList;
 
 	public KaliServicesRecyclerViewAdapter(Context context, List<KaliServicesModel> kaliServicesModelList){
 		this.context = context;
@@ -199,8 +199,7 @@ public class KaliServicesRecyclerViewAdapter extends RecyclerView.Adapter<KaliSe
 		return KaliServicesModelListFilter;
 	}
 
-	private Filter KaliServicesModelListFilter = new Filter() {
-
+	private final Filter KaliServicesModelListFilter = new Filter() {
 		@Override
 		protected FilterResults performFiltering(CharSequence constraint) {
 			FilterResults results = new FilterResults();
@@ -221,18 +220,18 @@ public class KaliServicesRecyclerViewAdapter extends RecyclerView.Adapter<KaliSe
 
 		@Override
 		protected void publishResults(CharSequence constraint, FilterResults results) {
-			KaliServicesData.getInstance().getKaliServicesModels().getValue().clear();
+			Objects.requireNonNull(KaliServicesData.getInstance().getKaliServicesModels().getValue()).clear();
 			KaliServicesData.getInstance().getKaliServicesModels().getValue().addAll((List<KaliServicesModel>) results.values);
 			KaliServicesData.getInstance().getKaliServicesModels().postValue(KaliServicesData.getInstance().getKaliServicesModels().getValue());
 		}
 	};
 
 	class ItemViewHolder extends RecyclerView.ViewHolder{
-		private TextView nametextView;
+		private final TextView nametextView;
 		//private Button editbutton;
-		private Switch mSwitch;
-		private CheckBox runOnChrootStartCheckbox;
-		private TextView statustextView;
+		private final Switch mSwitch;
+		private final CheckBox runOnChrootStartCheckbox;
+		private final TextView statustextView;
 
 		private ItemViewHolder(View view){
 			super(view);
@@ -243,8 +242,8 @@ public class KaliServicesRecyclerViewAdapter extends RecyclerView.Adapter<KaliSe
 			statustextView = view.findViewById(R.id.f_kaliservices_recyclerview_serviceresult_tv);
 			//WearOS optimisation
 			SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-			Boolean iswatch = sharedpreferences.getBoolean("running_on_wearos", false);
-			if(iswatch) {
+			boolean iswatch = sharedpreferences.getBoolean("running_on_wearos", false);
+			if (iswatch) {
 				runOnChrootStartCheckbox.setVisibility(View.GONE);
 			}
 		}

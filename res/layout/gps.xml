@@ -16,7 +16,7 @@
         android:padding="4dp"
         android:text="@string/gps_description" />
 
-    <Switch
+    <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/switch_gps_provider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -26,7 +26,7 @@
         android:textOff="Off"
         android:textOn="On" />
 
-    <Switch
+    <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/switch_gpsd"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

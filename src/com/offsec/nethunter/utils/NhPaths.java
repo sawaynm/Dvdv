@@ -17,6 +17,7 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
     private static NhPaths instance;
     private SharedPreferences sharedPreferences;
 
+    public static String APP;
     public static String APP_PATH;
     public static String APP_DATABASE_PATH;
     public static String APP_INITD_PATH;
@@ -41,8 +42,9 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
     private NhPaths(Context context) {
         sharedPreferences = context.getApplicationContext().getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-        APP_PATH                        = context.getApplicationContext().getFilesDir().getPath();
-        APP_DATABASE_PATH               = APP_PATH.replace("/files", "/databases");
+        APP                             = "com.offsec.nethunter";                // Static app name seems to be needed as some weirdness with getting app name is going on ( sometimes we get: androidx.multidex )
+        APP_PATH                        = "/data/data/" + APP;                   // context.getApplicationContext().getFilesDir().getPath();
+        APP_DATABASE_PATH               = APP_PATH + "/databases";
         APP_INITD_PATH                  = APP_PATH + "/etc/init.d";
         APP_SCRIPTS_PATH                = APP_PATH + "/scripts";
         APP_SCRIPTS_BIN_PATH            = APP_SCRIPTS_PATH + "/bin";

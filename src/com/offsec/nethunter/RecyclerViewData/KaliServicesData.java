@@ -12,16 +12,17 @@ import com.offsec.nethunter.utils.NhPaths;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class KaliServicesData {
 	private static KaliServicesData instance;
 	public static boolean isDataInitiated = false;
-	private ArrayList<KaliServicesModel> kaliServicesModelArrayList = new ArrayList<>();
-	private MutableLiveData<List<KaliServicesModel>> data = new MutableLiveData<>();
+	private final ArrayList<KaliServicesModel> kaliServicesModelArrayList = new ArrayList<>();
+	private final MutableLiveData<List<KaliServicesModel>> data = new MutableLiveData<>();
 	public List<KaliServicesModel> kaliServicesModelListFull;
-	private List<KaliServicesModel> copyOfKaliServicesModelListFull = new ArrayList<>();
+	private final List<KaliServicesModel> copyOfKaliServicesModelListFull = new ArrayList<>();
 
-	public synchronized static KaliServicesData getInstance(){
+	public static synchronized KaliServicesData getInstance(){
 		if (instance == null) {
 			instance = new KaliServicesData();
 		}
@@ -31,7 +32,7 @@ public class KaliServicesData {
 	public MutableLiveData<List<KaliServicesModel>> getKaliServicesModels(Context context){
 		if (!isDataInitiated) {
 			data.setValue(KaliServicesSQL.getInstance(context).bindData(kaliServicesModelArrayList));
-			kaliServicesModelListFull = new ArrayList<>(data.getValue());
+			kaliServicesModelListFull = new ArrayList<>(Objects.requireNonNull(data.getValue()));
 			isDataInitiated = true;
 		}
 		return data;
@@ -46,12 +47,12 @@ public class KaliServicesData {
 		kaliServicesAsyncTask.setListener(new KaliServicesAsyncTask.KaliServicesAsyncTaskListener() {
 			@Override
 			public void onAsyncTaskPrepare() {
-
+				// TODO document why this method is empty
 			}
 
 			@Override
 			public void onAsyncTaskFinished(List<KaliServicesModel> kaliServicesModelList) {
-				getKaliServicesModels().getValue().clear();
+				Objects.requireNonNull(getKaliServicesModels().getValue()).clear();
 				getKaliServicesModels().getValue().addAll(kaliServicesModelList);
 				getKaliServicesModels().postValue(getKaliServicesModels().getValue());
 			}
@@ -71,7 +72,7 @@ public class KaliServicesData {
 			public void onAsyncTaskFinished(List<KaliServicesModel> kaliServicesModelList) {
 				mSwitch.setEnabled(true);
 				mSwitch.setChecked(kaliServicesModelList.get(position).getStatus().startsWith("[+]"));
-				getKaliServicesModels().getValue().clear();
+				Objects.requireNonNull(getKaliServicesModels().getValue()).clear();
 				getKaliServicesModels().getValue().addAll(kaliServicesModelList);
 				getKaliServicesModels().postValue(getKaliServicesModels().getValue());
 				if (!mSwitch.isChecked()) NhPaths.showMessage(context, "Failed starting " + getKaliServicesModels().getValue().get(position).getServiceName() + " service");
@@ -92,7 +93,7 @@ public class KaliServicesData {
 			public void onAsyncTaskFinished(List<KaliServicesModel> kaliServicesModelList) {
 				mSwitch.setEnabled(true);
 				mSwitch.setChecked(kaliServicesModelList.get(position).getStatus().startsWith("[+]"));
-				getKaliServicesModels().getValue().clear();
+				Objects.requireNonNull(getKaliServicesModels().getValue()).clear();
 				getKaliServicesModels().getValue().addAll(kaliServicesModelList);
 				getKaliServicesModels().postValue(getKaliServicesModels().getValue());
 				if (mSwitch.isChecked()) NhPaths.showMessage(context, "Failed stopping " + getKaliServicesModels().getValue().get(position).getServiceName() + " service");
@@ -101,18 +102,18 @@ public class KaliServicesData {
 		kaliServicesAsyncTask.execute(getInitCopyOfKaliServicesModelListFull());
 	}
 
-	public void editData(int position, ArrayList<String> dataArrayList, KaliServicesSQL kaliServicesSQL){
-		KaliServicesAsyncTask kaliServicesAsyncTask = new KaliServicesAsyncTask(KaliServicesAsyncTask.EDITDATA, position, dataArrayList, kaliServicesSQL);
+	public void editData(int position, List<String> dataArrayList, KaliServicesSQL kaliServicesSQL){
+		KaliServicesAsyncTask kaliServicesAsyncTask = new KaliServicesAsyncTask(KaliServicesAsyncTask.EDITDATA, position, (ArrayList<String>) dataArrayList, kaliServicesSQL);
 		kaliServicesAsyncTask.setListener(new KaliServicesAsyncTask.KaliServicesAsyncTaskListener() {
 			@Override
 			public void onAsyncTaskPrepare() {
-
+				// TODO document why this method is empty
 			}
 
 			@Override
 			public void onAsyncTaskFinished(List<KaliServicesModel> kaliServicesModelList) {
 				updateKaliServicesModelListFull(kaliServicesModelList);
-				getKaliServicesModels().getValue().clear();
+				Objects.requireNonNull(getKaliServicesModels().getValue()).clear();
 				getKaliServicesModels().getValue().addAll(kaliServicesModelList);
 				getKaliServicesModels().postValue(getKaliServicesModels().getValue());
 			}
@@ -120,18 +121,18 @@ public class KaliServicesData {
 		kaliServicesAsyncTask.execute(getInitCopyOfKaliServicesModelListFull());
 	}
 
-	public void addData(int position, ArrayList<String> dataArrayList, KaliServicesSQL kaliServicesSQL){
-		KaliServicesAsyncTask kaliServicesAsyncTask = new KaliServicesAsyncTask(KaliServicesAsyncTask.ADDDATA, position, dataArrayList, kaliServicesSQL);
+	public void addData(int position, List<String> dataArrayList, KaliServicesSQL kaliServicesSQL){
+		KaliServicesAsyncTask kaliServicesAsyncTask = new KaliServicesAsyncTask(KaliServicesAsyncTask.ADDDATA, position, (ArrayList<String>) dataArrayList, kaliServicesSQL);
 		kaliServicesAsyncTask.setListener(new KaliServicesAsyncTask.KaliServicesAsyncTaskListener() {
 			@Override
 			public void onAsyncTaskPrepare() {
-
+				// TODO document why this method is empty
 			}
 
 			@Override
 			public void onAsyncTaskFinished(List<KaliServicesModel> kaliServicesModelList) {
 				updateKaliServicesModelListFull(kaliServicesModelList);
-				getKaliServicesModels().getValue().clear();
+				Objects.requireNonNull(getKaliServicesModels().getValue()).clear();
 				getKaliServicesModels().getValue().addAll(kaliServicesModelList);
 				getKaliServicesModels().postValue(getKaliServicesModels().getValue());
 			}
@@ -139,18 +140,18 @@ public class KaliServicesData {
 		kaliServicesAsyncTask.execute(getInitCopyOfKaliServicesModelListFull());
 	}
 
-	public void deleteData(ArrayList<Integer> selectedPositionsIndex, ArrayList<Integer> selectedTargetIds, KaliServicesSQL kaliServicesSQL){
-		KaliServicesAsyncTask kaliServicesAsyncTask = new KaliServicesAsyncTask(KaliServicesAsyncTask.DELETEDATA, selectedPositionsIndex, selectedTargetIds, kaliServicesSQL);
+	public void deleteData(List<Integer> selectedPositionsIndex, List<Integer> selectedTargetIds, KaliServicesSQL kaliServicesSQL){
+		KaliServicesAsyncTask kaliServicesAsyncTask = new KaliServicesAsyncTask(KaliServicesAsyncTask.DELETEDATA, (ArrayList<Integer>) selectedPositionsIndex, (ArrayList<Integer>) selectedTargetIds, kaliServicesSQL);
 		kaliServicesAsyncTask.setListener(new KaliServicesAsyncTask.KaliServicesAsyncTaskListener() {
 			@Override
 			public void onAsyncTaskPrepare() {
-
+				// TODO document why this method is empty
 			}
 
 			@Override
 			public void onAsyncTaskFinished(List<KaliServicesModel> kaliServicesModelList) {
 				updateKaliServicesModelListFull(kaliServicesModelList);
-				getKaliServicesModels().getValue().clear();
+				Objects.requireNonNull(getKaliServicesModels().getValue()).clear();
 				getKaliServicesModels().getValue().addAll(kaliServicesModelList);
 				getKaliServicesModels().postValue(getKaliServicesModels().getValue());
 			}
@@ -163,13 +164,13 @@ public class KaliServicesData {
 		kaliServicesAsyncTask.setListener(new KaliServicesAsyncTask.KaliServicesAsyncTaskListener() {
 			@Override
 			public void onAsyncTaskPrepare() {
-
+				// TODO document why this method is empty
 			}
 
 			@Override
 			public void onAsyncTaskFinished(List<KaliServicesModel> kaliServicesModelList) {
 				updateKaliServicesModelListFull(kaliServicesModelList);
-				getKaliServicesModels().getValue().clear();
+				Objects.requireNonNull(getKaliServicesModels().getValue()).clear();
 				getKaliServicesModels().getValue().addAll(kaliServicesModelList);
 				getKaliServicesModels().postValue(getKaliServicesModels().getValue());
 			}
@@ -188,13 +189,13 @@ public class KaliServicesData {
 			kaliServicesAsyncTask.setListener(new KaliServicesAsyncTask.KaliServicesAsyncTaskListener() {
 				@Override
 				public void onAsyncTaskPrepare() {
-
+					// TODO document why this method is empty
 				}
 
 				@Override
 				public void onAsyncTaskFinished(List<KaliServicesModel> kaliServicesModelList) {
 					updateKaliServicesModelListFull(kaliServicesModelList);
-					getKaliServicesModels().getValue().clear();
+					Objects.requireNonNull(getKaliServicesModels().getValue()).clear();
 					getKaliServicesModels().getValue().addAll(kaliServicesModelList);
 					getKaliServicesModels().postValue(getKaliServicesModels().getValue());
 					refreshData();
@@ -213,13 +214,13 @@ public class KaliServicesData {
 		kaliServicesAsyncTask.setListener(new KaliServicesAsyncTask.KaliServicesAsyncTaskListener() {
 			@Override
 			public void onAsyncTaskPrepare() {
-
+				// TODO document why this method is empty
 			}
 
 			@Override
 			public void onAsyncTaskFinished(List<KaliServicesModel> kaliServicesModelList) {
 				updateKaliServicesModelListFull(kaliServicesModelList);
-				getKaliServicesModels().getValue().clear();
+				Objects.requireNonNull(getKaliServicesModels().getValue()).clear();
 				getKaliServicesModels().getValue().addAll(kaliServicesModelList);
 				getKaliServicesModels().postValue(getKaliServicesModels().getValue());
 				refreshData();
@@ -228,18 +229,18 @@ public class KaliServicesData {
 		kaliServicesAsyncTask.execute(getInitCopyOfKaliServicesModelListFull());
 	}
 
-	public void updateRunOnChrootStartServices(int position, ArrayList<String> dataArrayList, KaliServicesSQL kaliServicesSQL) {
-		KaliServicesAsyncTask kaliServicesAsyncTask = new KaliServicesAsyncTask(KaliServicesAsyncTask.UPDATE_RUNONCHROOTSTART_SCRIPTS, position, dataArrayList, kaliServicesSQL);
+	public void updateRunOnChrootStartServices(int position, List<String> dataArrayList, KaliServicesSQL kaliServicesSQL) {
+		KaliServicesAsyncTask kaliServicesAsyncTask = new KaliServicesAsyncTask(KaliServicesAsyncTask.UPDATE_RUNONCHROOTSTART_SCRIPTS, position, (ArrayList<String>) dataArrayList, kaliServicesSQL);
 		kaliServicesAsyncTask.setListener(new KaliServicesAsyncTask.KaliServicesAsyncTaskListener() {
 			@Override
 			public void onAsyncTaskPrepare() {
-
+				// TODO document why this method is empty
 			}
 
 			@Override
 			public void onAsyncTaskFinished(List<KaliServicesModel> kaliServicesModelList) {
 				updateKaliServicesModelListFull(kaliServicesModelList);
-				getKaliServicesModels().getValue().clear();
+				Objects.requireNonNull(getKaliServicesModels().getValue()).clear();
 				getKaliServicesModels().getValue().addAll(kaliServicesModelList);
 				getKaliServicesModels().postValue(getKaliServicesModels().getValue());
 			}
@@ -257,5 +258,4 @@ public class KaliServicesData {
 		copyOfKaliServicesModelListFull.addAll(kaliServicesModelListFull);
 		return copyOfKaliServicesModelListFull;
 	}
-
 }
