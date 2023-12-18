@@ -399,7 +399,7 @@ public class VNCFragment extends Fragment {
             }
         });
         addClickListener(SetupVNCButton, v -> {
-            String desktop = exe.RunAsRootOutput(nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd dkpg -l | grep kali-desktop");
+            String desktop = exe.RunAsRootOutput(nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd dpkg -l | grep kali-desktop");
             if (desktop.equals("")) {
                 desktopDialog();
             } else run_cmd("echo -ne \"\\033]0;Setting up Server\\007\" && clear;chmod +x ~/.vnc/xstartup && clear;echo $'\n'\"Please enter your new VNC server password\"$'\n' && sudo -u " + selected_user + " vncpasswd && sleep 2 && exit"); // since is a kali command we can send it as is
