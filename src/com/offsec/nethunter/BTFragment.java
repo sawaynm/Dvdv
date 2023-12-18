@@ -1196,7 +1196,7 @@ public class BTFragment extends Fragment {
             StartBadBtButton.setOnClickListener( v -> {
                     if (selected_badbtmode.equals("Send strings")) {
                         String BadBT_string = badbt_string.getText().toString();
-                        exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd python3 /root/badbt/send_string.py '" + BadBT_string + "' " + prefixCMD + " " + uacCMD});
+                        run_cmd("python3 /root/badbt/send_string.py '" + BadBT_string + "' " + prefixCMD + " " + uacCMD);
                         Toast.makeText(getActivity().getApplicationContext(), "Sending strings..", Toast.LENGTH_SHORT).show();
                         } else if (selected_badbtmode.equals("Interactive")) {
                         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getActivity(), R.style.DialogStyleCompat);
