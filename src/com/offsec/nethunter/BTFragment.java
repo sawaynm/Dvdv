@@ -1196,7 +1196,7 @@ public class BTFragment extends Fragment {
             StartBadBtButton.setOnClickListener( v -> {
                     if (selected_badbtmode.equals("Send strings")) {
                         String BadBT_string = badbt_string.getText().toString();
-                        run_cmd("python3 /root/badbt/send_string.py '" + BadBT_string + "' " + prefixCMD + " " + uacCMD);
+                        run_cmd("python3 /root/badbt/send_string.py '" + BadBT_string + "' " + prefixCMD + " " + uacCMD + ";sleep 2 && echo 'Exiting..' && exit");
                         Toast.makeText(getActivity().getApplicationContext(), "Sending strings..", Toast.LENGTH_SHORT).show();
                         } else if (selected_badbtmode.equals("Interactive")) {
                         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getActivity(), R.style.DialogStyleCompat);
