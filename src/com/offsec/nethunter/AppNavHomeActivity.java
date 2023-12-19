@@ -94,6 +94,21 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         // Also with its sharepreference listener registered, the CHROOT_PATH variable can be updated immediately on sharepreference changes.
         nhPaths = NhPaths.getInstance(getApplicationContext());
 
+        // We need to run root check here so nothing else dosent pile up with dialogs
+        if (!CheckForRoot.isRoot()){
+            showWarningDialog("Root permission", "Root permission is required!!", false);
+        }
+
+        // This function just delays here until root is given.
+        // Purpose: don't run anything else until root access is given :)
+        while (!CheckForRoot.isRoot()) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                showWarningDialog("NetHunter app cannot be run properly", "Root permission is required!!", true);
+            }
+        }
+
         // Initiate the PermissionCheck class.
         permissionCheck = new PermissionCheck(this, getApplicationContext());
         // Register the NetHunter receiver with intent actions.
@@ -118,7 +133,6 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
 
             @Override
             public void onAsyncTaskFinished(Object result) {
-
                 // Fetch the busybox path again after the busybox_nh is copied.
                 NhPaths.BUSYBOX = NhPaths.getBusyboxPath();
 
@@ -131,12 +145,6 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
 
                 // Setup the default SharePreference value.
                 setDefaultSharePreference();
-
-                // After finishing copying app files, we do a compatibility check before allowing user to use it.
-                // First, check if the app has gained the root already.
-                if (!CheckForRoot.isRoot()){
-                    showWarningDialog("NetHunter app cannot be run properly", "Root permission is required!!", true);
-                }
 
                 // Secondly, check if busybox is present.
                 if (!CheckForRoot.isBusyboxInstalled()){
@@ -330,6 +338,8 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     @Override
     protected void onStart() {
         super.onStart();
+
+        // Run CompatCheck Service
         if (navigationView != null) startService(new Intent(getApplicationContext(), CompatCheckService.class));
     }
 
