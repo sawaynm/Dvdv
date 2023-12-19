@@ -402,7 +402,12 @@ public class VNCFragment extends Fragment {
             String desktop = exe.RunAsRootOutput(nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd dpkg -l | grep kali-desktop");
             if (desktop.equals("")) {
                 desktopDialog();
-            } else run_cmd("echo -ne \"\\033]0;Setting up Server\\007\" && clear;chmod +x ~/.vnc/xstartup && clear;echo $'\n'\"Please enter your new VNC server password\"$'\n' && sudo -u " + selected_user + " vncpasswd && sleep 2 && exit"); // since is a kali command we can send it as is
+            } else {
+                if (iswatch) {
+                    Toast.makeText(getActivity().getApplicationContext(), "Use password 123456 with root user for KeX on Smartwatch.", Toast.LENGTH_LONG).show();
+                    run_cmd("echo -ne \"\\033]0;KeX Setup\\007\" && clear;echo 'Setting root:123456 KeX credentials..' && sleep 2 && echo 123456\\\\n123456\\\\nn\\\\n | vncpasswd;echo 'Done! Exiting..' && sleep 2 && exit");
+                } else run_cmd("echo -ne \"\\033]0;Setting up Server\\007\" && clear;chmod +x ~/.vnc/xstartup && clear;echo $'\n'\"Please enter your new VNC server password\"$'\n' && sudo -u " + selected_user + " vncpasswd && sleep 2 && exit"); // since is a kali command we can send it as is
+            }
         });
         addClickListener(StartVNCButton, v -> {
             if(selected_user.equals("root")) {
@@ -714,7 +719,7 @@ public class VNCFragment extends Fragment {
         dbusbuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                run_cmd("echo -ne \"\\033]0;Installing XFCE\\007\" && clear;apt update && apt install -y kali-desktop-xfce tigervnc-standalone-server dbus-x11");
+                run_cmd("echo -ne \"\\033]0;Installing XFCE\\007\" && clear;apt update && apt install -y kali-desktop-xfce tigervnc-standalone-server dbus-x11;apt clean; echo 'Done! Exiting..' && sleep 2 && exit");
             }
         });
         dbusbuilder.setNegativeButton("No", (dialog, whichButton) -> {

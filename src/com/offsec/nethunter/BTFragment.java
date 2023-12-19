@@ -1196,14 +1196,14 @@ public class BTFragment extends Fragment {
             StartBadBtButton.setOnClickListener( v -> {
                     if (selected_badbtmode.equals("Send strings")) {
                         String BadBT_string = badbt_string.getText().toString();
-                        run_cmd("python3 /root/badbt/send_string.py '" + BadBT_string + "' " + prefixCMD + " " + uacCMD + ";sleep 2 && echo 'Exiting..' && exit");
+                        run_cmd("echo -ne \"\\033]0;BadBT Send Strings\\007\" && clear;python3 /root/badbt/send_string.py '" + BadBT_string + "' " + prefixCMD + " " + uacCMD + ";sleep 2 && echo 'Exiting..' && exit");
                         Toast.makeText(getActivity().getApplicationContext(), "Sending strings..", Toast.LENGTH_SHORT).show();
                         } else if (selected_badbtmode.equals("Interactive")) {
                         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getActivity(), R.style.DialogStyleCompat);
                         builder.setTitle("Are you sure?");
                         builder.setMessage("Interactive mode will run in NetHunter terminal, but needs a physical keyboard connected as of now.");
                         builder.setPositiveButton("Ok", (dialog, which) -> {
-                            run_cmd("python3 /root/badbt/kb_client.py");
+                            run_cmd("echo -ne \"\\033]0;BadBT Client\\007\" && clear;python3 /root/badbt/kb_client.py");
                             Toast.makeText(getActivity().getApplicationContext(), "Starting keyboard client..", Toast.LENGTH_SHORT).show();
                         });
                         builder.setNegativeButton("Cancel", (dialog, which) -> {
