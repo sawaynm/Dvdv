@@ -132,10 +132,9 @@ public class SearchSploitFragment extends Fragment {
                             // Search List
                             //String sd = NhPaths.SD_PATH;
                             String sd = "/sdcard";
-                            //String data = NhPaths.APP_PATH;
-                            String data = "/data/data/com.offsec.nethunter/files/";
+                            String data = NhPaths.APP_PATH + "/";
                             String DATABASE_NAME = "SearchSploit";
-                            String currentDBPath = "../databases/" + DATABASE_NAME;
+                            String currentDBPath = "databases/" + DATABASE_NAME;
                             String backupDBPath = "/nh_files/" + DATABASE_NAME; // From SD directory.
 
                             File backupDB = new File(data, currentDBPath);
@@ -308,10 +307,8 @@ class ExploitLoader extends BaseAdapter {
     private final Context _mContext;
 
     ExploitLoader(Context context, List<SearchSploit> exploitList) {
-
         _mContext = context;
         _exploitList = exploitList;
-
     }
 
     static class ViewHolderItem {
@@ -337,8 +334,9 @@ class ExploitLoader extends BaseAdapter {
 
     private void start(String file) {
         String[] command = new String[1];
-        command[0] = "su -mm -c /data/data/com.offsec.nethunter/files/scripts/bootkali file2hid-file " + file;
-        String test = "su -mm -c /data/data/com.offsec.nethunter/files/scripts/bootkali file2hid-file " + file;
+        String nhpath = NhPaths.APP_PATH;
+        command[0] = "su -mm -c " + nhpath + "/scripts/bootkali file2hid-file " + file;
+        String test = "su -mm -c " + nhpath + "/scripts/bootkali file2hid-file " + file;
         Log.d("Exe:", test);
         ShellExecuter exe = new ShellExecuter();
         exe.RunAsRoot(command);
@@ -360,7 +358,7 @@ class ExploitLoader extends BaseAdapter {
             vH.description = convertView.findViewById(R.id.description);
             // vH.cwSwich = (Switch) convertView.findViewById(R.id.switch1);
             vH.type = convertView.findViewById(R.id.type);
-	    vH.platform = convertView.findViewById(R.id.platform);
+	        vH.platform = convertView.findViewById(R.id.platform);
             vH.author = convertView.findViewById(R.id.author);
             vH.date = convertView.findViewById(R.id.exploit_date);
             vH.viewSource = convertView.findViewById(R.id.viewSource);
@@ -389,7 +387,7 @@ class ExploitLoader extends BaseAdapter {
         // set service name
         vH.description.setText(_desc);
         vH.type.setText(_type);
-	vH.platform.setText(_platform);
+	    vH.platform.setText(_platform);
         vH.author.setText(_author);
         vH.date.setText(_date);
         vH.viewSource.setOnClickListener(v -> {
