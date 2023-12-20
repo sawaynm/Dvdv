@@ -229,7 +229,7 @@ if [ ! $# -eq 0 ]; then
                         $BUSYBOX sync
                     elif echo $2 | grep -q ".tar.xz$"; then
                         if [ -z "$XZ" ]; then
-                            bklog "[-] Sorry, you must use /data/data/com.offsec.nethunter/files/scripts/bin/xz to get xz work here."
+                            bklog "[-] Sorry, you must use /data/data/com.offsec.nethunter/scripts/bin/xz to get xz work here."
                             bklog "[-] Or check if the execute permission of xz is granted."
                             bklog "[-] Or please choose to compress with .tar.gz instead."
                         else
