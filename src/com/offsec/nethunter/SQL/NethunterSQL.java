@@ -1,6 +1,5 @@
 package com.offsec.nethunter.SQL;
 
-import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -8,7 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.offsec.nethunter.BuildConfig;
 import com.offsec.nethunter.models.NethunterModel;
@@ -20,26 +18,24 @@ import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 
- /*
-    SQLiteOpenHelper class for nethunter fragment.
- */
+
 public class NethunterSQL extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "NethunterFragment";
     private static NethunterSQL instance;
     private static final String TAG = "NethunterSQL";
     private static final String TABLE_NAME = DATABASE_NAME;
-    private static ArrayList<String> COLUMNS = new ArrayList<>();
+    private static final ArrayList<String> COLUMNS = new ArrayList<>();
     private static final String[][] nethunterData = {
             {"1", "Kernel Version", "uname -a", "\\n", "1"},
             {"2", "Busybox Version", "/data/data/com.offsec.nethunter/scripts/bin/busybox_nh | head -n1", "\\n", "1"},
             {"3", "Root Status", "su -v", "\\n", "1"},
             {"4", "HID status", "ls /dev/hidg* || { echo \"HID interface not found.\" && if [[ $(uname -r) == 4.* || 5.* ]]; then echo \"Please enable in USB Arsenal\";fi }", "\\n", "1"},
-            {"5", "Nethunter Terminal Status", "[ \"$(pm list packages | grep 'com.offsec.nhterm')\" ] && echo \"Nethunter Terminal is installed.\" || echo \"Nethunter Terminal is NOT yet installed.\"", "\\n", "1"},
+            {"5", "NetHunter Terminal Status", "[ \"$(pm list packages | grep 'com.offsec.nhterm')\" ] && echo \"NetHunter Terminal is installed.\" || echo \"NetHunter Terminal is NOT yet installed.\"", "\\n", "1"},
             {"6", "Network Interface Status", " ip -o addr show | " + NhPaths.BUSYBOX + " awk '{print $2, $3, $4}'", "\\n", "1"},
             {"7", "External IP", NhPaths.BUSYBOX + " wget -qO - icanhazip.com || curl ipv4.icanhazip.com", "\\n", "0"}
     };
 
-    public synchronized static NethunterSQL getInstance(Context context){
+    public static synchronized NethunterSQL getInstance(Context context){
         if (instance == null) {
             instance = new NethunterSQL(context.getApplicationContext());
         }
@@ -84,11 +80,21 @@ public class NethunterSQL extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " ORDER BY " + COLUMNS.get(0) + ";", null);
         while (cursor.moveToNext()) {
+            int columnIndex1 = cursor.getColumnIndex(COLUMNS.get(1));
+            int columnIndex2 = cursor.getColumnIndex(COLUMNS.get(2));
+            int columnIndex3 = cursor.getColumnIndex(COLUMNS.get(3));
+            int columnIndex4 = cursor.getColumnIndex(COLUMNS.get(4));
+
+            String columnValue1 = columnIndex1 != -1 ? cursor.getString(columnIndex1) : null;
+            String columnValue2 = columnIndex2 != -1 ? cursor.getString(columnIndex2) : null;
+            String columnValue3 = columnIndex3 != -1 ? cursor.getString(columnIndex3) : null;
+            String columnValue4 = columnIndex4 != -1 ? cursor.getString(columnIndex4) : null;
+
             nethunterModelArrayList.add(new NethunterModel(
-                    cursor.getString(cursor.getColumnIndex(COLUMNS.get(1))),
-                    cursor.getString(cursor.getColumnIndex(COLUMNS.get(2))),
-                    cursor.getString(cursor.getColumnIndex(COLUMNS.get(3))),
-                    cursor.getString(cursor.getColumnIndex(COLUMNS.get(4))),
+                    columnValue1,
+                    columnValue2,
+                    columnValue3,
+                    columnValue4,
                     "".split("\\n")
             ));
         }
