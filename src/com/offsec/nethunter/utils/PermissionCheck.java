@@ -6,12 +6,13 @@ import android.content.pm.PackageManager;
 import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 
 public class PermissionCheck {
     private static final String TAG = "PermissionCheck";
     private Activity activity;
     private Context context;
-
     public static final int DEFAULT_PERMISSION_RQCODE = 1;
     public static final int NH_TERM_PERMISSIONS_RQCODE = 2;
 
@@ -39,7 +40,7 @@ public class PermissionCheck {
     private boolean hasPermissions(Context context, String... permissions) {
         if (context != null && permissions != null) {
             for (String permission : permissions) {
-                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                if (ContextCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
                     return false;
                 }
             }
@@ -49,7 +50,7 @@ public class PermissionCheck {
 
     public boolean isAllPermitted(String[] PERMISSIONS){
         for (String permissions:PERMISSIONS){
-            if (ActivityCompat.checkSelfPermission(context, permissions) != PackageManager.PERMISSION_GRANTED){
+            if (ContextCompat.checkSelfPermission(context, permissions) != PackageManager.PERMISSION_GRANTED){
                 Log.e(TAG, "Permissions are NOT all granted.");
                 return false;
             }
@@ -57,5 +58,4 @@ public class PermissionCheck {
         Log.d(TAG, "All permissions are granted.");
         return true;
     }
-
 }
