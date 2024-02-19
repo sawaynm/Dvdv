@@ -29,7 +29,6 @@
                 android:layout_height="1dp"
                 android:background="?android:attr/listDivider" />
 
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -46,15 +45,15 @@
                     android:text="Wireless interface:"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
 
-                <EditText
+                <TextView
                     android:id="@+id/wps_iface"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:ems="10"
-                    android:inputType="number"
-                    android:text="wlan0" />
+                    android:layout_height="wrap_content" />
 
+                <Spinner
+                    android:id="@+id/spinner2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
             </LinearLayout>
 
             <Spinner
@@ -89,7 +88,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Reset interface"/>
-
             </LinearLayout>
 
             <LinearLayout
@@ -117,7 +115,6 @@
                     android:layout_weight="1"
                     android:text="Pixie Force"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
-
             </LinearLayout>
 
             <LinearLayout
@@ -145,7 +142,6 @@
                     android:layout_weight="1"
                     android:text="Custom PIN"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
-
             </LinearLayout>
 
             <LinearLayout
@@ -173,7 +169,6 @@
                     android:layout_weight="1"
                     android:text="WPS Button"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
-
             </LinearLayout>
 
             <LinearLayout
@@ -203,7 +198,6 @@
                     android:ems="10"
                     android:hint="12345678"
                     android:inputType="number" />
-
             </LinearLayout>
 
             <LinearLayout
@@ -244,9 +238,6 @@
                 android:paddingTop="10dp"
                 android:text="seconds"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
-
-
-
             </LinearLayout>
 
             <Button
@@ -270,9 +261,6 @@
                 android:singleLine="false"
                 android:textSize="13sp"
                 android:visibility="gone"/>
-
         </LinearLayout>
-
 </ScrollView>
-
 </LinearLayout>
