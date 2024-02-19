@@ -35,6 +35,7 @@ import com.offsec.nethunter.viewmodels.NethunterViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -113,7 +114,7 @@ public class NetHunterFragment extends Fragment {
         //WearOS optimisation
         TextView NHDesc = view.findViewById(R.id.f_nethunter_banner2);
         LinearLayout NHButtons = view.findViewById(R.id.f_nethunter_linearlayoutBtn);
-        boolean iswatch = getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
+        boolean iswatch = requireActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
 
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
         sharedpreferences.edit().putBoolean("running_on_wearos", iswatch).apply();
@@ -132,15 +133,16 @@ public class NetHunterFragment extends Fragment {
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
 
         //WearOS optimisation
-        Boolean iswatch = getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
+        Boolean iswatch = requireActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
         Boolean snowfall;
-        if(iswatch) {
+        if (iswatch) {
             snowfall = sharedpreferences.getBoolean("snowfall_enabled", false);
             searchItem.setVisible(false);
         } else {
             snowfall = sharedpreferences.getBoolean("snowfall_enabled", true);
         }
         final SearchView searchView = (SearchView) searchItem.getActionView();
+        assert searchView != null;
         searchView.setOnSearchClickListener(v -> menu.setGroupVisible(R.id.f_nethunter_menu_group1, false));
         searchView.setOnCloseListener(() -> {
             menu.setGroupVisible(R.id.f_nethunter_menu_group1, true);
@@ -254,9 +256,9 @@ public class NetHunterFragment extends Fragment {
 
     private void trigger_snowfall(){
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-        Boolean iswatch = getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
+        Boolean iswatch = requireActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
         Boolean snowfall;
-        if(iswatch) {
+        if (iswatch) {
             snowfall = sharedpreferences.getBoolean("snowfall_enabled", false);
         } else {
             snowfall = sharedpreferences.getBoolean("snowfall_enabled", true);
@@ -264,11 +266,11 @@ public class NetHunterFragment extends Fragment {
         if (snowfall) {
             sharedpreferences.edit().putBoolean("snowfall_enabled", false).apply();
             snowfallButton.setIcon(R.drawable.snowflake_trigger_bw);
-            Toast.makeText(getActivity().getApplicationContext(), "Snowfall disabled. Restart app to take effect.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireActivity().getApplicationContext(), "Snowfall disabled. Restart app to take effect.", Toast.LENGTH_SHORT).show();
         } else {
             sharedpreferences.edit().putBoolean("snowfall_enabled", true).apply();
             snowfallButton.setIcon(R.drawable.snowflake_trigger);
-            Toast.makeText(getActivity().getApplicationContext(), "Snowfall enabled. Restart app to take effect.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireActivity().getApplicationContext(), "Snowfall enabled. Restart app to take effect.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -440,7 +442,7 @@ public class NetHunterFragment extends Fragment {
                             }
                         }
                     }
-                    if (selectedPosition.size() != 0) {
+                    if (!selectedPosition.isEmpty()) {
                         NethunterData.getInstance().deleteData(selectedPosition, selectedTargetIds, NethunterSQL.getInstance(context));
                         NhPaths.showMessage(context, "Successfully deleted " + selectedPosition.size() + " items.");
                         adDelete.dismiss();
