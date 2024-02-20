@@ -1,15 +1,8 @@
 package com.offsec.nethunter.gps;
 
-
 import java.util.Locale;
 
-/**
- * Created by Danial on 2/23/2015.
- * https://github.com/danialgoodwin/android-app-samples/blob/master/gps-satellite-nmea-info/app/src/main/java/net/simplyadvanced/gpsandsatelliteinfo/GpsPosition.java
- */
-
 public class GpsPosition {
-
     public float time = 0.0f;
     private float latitude = 0.0f;
     private float longitude = 0.0f;
@@ -18,8 +11,8 @@ public class GpsPosition {
     private float altitude = 0.0f;
     private float velocity = 0.0f;
 
-    public void updateIsfixed() {
-        boolean isFixed = quality > 0;
+    public boolean updateIsFixed() {
+        return quality > 0;
     }
 
     @Override
@@ -28,5 +21,4 @@ public class GpsPosition {
                         "direction: %f, altitude: %f, velocity: %f", latitude, longitude, time, quality,
                 direction, altitude, velocity);
     }
-
 }
