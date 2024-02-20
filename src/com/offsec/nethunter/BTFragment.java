@@ -45,7 +45,6 @@ import com.offsec.nethunter.utils.ShellExecuter;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -76,7 +75,6 @@ public class BTFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         View rootView = inflater.inflate(R.layout.bt, container, false);
         BTFragment.TabsPagerAdapter tabsPagerAdapter = new TabsPagerAdapter(getChildFragmentManager());
 
@@ -111,7 +109,7 @@ public class BTFragment extends Fragment {
             case R.id.update:
                 sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
                 iswatch = sharedpreferences.getBoolean("running_on_wearos", false);
-                if (iswatch) Toast.makeText(getActivity().getApplicationContext(), "Updates have to be done manually through adb shell. If anything gone wrong at first run, please run Setup again.", Toast.LENGTH_LONG).show();
+                if (iswatch) Toast.makeText(requireActivity().getApplicationContext(), "Updates have to be done manually through adb shell. If anything gone wrong at first run, please run Setup again.", Toast.LENGTH_LONG).show();
                 else RunUpdate();
                 return true;
             default:
@@ -170,7 +168,7 @@ public class BTFragment extends Fragment {
 
     public void RunSetup() {
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-        run_cmd("echo -ne \"\\033]0;BT Arsenal Setup\\007\" && clear;apt-get update && apt-get install bluetooth bluez bluez-tools bluez-obexd libbluetooth3 sox spooftooph libglib2.0*-dev " +
+        run_cmd("echo -ne \"\\033]0;BT Arsenal Setup\\007\" && clear;apt update && apt install bluetooth bluez bluez-tools bluez-obexd libbluetooth3 sox spooftooph libglib2.0*-dev " +
                         "libsystemd-dev python3-dbus python3-bluez python3-pyudev python3-evdev libbluetooth-dev redfang bluelog blueranger -y;" +
                         "if [[ -f /usr/bin/carwhisperer && -f /usr/bin/rfcomm_scan ]];then echo 'All scripts are installed!'; else " +
                         "git clone https://github.com/yesimxev/carwhisperer-0.2 /root/carwhisperer;" +
@@ -190,7 +188,7 @@ public class BTFragment extends Fragment {
 
     public void RunUpdate() {
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-        run_cmd("echo -ne \"\\033]0;BT Arsenal Update\\007\" && clear;apt-get update && apt-get install bluetooth bluez bluez-tools bluez-obexd libbluetooth3 sox spooftooph " +
+        run_cmd("echo -ne \"\\033]0;BT Arsenal Update\\007\" && clear;apt update && apt install bluetooth bluez bluez-tools bluez-obexd libbluetooth3 sox spooftooph " +
                 "libbluetooth-dev redfang bluelog blueranger libglib2.0*-dev libsystemd-dev python3-dbus python3-bluez python3-pyudev python3-evdev  -y;if [[ -f /usr/bin/carwhisperer && -f /usr/bin/rfcomm_scan && -f /root/bluebinder && -f /root/libgbinder && -f /root/libglibutil ]];" +
                 "then cd /root/carwhisperer/;git pull && make && make install;cd /root/bluebinder/;git pull && make && make install;cd /root/libgbinder/;git pull && make && " +
                 "make install-dev;cd /root/libglibutil/;git pull && make && make install-dev;cd /root/bt_audit; git pull; cd src && make;" +
@@ -266,13 +264,8 @@ public class BTFragment extends Fragment {
         @Override
         public void onResume(){
             super.onResume();
-            Toast.makeText(getActivity().getApplicationContext(), "Status updated", Toast.LENGTH_SHORT).show();
-            AsyncTask.execute(new Runnable() {
-                @Override
-                public void run() {
-                    refresh(getView().getRootView());
-                }
-            });
+            Toast.makeText(requireActivity().getApplicationContext(), "Status updated", Toast.LENGTH_SHORT).show();
+            AsyncTask.execute(() -> refresh(requireView().getRootView()));
         }
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -295,9 +288,10 @@ public class BTFragment extends Fragment {
 
             //First run
             Boolean setupdone = sharedpreferences.getBoolean("setup_done", false);
-            if (!setupdone.equals(true))
+            if (!setupdone.equals(true)) {
                 if (iswatch) SetupDialogWatch();
-                else SetupDialog();
+                SetupDialog();
+            }
 
             final Spinner ifaces = rootView.findViewById(R.id.hci_interface);
 
@@ -370,8 +364,8 @@ public class BTFragment extends Fragment {
                             File bluebinder = new File(NhPaths.CHROOT_PATH() + "/usr/sbin/bluebinder");
                             if (bluebinder.exists()) {
                                 exe.RunAsRoot(new String[]{"svc bluetooth disable"});
-                                run_cmd("echo -ne \"\\033]0;Bluebinder\\007\" && clear;bluebinder || bluebinder;exit");
-                                Toast.makeText(getActivity().getApplicationContext(), "Starting bluebinder...", Toast.LENGTH_SHORT).show();
+                                run_cmd("echo -ne \"\\033]0;Bluebinder\\007\" && clear;screen -A bluebinder || bluebinder;exit");
+                                Toast.makeText(requireActivity().getApplicationContext(), "Starting bluebinder...", Toast.LENGTH_SHORT).show();
                             } else {
                                 Toast.makeText(requireActivity().getApplicationContext(), "Bluebinder is not installed. Launching setup..", Toast.LENGTH_SHORT).show();
                                 RunSetup();
@@ -842,7 +836,6 @@ public class BTFragment extends Fragment {
                 }
                 @Override
                 public void onNothingSelected(AdapterView<?> parentView) {
-                    // TODO document why this method is empty
                 }
             });
 
@@ -902,7 +895,7 @@ public class BTFragment extends Fragment {
                         InputStream s = null;
                         try {
                             s = new FileInputStream(cw_listenfile);
-                        } catch (NullPointerException | FileNotFoundException e) {
+                        } catch (NullPointerException | IOException e) {
                             e.printStackTrace();
                         }
                         audioTrack.play();
@@ -910,11 +903,15 @@ public class BTFragment extends Fragment {
                         byte[] data = new byte[200];
                         int n = 0;
                         try {
-                            while ((n = s.read(data)) != -1)
+                            while (true) {
+                                assert s != null;
+                                if ((n = s.read(data)) == -1) break;
                                 synchronized (audioTrack) {
                                     audioTrack.write(data, 0, n);
                                 }
-                        } catch (IOException ignored) {
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
                     });
                 }
@@ -930,7 +927,6 @@ public class BTFragment extends Fragment {
         private Context context;
         private String selected_badbtmode;
         private String selected_preset;
-
         private String selected_preset_uac;
         private String selected_prefix;
         String prefixCMD = "";
@@ -946,13 +942,8 @@ public class BTFragment extends Fragment {
         @Override
         public void onResume(){
             super.onResume();
-            Toast.makeText(getActivity().getApplicationContext(), "Status updated", Toast.LENGTH_SHORT).show();
-            AsyncTask.execute(new Runnable() {
-                @Override
-                public void run() {
-                    refresh_badbt(getView().getRootView());
-                }
-            });
+            Toast.makeText(requireActivity().getApplicationContext(), "Status updated", Toast.LENGTH_SHORT).show();
+            AsyncTask.execute(() -> refresh_badbt(requireView().getRootView()));
         }
 
         @Override
@@ -961,7 +952,7 @@ public class BTFragment extends Fragment {
             View rootView = inflater.inflate(R.layout.bt_badbt, container, false);
             final Button badbtServerButton = rootView.findViewById(R.id.badbtserver_button);
             SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-            boolean iswatch = getContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
+            boolean iswatch = requireContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
 
             //Watch optimisation
             final TextView BadBTdesc = rootView.findViewById(R.id.badbt_desc);
@@ -977,17 +968,15 @@ public class BTFragment extends Fragment {
             //Refresh
             refresh_badbt(rootView);
             String prevbadbtname = sharedpreferences.getString("badbt-name", "");
-            if (!prevbadbtname.equals("")) badbt_name.setText(prevbadbtname);
+            if (!prevbadbtname.isEmpty()) badbt_name.setText(prevbadbtname);
             String prevbadbtiface = sharedpreferences.getString("badbt-iface", "");
-            if (!prevbadbtiface.equals("")) badbt_interface.setText(prevbadbtiface);
+            if (!prevbadbtiface.isEmpty()) badbt_interface.setText(prevbadbtiface);
             String prevbadbtaddr = sharedpreferences.getString("badbt-bdaddr", "");
-            if (!prevbadbtaddr.equals("")) badbt_bdaddr.setText(prevbadbtaddr);
+            if (!prevbadbtaddr.isEmpty()) badbt_bdaddr.setText(prevbadbtaddr);
 
             //Refresh Status
             ImageButton RefreshBadBTStatus = rootView.findViewById(R.id.refreshBadBTStatus);
-            RefreshBadBTStatus.setOnClickListener(v -> {
-                refresh_badbt(rootView);
-            });
+            RefreshBadBTStatus.setOnClickListener(v -> refresh_badbt(rootView));
 
             //String
             final EditText badbt_string = rootView.findViewById(R.id.editBadBT);
@@ -1005,19 +994,19 @@ public class BTFragment extends Fragment {
                     sharedpreferences.edit().putString("badbt-iface", BadBT_iface).apply();
                     sharedpreferences.edit().putString("badbt-bdaddr", BadBT_bdaddr).apply();
 
-                    if (dbus_statusCMD.equals("dbus is running.") && bt_statusCMD.equals("bluetooth is running.") && !bt_ifaceCMD.equals("")) {
-                        if (!BadBT_name.equals("") && !BadBT_iface.equals("") && !BadBT_bdaddr.equals("")) {
-                            Toast.makeText(getActivity().getApplicationContext(), "Starting server...", Toast.LENGTH_SHORT).show();
+                    if (dbus_statusCMD.equals("dbus is running.") && bt_statusCMD.equals("bluetooth is running.") && !bt_ifaceCMD.isEmpty()) {
+                        if (!BadBT_name.isEmpty() && !BadBT_iface.isEmpty() && !BadBT_bdaddr.isEmpty()) {
+                            Toast.makeText(requireActivity().getApplicationContext(), "Starting server...", Toast.LENGTH_SHORT).show();
                             run_cmd("echo -ne \"\\033]0;BadBT Server\\007\" && clear;sed -i -e 's/\\(MY_DEV_NAME = \\).*/\\1\\\"" + BadBT_name + "\\\"/' /root/badbt/btk_server.py &&" +
                                     " sed -i -e 's/\\(MY_ADDRESS = \\).*/\\1\\\"" + BadBT_bdaddr + "\\\"/' /root/badbt/btk_server.py &&" +
                                     " sed -i -e 's/\\(MY_INTERFACE = \\).*/\\1\\\"" + BadBT_iface + "\\\"/' /root/badbt/btk_server.py &&" +
                                     " clear;python3 /root/badbt/btk_server.py &;sleep 1 && echo 'Starting agent...' && sleep 1 && bluetoothctl --agent NoInputNoOutput && exit");
                             refresh_badbt(rootView);
                         } else {
-                            Toast.makeText(getActivity().getApplicationContext(), "Please enter interface, keyboard name, and address!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireActivity().getApplicationContext(), "Please enter interface, keyboard name, and address!", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        Toast.makeText(getActivity().getApplicationContext(), "Bluetooth interface or service not running!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(requireActivity().getApplicationContext(), "Bluetooth interface or service not running!", Toast.LENGTH_LONG).show();
                     }
                 } else if (badbtServerButton.getText().equals("Stop")) {
                     exe.RunAsRoot(new String[]{"kill `ps -ef | grep '[btk]_server' | awk {'print $2'}`"});
@@ -1032,7 +1021,7 @@ public class BTFragment extends Fragment {
             final ArrayList<String> modes = new ArrayList<>();
             modes.add("Send strings");
             modes.add("Interactive");
-            badbtmode.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, modes));
+            badbtmode.setAdapter(new ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, modes));
             badbtmode.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int pos, long id) {
@@ -1061,7 +1050,7 @@ public class BTFragment extends Fragment {
             prefixes.add("Mac Terminal");
             prefixes.add("Linux Terminal");
             prefixes.add("None");
-            badbtprefix.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, prefixes));
+            badbtprefix.setAdapter(new ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, prefixes));
             badbtprefix.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int pos, long id) {
@@ -1072,7 +1061,7 @@ public class BTFragment extends Fragment {
                         uacCheckBox.setChecked(false);
                         presets_uac.clear();
                         presets_uac.add("None");
-                        badbtpresets_uac.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, presets_uac));
+                        badbtpresets_uac.setAdapter(new ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, presets_uac));
                         uacCMD = "-";
                     } else if (selected_prefix.equals("Mobile Browser")) {
                         BadBTUACView.setVisibility(View.GONE);
@@ -1080,7 +1069,7 @@ public class BTFragment extends Fragment {
                         uacCheckBox.setChecked(false);
                         presets_uac.clear();
                         presets_uac.add("None");
-                        badbtpresets_uac.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, presets_uac));
+                        badbtpresets_uac.setAdapter(new ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, presets_uac));
                         uacCMD = "-";
                     } else if (selected_prefix.equals("Windows CMD")) {
                         BadBTUACView.setVisibility(View.VISIBLE);
@@ -1091,7 +1080,7 @@ public class BTFragment extends Fragment {
                         uacCheckBox.setChecked(false);
                         presets_uac.clear();
                         presets_uac.add("None");
-                        badbtpresets_uac.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, presets_uac));
+                        badbtpresets_uac.setAdapter(new ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, presets_uac));
                         uacCMD = "-";
                     } else if (selected_prefix.equals("Linux Terminal")) {
                         BadBTUACView.setVisibility(View.GONE);
@@ -1099,7 +1088,7 @@ public class BTFragment extends Fragment {
                         uacCheckBox.setChecked(false);
                         presets_uac.clear();
                         presets_uac.add("None");
-                        badbtpresets_uac.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, presets_uac));
+                        badbtpresets_uac.setAdapter(new ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, presets_uac));
                         uacCMD = "-";
                     } else if (selected_prefix.equals("None")) {
                         BadBTUACView.setVisibility(View.GONE);
@@ -1107,7 +1096,7 @@ public class BTFragment extends Fragment {
                         uacCheckBox.setChecked(false);
                         presets_uac.clear();
                         presets_uac.add("None");
-                        badbtpresets_uac.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, presets_uac));
+                        badbtpresets_uac.setAdapter(new ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, presets_uac));
                         uacCMD = "-";
                     }
                 }
@@ -1123,7 +1112,7 @@ public class BTFragment extends Fragment {
             presets.add("Rickroll");
             presets.add("Fake Windows Update");
             presets.add("None");
-            badbtpresets.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, presets));
+            badbtpresets.setAdapter(new ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, presets));
             badbtpresets.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int pos, long id) {
@@ -1150,12 +1139,12 @@ public class BTFragment extends Fragment {
                     presets_uac.add("Windows 8");
                     presets_uac.add("Windows 10");
                     presets_uac.add("Windows 11");
-                    badbtpresets_uac.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, presets_uac));
+                    badbtpresets_uac.setAdapter(new ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, presets_uac));
                 }
                 else {
                     presets_uac.clear();
                     presets_uac.add("None");
-                    badbtpresets_uac.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, presets_uac));
+                    badbtpresets_uac.setAdapter(new ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, presets_uac));
                     badbtpresets_uac.setVisibility(View.GONE);
                     uacCMD = "-";
                 }
@@ -1197,14 +1186,14 @@ public class BTFragment extends Fragment {
                     if (selected_badbtmode.equals("Send strings")) {
                         String BadBT_string = badbt_string.getText().toString();
                         run_cmd("echo -ne \"\\033]0;BadBT Send Strings\\007\" && clear;python3 /root/badbt/send_string.py '" + BadBT_string + "' " + prefixCMD + " " + uacCMD + ";sleep 2 && echo 'Exiting..' && exit");
-                        Toast.makeText(getActivity().getApplicationContext(), "Sending strings..", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireActivity().getApplicationContext(), "Sending strings..", Toast.LENGTH_SHORT).show();
                         } else if (selected_badbtmode.equals("Interactive")) {
-                        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getActivity(), R.style.DialogStyleCompat);
+                        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireActivity(), R.style.DialogStyleCompat);
                         builder.setTitle("Are you sure?");
                         builder.setMessage("Interactive mode will run in NetHunter terminal, but needs a physical keyboard connected as of now.");
                         builder.setPositiveButton("Ok", (dialog, which) -> {
                             run_cmd("echo -ne \"\\033]0;BadBT Client\\007\" && clear;python3 /root/badbt/kb_client.py");
-                            Toast.makeText(getActivity().getApplicationContext(), "Starting keyboard client..", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireActivity().getApplicationContext(), "Starting keyboard client..", Toast.LENGTH_SHORT).show();
                         });
                         builder.setNegativeButton("Cancel", (dialog, which) -> {
                         });
@@ -1222,18 +1211,15 @@ public class BTFragment extends Fragment {
             final Button badbtserverButton = BTFragment.findViewById(R.id.badbtserver_button);
             SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
 
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    String badbtserver_statusCMD = exe.RunAsRootOutput("ps -ef | grep btk_server");
-                    if (!badbtserver_statusCMD.contains("btk_server.py")) {
-                        BadBTServerStatus.setText("Stopped");
-                        badbtserverButton.setText("Start");
-                    }
-                    else {
-                        BadBTServerStatus.setText("Running");
-                        badbtserverButton.setText("Stop");
-                    }
+            requireActivity().runOnUiThread(() -> {
+                String badbtserver_statusCMD = exe.RunAsRootOutput("ps -ef | grep btk_server");
+                if (!badbtserver_statusCMD.contains("btk_server.py")) {
+                    BadBTServerStatus.setText("Stopped");
+                    badbtserverButton.setText("Start");
+                }
+                else {
+                    BadBTServerStatus.setText("Running");
+                    badbtserverButton.setText("Stop");
                 }
             });
         }
@@ -1251,15 +1237,14 @@ public class BTFragment extends Fragment {
             if (requestCode == 1002) {
                 if (resultCode == Activity.RESULT_OK) {
                     ShellExecuter exe = new ShellExecuter();
-                    EditText badbtstring = getActivity().findViewById(R.id.editBadBT);
-                    String FilePath = data.getData().getPath();
-                    Toast.makeText(getActivity().getApplicationContext(), FilePath, Toast.LENGTH_SHORT).show();
+                    EditText badbtstring = requireActivity().findViewById(R.id.editBadBT);
+                    String FilePath = Objects.requireNonNull(data.getData()).getPath();
+                    Toast.makeText(requireActivity().getApplicationContext(), FilePath, Toast.LENGTH_SHORT).show();
                     FilePath = exe.RunAsRootOutput("echo " + FilePath + " | sed -e 's/\\/document\\/primary:/\\/sdcard\\//g' ");
                     FilePath = exe.RunAsRootOutput("cat " + FilePath);
                     badbtstring.setText(FilePath);
                 }
             }
-
         }
 
     public static class PreferencesData {
