@@ -25,7 +25,6 @@
             android:layout_centerVertical="true"
             android:id="@+id/nmap_scan_button"
             android:layout_alignParentStart="true" />
-
     </RelativeLayout>
 
     <LinearLayout
@@ -37,13 +36,12 @@
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp">
 
-        <Switch
+        <androidx.appcompat.widget.SwitchCompat
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/advancedOptionsSwitchText"
             android:id="@+id/nmap_adv_switch"
             android:textAlignment="center" />
-
     </LinearLayout>
 
     <ScrollView
@@ -167,11 +165,9 @@
                 android:text="@string/nmap_udpscan"
                 android:id="@+id/nmap_udp_checkbox" />
 
-            <Space
+            <androidx.legacy.widget.Space
                 android:layout_width="1dp"
                 android:layout_height="30dp"/>
-
-
         </LinearLayout>
     </ScrollView>
 
@@ -179,6 +175,4 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal" />
-
-
 </LinearLayout>
