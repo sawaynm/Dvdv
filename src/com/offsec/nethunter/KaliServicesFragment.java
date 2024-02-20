@@ -33,6 +33,7 @@ import com.offsec.nethunter.viewmodels.KaliServicesViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -117,7 +118,7 @@ public class KaliServicesFragment extends Fragment {
         final MenuItem searchItem = menu.findItem(R.id.f_kaliservices_action_search);
         final SearchView searchView = (SearchView) searchItem.getActionView();
         //WearOS optimisation
-        boolean iswatch = getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
+        boolean iswatch = requireActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
         if(iswatch) {
             searchItem.setVisible(false);
         }

@@ -26,11 +26,14 @@ public class KaliServicesSQL extends SQLiteOpenHelper {
 	private static final String TABLE_NAME = DATABASE_NAME;
 	private static final ArrayList<String> COLUMNS = new ArrayList<>();
 	private static final String[][] kaliserviceData = {
-			{"1", "SSH", "service ssh start", "service ssh stop", "sshd", "0"},
-			{"2", "APACHE2", "service apache2 start", "service apache2 stop", "apache2", "0"},
-			{"3", "POSTGRESQL", "service postgresql start", "service postgresql stop", "postgres", "0"},
+			{"1", "APACHE2", "service apache2 start", "service apache2 stop", "apache2", "0"},
+			{"2", "BLUETOOTH", "service bluetooth start", "service bluetooth stop", "bluetooth", "0"},
+			{"3", "DBUS", "service dbus start", "service dbus stop", "dbus", "0"},
 			{"4", "DNSMASQ", "service dnsmasq start", "service dnsmasq stop", "dnsmasq", "0"},
-			{"5", "DBUS", "service dbus start", "service dbus stop", "dbus", "0"}
+			{"5", "GPSD", "service gpsd start", "service gpsd stop", "gpsd", "0"},
+			{"6", "POSTGRESQL", "service postgresql start", "service postgresql stop", "postgres", "0"},
+			{"7", "SSH", "service ssh start", "service ssh stop", "ssh", "0"},
+			{"8", "NETWORKING", "service networking start", "service networking stop", "networking", "0"},
 	};
 
 	public synchronized static KaliServicesSQL getInstance(Context context){
