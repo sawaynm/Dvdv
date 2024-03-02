@@ -16,15 +16,13 @@ import com.offsec.nethunter.utils.ShellExecuter;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+
 public class PineappleFragment extends Fragment {
-
     private static final String TAG = "PineappleFragment";
-
     private String start_type = "start ";
     private String proxy_type;
     private Context context;
     private static final String ARG_SECTION_NUMBER = "section_number";
-
     public PineappleFragment() {
     }
 
