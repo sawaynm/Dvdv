@@ -36,7 +36,6 @@ import java.util.List;
 public class WPSFragment extends Fragment {
     public static final String TAG = "WPSFragment";
     private static final String ARG_SECTION_NUMBER = "section_number";
-    private TextView SelectedIface;
     private TextView CustomPIN;
     private TextView DelayTime;
     private Spinner WPSList;
@@ -49,8 +48,7 @@ public class WPSFragment extends Fragment {
     private final ArrayList<String> arrayList = new ArrayList<>();
     private LinearLayout WPSPinLayout;
     private LinearLayout DelayLayout;
-    private Context context;
-    private static Activity activity;
+    private Activity activity;
     private NhPaths nh;
     private final ShellExecuter exe = new ShellExecuter();
     private String selected_network;
@@ -75,7 +73,7 @@ public class WPSFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        context = getContext();
+        Context context = getContext();
         activity = getActivity();
     }
 
@@ -116,7 +114,7 @@ public class WPSFragment extends Fragment {
             else exe.RunAsRoot(new String[]{"svc wifi disable; sleep 1 && svc wifi enable"});
         });
 
-        Spinner spinner = rootView.findViewById(R.id.spinner2);
+        Spinner spinner = rootView.findViewById(R.id.wps_iface);
         List<String> interfaces = getWirelessInterfaces();
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, interfaces);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -199,11 +197,11 @@ public class WPSFragment extends Fragment {
 
         //Start attack
         Button startButton = rootView.findViewById(R.id.start_oneshot);
-        SelectedIface = rootView.findViewById(R.id.wps_iface);
+        Spinner SelectedIface = rootView.findViewById(R.id.wps_iface);
         DelayTime = rootView.findViewById(R.id.delaytime);
 
         startButton.setOnClickListener(v ->  {
-            String selected_interface = SelectedIface.getText().toString();
+            String selected_interface = SelectedIface.getSelectedItem().toString();
             customPIN = CustomPIN.getText().toString();
             delayTIME = DelayTime.getText().toString();
             if (!selected_network.isEmpty()) {
@@ -247,21 +245,21 @@ public class WPSFragment extends Fragment {
                 else exe.RunAsRoot(new String[]{"svc wifi enable"});
                 arrayList.clear();
                 arrayList.add("Scanning...");
-                WPSList.setAdapter(new ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, arrayList));
+                WPSList.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, arrayList));
                 WPSList.setVisibility(View.VISIBLE);
             });
             String outputScanLog = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd python3 /sdcard/nh_files/modules/oneshot.py -i wlan0 -s | grep -E '[0-9])' | awk '{print $2\";\"$3}'");
             requireActivity().runOnUiThread(() -> {
                 final String[] arrayList = outputScanLog.split("\n");
-                ArrayAdapter targetsadapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, arrayList);
+                ArrayAdapter<String> targetsadapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, arrayList);
                 if (outputScanLog.isEmpty()) {
                     final ArrayList<String> notargets = new ArrayList<>();
                     notargets.add("No nearby WPS networks");
-                    WPSList.setAdapter(new ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, notargets));
+                    WPSList.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, notargets));
                 } else if (outputScanLog.equals("Error:;command")){
                     final ArrayList<String> notargets = new ArrayList<>();
                     notargets.add("Please reset the interface!");
-                    WPSList.setAdapter(new ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, notargets));
+                    WPSList.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, notargets));
                 } else {
                     WPSList.setAdapter(targetsadapter);
                     }
@@ -277,7 +275,7 @@ public class WPSFragment extends Fragment {
     // Bridge side functions
     ////
 
-    public static void run_cmd(String cmd) {
+    public void run_cmd(String cmd) {
         Intent intent = Bridge.createExecuteIntent("/data/data/com.offsec.nhterm/files/usr/bin/kali", cmd);
         activity.startActivity(intent);
     }
