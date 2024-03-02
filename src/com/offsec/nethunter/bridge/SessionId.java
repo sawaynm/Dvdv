@@ -4,9 +4,7 @@ import androidx.annotation.NonNull;
 
 import java.util.Objects;
 
-/**
- * @author kiva
- */
+
 public class SessionId {
   /**
    * Created a new session.
