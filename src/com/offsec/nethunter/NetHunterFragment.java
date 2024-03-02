@@ -35,7 +35,6 @@ import com.offsec.nethunter.viewmodels.NethunterViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
