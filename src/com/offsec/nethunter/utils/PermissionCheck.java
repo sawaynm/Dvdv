@@ -11,8 +11,8 @@ import androidx.core.content.ContextCompat;
 
 public class PermissionCheck {
     private static final String TAG = "PermissionCheck";
-    private Activity activity;
-    private Context context;
+    private final Activity activity;
+    private final Context context;
     public static final int DEFAULT_PERMISSION_RQCODE = 1;
     public static final int NH_TERM_PERMISSIONS_RQCODE = 2;
 
