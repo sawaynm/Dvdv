@@ -5,16 +5,16 @@ import android.os.AsyncTask;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
 
+
 public class MacchangerAsyncTask extends AsyncTask<String, Void, Void> {
     private MacchangerAsyncTaskListener listener;
     public static final int GETHOSTNAME = 0;
     public static final int SETHOSTNAME = 1;
     public static final int SETMAC = 2;
     public static final int GETORIGINMAC = 3;
-
-    private ShellExecuter exe = new ShellExecuter();
+    private final ShellExecuter exe = new ShellExecuter();
     private Object result;
-    private int ActionCode;
+    private final int ActionCode;
 
 
     public MacchangerAsyncTask(Integer ActionCode) {
