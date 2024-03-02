@@ -33,7 +33,6 @@ import com.offsec.nethunter.viewmodels.KaliServicesViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -46,7 +45,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 public class KaliServicesFragment extends Fragment {
-    private static final String TAG = "KaliServicesFragment";
+    public static final String TAG = "KaliServicesFragment";
     private static final String ARG_SECTION_NUMBER = "section_number";
     private Activity activity;
     private Context context;
@@ -83,7 +82,9 @@ public class KaliServicesFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         KaliServicesViewModel kaliServicesViewModel = new ViewModelProvider(this).get(KaliServicesViewModel.class);
         kaliServicesViewModel.init(context);
-        kaliServicesViewModel.getLiveDataKaliServicesModelList().observe(getViewLifecycleOwner(), kaliServicesModelList -> kaliServicesRecyclerViewAdapter.notifyDataSetChanged());
+        kaliServicesViewModel.getLiveDataKaliServicesModelList().observe(getViewLifecycleOwner(), kaliServicesModelList -> {
+            kaliServicesRecyclerViewAdapter.notifyDataSetChanged();
+        });
 
         kaliServicesRecyclerViewAdapter = new KaliServicesRecyclerViewAdapter(context, kaliServicesViewModel.getLiveDataKaliServicesModelList().getValue());
         RecyclerView recyclerViewServiceTitle = view.findViewById(R.id.f_kaliservices_recyclerviewServiceTitle);
