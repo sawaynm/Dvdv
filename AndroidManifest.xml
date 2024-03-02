@@ -45,7 +45,8 @@
         android:resizeableActivity="true"
         android:theme="@style/Theme.Nethunter"
         android:windowSoftInputMode="adjustResize"
-        android:requestLegacyExternalStorage="true">
+        android:requestLegacyExternalStorage="true"
+        tools:targetApi="n">
         <activity
             android:name=".AppNavHomeActivity"
             android:configChanges="orientation|keyboardHidden|screenSize|keyboard"
@@ -65,7 +66,8 @@
                 android:defaultWidth="600dp"
                 android:gravity="top|end"
                 android:minHeight="320dp"
-                android:minWidth="480dp" />
+                android:minWidth="480dp"
+                tools:targetApi="n" />
         </activity>
 
         <activity
@@ -131,4 +133,3 @@
             android:exported="false" />
     </application>
 </manifest>
-
