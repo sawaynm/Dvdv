@@ -1,7 +1,6 @@
 package com.offsec.nethunter;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -43,7 +42,6 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
     private boolean reattachedToRunningService = false;
     private SwitchCompat switch_gps_provider = null;
     private SwitchCompat switch_gpsd = null;
-    private Button button_launch_app = null;
     private String rtlsdr = "";
     private String rtlamr = "";
     private String rtladsb = "";
@@ -84,7 +82,7 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
         TextView gpsHelpView = view.findViewById(R.id.gps_help);
         switch_gps_provider = view.findViewById(R.id.switch_gps_provider);
         switch_gpsd = view.findViewById(R.id.switch_gpsd);
-        button_launch_app = view.findViewById(R.id.gps_button_launch_app);
+        Button button_launch_app = view.findViewById(R.id.gps_button_launch_app);
         ShellExecuter exe = new ShellExecuter();
         EditText wlan_interface = view.findViewById(R.id.wlan_interface);
         EditText bt_interface = view.findViewById(R.id.bt_interface);
