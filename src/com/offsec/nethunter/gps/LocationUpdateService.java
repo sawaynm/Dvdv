@@ -17,7 +17,9 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.StrictMode;
 
 import androidx.annotation.NonNull;
@@ -33,6 +35,7 @@ import android.widget.RemoteViews;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -52,17 +55,15 @@ import java.net.UnknownHostException;
 import java.net.InetAddress;
 import java.util.Date;
 import java.util.Objects;
-import java.util.concurrent.Executors;
 
-public class LocationUpdateService extends Service implements
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+
+public class LocationUpdateService extends Service {
     private static LocationUpdateService instance = null;
-
     private KaliGPSUpdates.Receiver updateReceiver;
     public static final String CHANNEL_ID = "NethunterLocationUpdateChannel";
     public static final int NOTIFY_ID = 1004;
     private static final String TAG = "LocationUpdateService";
-    private GoogleApiClient apiClient = null;
+    private FusedLocationProviderClient fusedLocationProviderClient = null;
     private DatagramSocket dSock = null;
     private InetAddress udpDestAddr = null;
     private static final String notificationTitle = "GPS Provider running";
@@ -200,21 +201,17 @@ public class LocationUpdateService extends Service implements
         return lat + "," + lon;
     }
 
-    @Override
     public void onConnected(@Nullable Bundle bundle) {
         Log.d(TAG, "onConnected");
     }
 
-    @Override
     public void onConnectionSuspended(int i) {
 
     }
 
-    @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.d(TAG, "Google API Client connection failed");
     }
-
 
     public class ServiceBinder extends Binder {
         public LocationUpdateService getService() {
@@ -230,7 +227,6 @@ public class LocationUpdateService extends Service implements
     }
 
     public class MyConnectionCallback implements GoogleApiClient.ConnectionCallbacks {
-
         @Override
         public void onConnected(@Nullable Bundle bundle) {
             Log.d(TAG, "onConnected (MyConnectionCallback)");
@@ -249,20 +245,13 @@ public class LocationUpdateService extends Service implements
         Log.d(TAG, "In requestUpdates");
         if (receiver != null)
             this.updateReceiver = receiver;
-        if (apiClient == null) {
-            apiClient = new GoogleApiClient.Builder(LocationUpdateService.this, this, this)
-                    .addApi(LocationServices.API)
-                    .build();
-        }
-        if (!apiClient.isConnected()) {
-            apiClient.registerConnectionCallbacks(new MyConnectionCallback());
-            apiClient.connect();
+        if (fusedLocationProviderClient == null) {
+            fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(LocationUpdateService.this);
         }
     }
 
     public void stopUpdates() {
         Log.d(TAG, "In stopUpdates");
-
         stopSelf();
     }
 
@@ -288,7 +277,8 @@ public class LocationUpdateService extends Service implements
                 == PackageManager.PERMISSION_GRANTED) {
 
             // register with Location services, so we can construct fake NMEA data
-            LocationServices.FusedLocationApi.requestLocationUpdates(apiClient, lr, locationListener);
+            FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+            fusedLocationProviderClient.requestLocationUpdates(lr, locationListener, Looper.myLooper());
 
             // try to register for actual NMEA data straight from the GPS
             LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -329,8 +319,10 @@ public class LocationUpdateService extends Service implements
     }
 
     private void initTimers() {
-        timerTaskHandler = (Handler) Executors.newSingleThreadExecutor();
-        resetListenersTimerTaskHandler = (Handler) Executors.newSingleThreadExecutor();
+        HandlerThread handlerThread = new HandlerThread("TimerThread");
+        handlerThread.start();
+        timerTaskHandler = new Handler(handlerThread.getLooper());
+        resetListenersTimerTaskHandler = new Handler(handlerThread.getLooper());
     }
 
     private void startTimers() {
@@ -441,9 +433,9 @@ public class LocationUpdateService extends Service implements
     }
 
     private final GpsStatus.NmeaListener nmeaListener = (l, s) -> {
-        if(!s.startsWith("$GPGGA")) {
+        if (!s.startsWith("$GPGGA")) {
             // if we're using the real GPS as our source, go ahead and send these extra information strings to gpsd
-            if("GPS".equals(lastLocationSourcePublished))
+            if ("GPS".equals(lastLocationSourcePublished))
                 sendUdpPacket(s);
             return;
         }
@@ -455,7 +447,7 @@ public class LocationUpdateService extends Service implements
             // sats = Integer.parseInt(fields[7]);
         } catch (NumberFormatException | ArrayIndexOutOfBoundsException ignored) {
         }
-        if(fixType == 0)
+        if (fixType == 0)
             return;
         // Log.d(TAG, "sats = " + sats);
         Log.d(TAG, "Real NMEA: " + s);
@@ -469,7 +461,7 @@ public class LocationUpdateService extends Service implements
 
         Log.d(TAG, "Constructed NMEA: "+nmeaSentence);
         // we will only publish these constructed sentences if we aren't currently getting real ones from the NmeaListener
-        if(lastLocationSourceReceived.equals("LocationListener"))
+        if (lastLocationSourceReceived.equals("LocationListener"))
             publishLocation(nmeaSentence, "Network");
         lastLocationSourceReceived = "LocationListener";
     };
@@ -538,7 +530,7 @@ public class LocationUpdateService extends Service implements
             }
         }
 
-        if(dSock != null && udpDestAddr != null) {
+        if (dSock != null && udpDestAddr != null) {
             try {
                 // dSock.setBroadcast(true);
                 nmeaSentence += "\n";
@@ -584,9 +576,8 @@ public class LocationUpdateService extends Service implements
         }
 
         // unregister with LocationServices
-        if (apiClient != null && apiClient.isConnected()) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(apiClient, locationListener);
-            apiClient.disconnect();
+        if (fusedLocationProviderClient != null) {
+            fusedLocationProviderClient.removeLocationUpdates(locationListener);
         }
     }
 
@@ -598,9 +589,7 @@ public class LocationUpdateService extends Service implements
 
         // stop our Notification update timer
         stopTimers();
-
         stopLocationUpdates();
-
         super.onDestroy();
     }
 }

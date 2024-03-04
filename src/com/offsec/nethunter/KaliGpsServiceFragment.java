@@ -292,4 +292,3 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
         context.startActivity(intent);
     }
 }
-

@@ -1,6 +1,5 @@
 package com.offsec.nethunter.gps;
 
-
 import android.location.GpsSatellite;
 import android.location.GpsStatus;
 import android.location.Location;
