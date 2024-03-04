@@ -62,7 +62,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/searchsploit_sendhid_button"
         android:layout_alignStart="@+id/openWeb"
-        android:layout_marginRight="@dimen/base_listItem_LR"
+        android:layout_marginEnd="@dimen/base_listItem_LR"
         android:text="View Source" />
 
     <TextView
@@ -121,7 +121,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/viewSource"
         android:layout_alignParentEnd="true"
-        android:layout_marginRight="@dimen/base_listItem_LR"
+        android:layout_marginEnd="@dimen/base_listItem_LR"
         android:text="View in www" />
 
     <Button
@@ -132,5 +132,4 @@
         android:layout_alignEnd="@+id/viewSource"
         android:layout_alignParentTop="true"
         android:text="SEND HID" />
-
 </RelativeLayout>

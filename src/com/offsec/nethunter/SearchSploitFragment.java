@@ -1,11 +1,11 @@
 package com.offsec.nethunter;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,6 +19,7 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -112,13 +113,9 @@ public class SearchSploitFragment extends Fragment {
         });
         // Load/reload database button
         final Button searchSearchSploit = rootView.findViewById(R.id.serchsploit_loadDB);
-        searchSearchSploit.setVisibility(View.GONE);
+        final ProgressBar progressBar = rootView.findViewById(R.id.progressBar);
         searchSearchSploit.setOnClickListener(v -> {
-            final ProgressDialog pd = new ProgressDialog(activity);
-            pd.setTitle("Feeding Exploit DB");
-            pd.setMessage("This can take a minute, wait...");
-            pd.setCancelable(false);
-            pd.show();
+            progressBar.setVisibility(View.VISIBLE);
             new Thread(() -> {
                 final Boolean isFeeded = database.doDbFeed();
                 searchSearchSploit.post(() -> {
@@ -126,8 +123,7 @@ public class SearchSploitFragment extends Fragment {
                         NhPaths.showMessage_long(context, "DB FEED DONE");
                         try {
                             // Search List
-                            //String sd = NhPaths.SD_PATH;
-                            String sd = "/sdcard";
+                            String sd = Environment.getExternalStorageDirectory().getPath();
                             String data = NhPaths.APP_PATH + "/";
                             String DATABASE_NAME = "SearchSploit";
                             String currentDBPath = "databases/" + DATABASE_NAME;
@@ -142,18 +138,16 @@ public class SearchSploitFragment extends Fragment {
 
                             src.close();
                             dst.close();
-                            Log.d("importDB", "Successfuly imported " + DATABASE_NAME);
+                            Log.d("importDB", "Successfully imported " + DATABASE_NAME);
                             main(rootView);
-
-                            pd.dismiss();
                         } catch (Exception e) {
                             Log.d("importDB", e.toString());
                         }
-                        // main(rootView);
                     } else {
                         NhPaths.showMessage_long(context,
                                 "Unable to find Searchsploit files.csv database. Install exploitdb in chroot");
                     }
+                    progressBar.setVisibility(View.GONE);
                 });
             }).start();
         });
