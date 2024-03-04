@@ -9,20 +9,21 @@ import com.offsec.nethunter.utils.ShellExecuter;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+
 public class ChrootManagerAsynctask extends AsyncTask<Object, Integer, Void> {
     private ChrootManagerAsyncTaskListener listener;
-    private ShellExecuter exe = new ShellExecuter();
-    private int ACTIONCODE;
+    private final ShellExecuter exe = new ShellExecuter();
+    private final int ACTIONCODE;
     private int resultCode;
-    private ArrayList<String> resultString = new ArrayList<>();
+    private final ArrayList<String> resultString = new ArrayList<>();
     public static final int CHECK_CHROOT = 0;
     public static final int MOUNT_CHROOT = 1;
     public static final int UNMOUNT_CHROOT = 2;
@@ -84,7 +85,10 @@ public class ChrootManagerAsynctask extends AsyncTask<Object, Integer, Void> {
 
                     InputStream input = connection.getInputStream();
                     BufferedInputStream reader = new BufferedInputStream(input);
-                    BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(objects[3].toString()));
+                    BufferedOutputStream writer = null;
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        writer = new BufferedOutputStream(Files.newOutputStream(Paths.get(objects[3].toString())));
+                    }
 
                     byte[] data = new byte[1024];
                     long bytes = -1;
@@ -93,8 +97,10 @@ public class ChrootManagerAsynctask extends AsyncTask<Object, Integer, Void> {
                         bytes += count;
                         int progress = (int) ((bytes / (float) lengthOfFile) * 100);
                         publishProgress(progress);
+                        assert writer != null;
                         writer.write(data, 0, count);
                     }
+                    assert writer != null;
                     writer.close();
                     reader.close();
                     exe.RunAsRootOutput("echo \"[+] Download completed.\"", ((TextView)objects[0]));
