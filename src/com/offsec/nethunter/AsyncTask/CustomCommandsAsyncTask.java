@@ -17,9 +17,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+
 public class CustomCommandsAsyncTask extends AsyncTask<List<CustomCommandsModel>, Void, List<CustomCommandsModel>> {
 	private CustomCommandsAsyncTaskListener listener;
-	private int actionCode;
+	private final int actionCode;
 	private int position;
 	private int originalPositionIndex;
 	private int targetPositionIndex;
@@ -54,7 +55,7 @@ public class CustomCommandsAsyncTask extends AsyncTask<List<CustomCommandsModel>
 	public CustomCommandsAsyncTask(int actionCode, int position, Context context){
 		this.actionCode = actionCode;
 		this.position = position;
-		this.context = new WeakReference<>(context);
+		CustomCommandsAsyncTask.context = new WeakReference<>(context);
 	}
 
 	public CustomCommandsAsyncTask(int actionCode, int position, ArrayList<String> dataArrayList, CustomCommandsSQL customCommandsSQL){
@@ -164,7 +165,7 @@ public class CustomCommandsAsyncTask extends AsyncTask<List<CustomCommandsModel>
 			case DELETEDATA:
 				customCommandsModelList = copyOfcustomCommandsModelList[0];
 				if (customCommandsModelList != null){
-					Collections.sort(selectedPositionsIndex, Collections.<Integer>reverseOrder());
+					Collections.sort(selectedPositionsIndex, Collections.reverseOrder());
 					for (Integer selectedPosition: selectedPositionsIndex) {
 						int i = selectedPosition;
 						customCommandsModelList.remove(i);
@@ -192,17 +193,16 @@ public class CustomCommandsAsyncTask extends AsyncTask<List<CustomCommandsModel>
 
 				break;
 			case BACKUPDATA:
-				break;
+            case RESETDATA:
+                break;
 			case RESTOREDATA:
 				customCommandsModelList = copyOfcustomCommandsModelList[0];
 				if (customCommandsModelList != null) {
 					customCommandsModelList.clear();
-					customCommandsModelList = customCommandsSQL.bindData((ArrayList<CustomCommandsModel>)customCommandsModelList);
-				}
+                    customCommandsSQL.bindData((ArrayList<CustomCommandsModel>) customCommandsModelList);
+                }
 				break;
-			case RESETDATA:
-				break;
-		}
+        }
 		return copyOfcustomCommandsModelList[0];
 	}
 
