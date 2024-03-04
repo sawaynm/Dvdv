@@ -5,14 +5,11 @@
     android:id="@+id/deauth_item"
     android:weightSum="1">
 
-    <EditText
+    <Spinner
+        android:id="@+id/wlan_interface"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:text="wlan1"
-        android:ems="10"
-        android:id="@+id/wlan_interface"
-        android:hint="@string/type_wlan_interface" />
+        android:prompt="Wlan interface" />
 
     <com.google.android.material.button.MaterialButton
         android:text="@string/scan_networks"
@@ -22,7 +19,8 @@
 
     <EditText
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:inputType="none"
         android:editable="false"
         android:id="@+id/TerminalOutputDeAuth"
         android:padding="16sp"
@@ -65,5 +63,4 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/StartDeAuth" />
-
 </LinearLayout>
