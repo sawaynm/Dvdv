@@ -31,7 +31,7 @@ public class NethunterSQL extends SQLiteOpenHelper {
     private static ArrayList<String> COLUMNS = new ArrayList<>();
     private static final String[][] nethunterData = {
             {"1", "Kernel Version", "uname -a", "\\n", "1"},
-            {"2", "Busybox Version", "`which busybox_nh` | head -n1", "\\n", "1"},
+            {"2", "Busybox Version", "/data/data/com.offsec.nethunter/scripts/bin/busybox_nh | head -n1", "\\n", "1"},
             {"3", "Root Status", "su -v", "\\n", "1"},
             {"4", "HID status", "ls /dev/hidg* || { echo \"HID interface not found.\" && if [[ $(uname -r) == 4.* || 5.* ]]; then echo \"Please enable in USB Arsenal\";fi }", "\\n", "1"},
             {"5", "Nethunter Terminal Status", "[ \"$(pm list packages | grep 'com.offsec.nhterm')\" ] && echo \"Nethunter Terminal is installed.\" || echo \"Nethunter Terminal is NOT yet installed.\"", "\\n", "1"},

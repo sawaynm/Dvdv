@@ -63,22 +63,6 @@ public class CompatCheckService extends IntentService {
     }
 
     private boolean checkCompat() {
-        // First, check if root access is acquired.
-        if (!CheckForRoot.isRoot()) {
-            message = "Root permission is required!!";
-            return false;
-        }
-        // Secondly, check if busybox is present.
-        if (!CheckForRoot.isBusyboxInstalled()) {
-            message = "No busybox is detected, please make sure you have busybox installed!!";
-            return false;
-        }
-        // Lastly, check if nethunter terminal app has been installed.
-        if (getApplicationContext().getPackageManager().getLaunchIntentForPackage("com.offsec.nhterm") == null) {
-            message = "Nethunter terminal is not installed yet.";
-            return false;
-        }
-
         // All of the code start from here will always be executed every time this service is started.
         // And remember no any return true or false except the last line of this function.
         /* Other compat checks start from here */
