@@ -130,16 +130,15 @@ public class ManaFragment extends Fragment {
 
     private void checkiptables() {
         ShellExecuter exe = new ShellExecuter();
-        String iptables_ver = exe.RunAsRootOutput("bootkali custom_cmd iptables -V | grep iptables");
-        String arch_path = exe.RunAsRootOutput("ls " + NhPaths.CHROOT_PATH() + "/usr/lib/ | grep linux-gnu");
+        String iptables_ver = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd iptables -V | grep iptables");
+        String arch_path = exe.RunAsRootOutput("ls " + NhPaths.CHROOT_PATH() + "/usr/lib/ | grep linux-gnu | head -n1");
         String arch;
         String old_kali = "http://old.kali.org/kali/pool/main/i/iptables/";
         if (!iptables_ver.equals("iptables v1.6.2")) {
-            Toast.makeText(getActivity().getApplicationContext(), iptables_ver, Toast.LENGTH_LONG).show();
             if (arch_path.equals("aarch64-linux-gnu")) arch = "arm64"; else arch = "armhf";
             MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
             builder.setTitle("Mana is deprecated!");
-            builder.setMessage("Until we find a perfect replacement, you can downgrade iptables in order to use Mana.");
+            builder.setMessage("Until we find a perfect replacement, you need to downgrade iptables in order to use Mana.");
             builder.setPositiveButton("Downgrade", (dialog, which) -> {
                 run_cmd("echo -ne \"\\033]0;Downgrading iptables\\007\" && clear;" +
                         "wget " + old_kali + "iptables_1.6.2-1.1_" + arch + ".deb && " +

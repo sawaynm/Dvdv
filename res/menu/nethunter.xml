@@ -6,7 +6,9 @@
         android:id="@+id/f_nethunter_action_snowfall"
         android:icon="@drawable/snowflake_trigger"
         android:title="Snowfall"
-        app:showAsAction="always" />
+        app:showAsAction="always"
+        android:visible="false" />
+    <!-- Snowfall enable 1/2 above -->
 
     <item
         android:id="@+id/f_nethunter_action_search"

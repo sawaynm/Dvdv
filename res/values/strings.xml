@@ -217,11 +217,11 @@
     <string name="kex_description">Welcome to the Kali NetHunter Desktop Experience.\nEnjoy the full potential of Kali Linux, straight from your pocket, even on HDMI output. Audio is also available, please use Simple Protocol Player app from GitHub to stream through KeX. Delay has been added to avoid soft reboot on some devices.</string>
 
     <!-- BT Attacks -->
-    <string name="bt_description">Recon, spoof, listen to, or inject audio to various devices. Internal bluetooth support is now available for devices with RFCOMM, UART H4, VHCI and BINDER_IPC enabled in kernel, or devices with bt_smd driver. Carwshisperer is not supported by internal bluetooth (VHCI or bt_smd) yet.</string>
-    <string name="bt_carwhisperer">Carwhisperer script from the way back. Listen to, or inject audio to various devices like speakers, headsets, watches or even cars. Note that target needs to be disconnected from original source. Live stream will have some delay. The sampling has to be 8kHz as we\'re injecting into SCO protocol.</string>
-    <string name="bt_spoof">Spoof your BT adapters.\nWill play essential role in upcoming attacks.</string>
+    <string name="bt_description">Welcome to Bluetooth Arsenal! Internal bluetooth support is now available for devices with RFCOMM, UART H4, VHCI and BINDER_IPC enabled in kernel, or devices with bt_smd driver.</string>
+    <string name="bt_carwhisperer">Carwhisperer script from the way back. Listen to, or inject audio to various devices like speakers, headsets, watches or even cars. Carwshisperer is not supported by internal bluetooth (VHCI or bt_smd) yet.</string>
+    <string name="bt_spoof">Spoof your BT adapters address, class, and name.</string>
     <string name="bt_tools">Brute force BT device addresses, ping, and discover their services.</string>
-    <string name="bt_badbt">Inspired by the Mr.Robot police car scene and the Flipper XFW Team, you can now create a Bluetooth keyboard server and send keystrokes straight from NetHunter. If you read this first, you may need to run setup again from the top right menu to install BadBT.</string>
+    <string name="bt_badbt">Inspired by the Mr.Robot police car scene and the Flipper XFW Team, you can now create a Bluetooth keyboard server and send keystrokes straight from NetHunter. You may need to run setup again from the top right menu to install BadBT. Running this on a smartwatch against your paired phone may dispair your watch from phone/wearos app. Prefixes are experimental.</string>
 
     <!-- SET -->
     <string name="set_description">Social Engineering Toolkit email template builder by yesimxev. Please note you need to have a working Gmail or email relay configuration for SET in order to use these templates. It is recommended not to have account picture if you use Gmail.</string>

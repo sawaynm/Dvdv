@@ -132,10 +132,13 @@ public class NetHunterFragment extends Fragment {
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
 
         //WearOS optimisation
-        boolean iswatch = getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
+        Boolean iswatch = getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
+        Boolean snowfall;
         if(iswatch) {
-            sharedpreferences.edit().putBoolean("snowfall_enabled", false).apply();
+            snowfall = sharedpreferences.getBoolean("snowfall_enabled", false);
             searchItem.setVisible(false);
+        } else {
+            snowfall = sharedpreferences.getBoolean("snowfall_enabled", true);
         }
         final SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setOnSearchClickListener(v -> menu.setGroupVisible(R.id.f_nethunter_menu_group1, false));
@@ -146,7 +149,6 @@ public class NetHunterFragment extends Fragment {
 
         //Snowfall
         snowfallButton = menu.findItem(f_nethunter_action_snowfall);
-        Boolean snowfall = sharedpreferences.getBoolean("snowfall_enabled", true);
         if (snowfall) snowfallButton.setIcon(R.drawable.snowflake_trigger);
         else snowfallButton.setIcon(R.drawable.snowflake_trigger_bw);
 
@@ -252,7 +254,13 @@ public class NetHunterFragment extends Fragment {
 
     private void trigger_snowfall(){
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-        Boolean snowfall = sharedpreferences.getBoolean("snowfall_enabled", true);
+        Boolean iswatch = getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
+        Boolean snowfall;
+        if(iswatch) {
+            snowfall = sharedpreferences.getBoolean("snowfall_enabled", false);
+        } else {
+            snowfall = sharedpreferences.getBoolean("snowfall_enabled", true);
+        }
         if (snowfall) {
             sharedpreferences.edit().putBoolean("snowfall_enabled", false).apply();
             snowfallButton.setIcon(R.drawable.snowflake_trigger_bw);
