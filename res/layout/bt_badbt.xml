@@ -96,10 +96,17 @@
 
         </LinearLayout>
 
+        <View
+            android:id="@+id/divider2"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:focusable="true"
+            android:layout_marginTop="10dp"
             android:focusableInTouchMode="true"
             android:gravity="center_horizontal">
 
@@ -111,7 +118,6 @@
                 android:layout_weight="1"
                 android:text="Server:"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:layout_marginBottom="11dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/guideline_1"/>
 
@@ -286,7 +292,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Start"
+            android:text="Send"
             android:textColor="#ffffffff" />
 
     </LinearLayout>
