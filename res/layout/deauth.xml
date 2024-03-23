@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/deauth_item"
     android:weightSum="1">
@@ -9,7 +10,7 @@
         android:id="@+id/wlan_interface"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:prompt="Wlan interface" />
+        android:prompt="@+id/wlan_interface" />
 
     <com.google.android.material.button.MaterialButton
         android:text="@string/scan_networks"
@@ -20,8 +21,8 @@
     <EditText
         android:layout_width="fill_parent"
         android:layout_height="0dp"
+        android:autofillHints="None"
         android:inputType="none"
-        android:editable="false"
         android:id="@+id/TerminalOutputDeAuth"
         android:padding="16sp"
         android:background="@android:color/black"
@@ -34,6 +35,7 @@
         android:id="@+id/channel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:autofillHints="None"
         android:ems="10"
         android:hint="@string/channel"
         android:inputType="number" />
