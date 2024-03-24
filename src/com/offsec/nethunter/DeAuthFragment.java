@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,7 +32,6 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Objects;
 
 
 public class DeAuthFragment  extends Fragment {
@@ -78,11 +78,24 @@ public class DeAuthFragment  extends Fragment {
             } catch (SocketException e) {
                 e.printStackTrace();
             }
+
         final EditText term = rootView.findViewById(R.id.TerminalOutputDeAuth);
         final Button start = rootView.findViewById(R.id.StartDeAuth);
-        final EditText channel = rootView.findViewById(R.id.channel);
         final CheckBox whitelist = rootView.findViewById(R.id.deauth_whitelist);
         final CheckBox white_me = rootView.findViewById(R.id.deauth_me);
+        final EditText channel = rootView.findViewById(R.id.channel);
+
+            channel.setFilters(new InputFilter[]{
+                    (source, start1, end, dest, dstart, dend) -> {
+                        try {
+                            int input = Integer.parseInt(dest.toString() + source.toString());
+                            if (isInRange(1, 250, input))
+                                return null;
+                        } catch (NumberFormatException ignored) { }
+                        return "";
+                    }
+            });
+
         whitelist.setChecked(false);
         start.setOnClickListener(v -> {
             String whitelist_command;
@@ -155,6 +168,10 @@ public class DeAuthFragment  extends Fragment {
             }
         });
         return rootView;
+    }
+
+    private boolean isInRange(int a, int b, int c) {
+        return b > a ? c >= a && c <= b : c >= b && c <= a;
     }
 
     @Override
