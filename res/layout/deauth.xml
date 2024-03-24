@@ -30,6 +30,7 @@
         android:fontFamily="monospace"
         android:layout_weight="1.00"
         android:textSize="14sp"
+        android:enabled="false"
         tools:ignore="LabelFor" />
 
     <EditText
