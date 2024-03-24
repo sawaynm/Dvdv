@@ -9,10 +9,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,7 +22,6 @@ import com.offsec.nethunter.bridge.Bridge;
 import com.offsec.nethunter.gps.KaliGPSUpdates;
 import com.offsec.nethunter.gps.LocationUpdateService;
 import com.offsec.nethunter.utils.NhPaths;
-import com.offsec.nethunter.utils.ShellExecuter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,7 +29,14 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.Receiver {
@@ -84,7 +92,19 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
         switch_gpsd = view.findViewById(R.id.switch_gpsd);
         Button button_launch_app = view.findViewById(R.id.gps_button_launch_app);
         ShellExecuter exe = new ShellExecuter();
-        EditText wlan_interface = view.findViewById(R.id.wlan_interface);
+        Spinner wlanSpinner = (Spinner) view.findViewById(R.id.wlan_interface);
+
+        // Get the list of available WiFi adapters
+        List<String> wlanAdapters = getAvailableWifiAdapters();
+
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireActivity(), android.R.layout.simple_spinner_item, wlanAdapters);
+
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // Apply the adapter to the spinner
+        wlanSpinner.setAdapter(adapter);
         EditText bt_interface = view.findViewById(R.id.bt_interface);
         CheckBox sdrcheckbox = view.findViewById(R.id.rtlsdr);
         CheckBox sdramrcheckbox = view.findViewById(R.id.rtlamr);
@@ -93,10 +113,10 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
 
         // TODO: make this text dynamic so we can launch other apps besides Kismet
         button_launch_app.setText("Launch Kismet in NH Terminal");
-        if(!wantHelpView)
+        if (!wantHelpView)
             gpsHelpView.setVisibility(View.GONE);
         Log.d(TAG, "reattachedToRunningService: " + reattachedToRunningService);
-        if(reattachedToRunningService) {
+        if (reattachedToRunningService) {
             // gpsTextView.append("Service already running\n");
             setCheckedQuietly(switch_gps_provider, true);
         }
@@ -105,10 +125,10 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
         check_gpsd();
 
         switch_gps_provider.setOnCheckedChangeListener((compoundButton, isChecked) -> {
-            if(switch_gps_provider.getTag() != null)
+            if (switch_gps_provider.getTag() != null)
                 return;
             Log.d(TAG, "switch_gps_provider clicked: " + isChecked);
-            if(isChecked) {
+            if (isChecked) {
                 startGpsProvider();
             } else {
                 stopGpsProvider();
@@ -116,7 +136,7 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
         });
 
         switch_gpsd.setOnCheckedChangeListener((compoundButton, isChecked) -> {
-            if(switch_gpsd.getTag() != null)
+            if (switch_gpsd.getTag() != null)
                 return;
             Log.d(TAG, "switch_gpsd clicked: " + isChecked);
             if (isChecked) {
@@ -138,7 +158,7 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
                 startChrootGpsd();
             }
             //WLAN interface
-            String wlaniface = wlan_interface.getText().toString() ;
+            String wlaniface = wlanSpinner.getSelectedItem().toString();
             if (!wlaniface.isEmpty()) wlaniface = "source=" + wlaniface + "\n";
 
             //BT interface
@@ -158,16 +178,73 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
             else rtladsb = "";
 
             //Mousejack interface
-            if (mousejackcheckbox.isChecked()) mousejack = "source=mousejack:name=nRF,channel_hoprate=100/sec\n";
+            if (mousejackcheckbox.isChecked())
+                mousejack = "source=mousejack:name=nRF,channel_hoprate=100/sec\n";
             else mousejack = "";
 
             String conf = "log_template=%p/%n\nlog_prefix=/captures/kismet/\ngps=gpsd:host=localhost,port=2947\n" + wlaniface + btiface + rtlsdr + rtlamr + rtladsb + mousejack;
-            exe.RunAsRoot(new String[]{"echo \"" + conf + "\" > " + NhPaths.SD_PATH + "/kismet_site.conf"});
-            exe.RunAsRoot(new String[]{"bootkali custom_cmd mv /sdcard/kismet_site.conf /etc/kismet/"});
+            try {
+                exe.RunAsRoot();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            try {
+                exe.RunAsRoot();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             Toast.makeText(requireActivity().getApplicationContext(), "Starting Kismet.. Web UI will be available at localhost:2501\"", Toast.LENGTH_LONG).show();
             wantKismet = true;
             gpsTextView.append("Kismet will launch after next position received.  Waiting...\n");
         });
+    }
+
+    private List<String> getAvailableWifiAdapters() {
+        List<String> wlanAdapters = new ArrayList<>();
+        ShellExecuter exe = new ShellExecuter();
+        String command = "ls /sys/class/net/";
+        String response = exe.RunAsRootOutput(command);
+        String[] interfaces = response.split("\n");
+        for (String iface : interfaces) {
+            if (iface.startsWith("wlan")) {
+                wlanAdapters.add(iface);
+            }
+        }
+        return wlanAdapters;
+    }
+
+    public static class ShellExecuter {
+        public String RunAsRootOutput(String cmd) {
+            StringBuilder result = new StringBuilder();
+            try {
+                Process p = Runtime.getRuntime().exec("su");
+                DataOutputStream os = new DataOutputStream(p.getOutputStream());
+                InputStream is = p.getInputStream();
+                os.writeBytes(cmd + "\n");
+                os.writeBytes("exit\n");
+                os.flush();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    result.append(line).append("\n");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return result.toString();
+        }
+
+
+        public void RunAsRoot() throws IOException {
+            try {
+                Process p = Runtime.getRuntime().exec("su");
+                DataOutputStream os = new DataOutputStream(p.getOutputStream());
+                os.writeBytes("exit\n");
+                os.flush();
+            } catch (IOException ignored) {
+                // do nothing
+            }
+        }
     }
 
     private void startGpsProvider() {
