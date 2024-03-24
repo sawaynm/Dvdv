@@ -1,6 +1,10 @@
 package com.offsec.nethunter;
 
 import android.Manifest;
+import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -13,7 +17,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,6 +40,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 
 public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.Receiver {
@@ -56,6 +60,7 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
     private String mousejack = "";
 
     public KaliGpsServiceFragment() {
+        // TODO document why this constructor is empty
     }
 
     public static KaliGpsServiceFragment newInstance(int sectionNumber) {
@@ -86,6 +91,12 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        setupBluetooth();
+        checkBluetoothDevice();
+        if (getActivity() != null) {
+            populateBluetoothSpinner(getActivity());
+        }
+        Spinner bt_interface = view.findViewById(R.id.bt_interface);
         gpsTextView = view.findViewById(R.id.gps_textview);
         TextView gpsHelpView = view.findViewById(R.id.gps_help);
         switch_gps_provider = view.findViewById(R.id.switch_gps_provider);
@@ -105,14 +116,13 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
 
         // Apply the adapter to the spinner
         wlanSpinner.setAdapter(adapter);
-        EditText bt_interface = view.findViewById(R.id.bt_interface);
         CheckBox sdrcheckbox = view.findViewById(R.id.rtlsdr);
         CheckBox sdramrcheckbox = view.findViewById(R.id.rtlamr);
         CheckBox sdradsbcheckbox = view.findViewById(R.id.rtladsb);
         CheckBox mousejackcheckbox = view.findViewById(R.id.mousejack);
 
         // TODO: make this text dynamic so we can launch other apps besides Kismet
-        button_launch_app.setText("Launch Kismet in NH Terminal");
+        button_launch_app.setText(R.string.launch_kismet_nhterm);
         if (!wantHelpView)
             gpsHelpView.setVisibility(View.GONE);
         Log.d(TAG, "reattachedToRunningService: " + reattachedToRunningService);
@@ -162,7 +172,7 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
             if (!wlaniface.isEmpty()) wlaniface = "source=" + wlaniface + "\n";
 
             //BT interface
-            String btiface = bt_interface.getText().toString();
+            String btiface = bt_interface.getSelectedItem().toString();
             if (!btiface.isEmpty()) btiface = "source=" + btiface + "\n";
 
             //SDR sensors interface
@@ -199,6 +209,49 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
         });
     }
 
+    private void checkBluetoothDevice() {
+        ShellExecuter shellExecuter = new ShellExecuter();
+        String command = "hciconfig hci0 | grep DOWN";
+        String output = shellExecuter.executeCommand(command);
+        if (output.contains("DOWN")) {
+            Log.e(TAG, "Bluetooth device hci0 is down");
+        } else {
+            Log.i(TAG, "Bluetooth device hci0 is up");
+        }
+    }
+
+    private void setupBluetooth() {
+        BluetoothManager bluetoothManager = (BluetoothManager) requireActivity().getSystemService(Context.BLUETOOTH_SERVICE);
+        BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
+        if (bluetoothAdapter == null) {
+            // Bluetooth is not supported
+            Log.e(TAG, "Bluetooth is not supported on this device");
+            return;
+        }
+
+        if (!bluetoothAdapter.isEnabled()) {
+            // Bluetooth is not enabled
+            Log.e(TAG, "Bluetooth is not enabled. Enable Bluetooth and retry.");
+            return;
+        }
+
+        if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+        if (pairedDevices.isEmpty()) {
+            // There are no paired Bluetooth devices
+            Log.e(TAG, "No paired Bluetooth devices found.");
+        }
+    }
+
     private List<String> getAvailableWifiAdapters() {
         List<String> wlanAdapters = new ArrayList<>();
         ShellExecuter exe = new ShellExecuter();
@@ -211,6 +264,30 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
             }
         }
         return wlanAdapters;
+    }
+
+    private void populateBluetoothSpinner(Activity view) {
+        Spinner btSpinner = view.findViewById(R.id.bt_interface);
+        BluetoothManager bluetoothManager = (BluetoothManager) requireActivity().getSystemService(Context.BLUETOOTH_SERVICE);
+        BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
+        if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+        List<String> btDeviceNames = new ArrayList<>();
+        for (BluetoothDevice device : pairedDevices) {
+            btDeviceNames.add(device.getName());
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireActivity(), android.R.layout.simple_spinner_item, btDeviceNames);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        btSpinner.setAdapter(adapter);
     }
 
     public static class ShellExecuter {
@@ -234,6 +311,21 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
             return result.toString();
         }
 
+        public String executeCommand(String command) {
+            StringBuilder output = new StringBuilder();
+            try {
+                // Use bootkali to enter the chroot environment
+                Process process = Runtime.getRuntime().exec(new String[]{"su", "-c", NhPaths.APP_SCRIPTS_PATH + "/bootkali " + command});
+                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    output.append(line);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return output.toString();
+        }
 
         public void RunAsRoot() throws IOException {
             try {
@@ -333,19 +425,19 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
         CharSequence charSequence = gpsTextView.getText();
         int lineCnt = 0;
         int i;
-        for(i=charSequence.length()-1; i >= 0; i--) {
+        for (i=charSequence.length()-1; i >= 0; i--) {
             if (charSequence.charAt(i) == '\n')
                 lineCnt++;
             if (lineCnt >= 20)
                 break;
         }
         // delete anything more than X lines previous so this doesn't get huge
-        if(i > 0) {
+        if (i > 0) {
             gpsTextView.getEditableText().delete(0, i);
         }
 
         gpsTextView.append(nmeaSentences + "\n");
-        if(wantKismet) {
+        if (wantKismet) {
             wantKismet = false;
             gpsTextView.append("Launching kismet in NetHunter Terminal\n");
             startKismet();
@@ -354,6 +446,7 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
 
     @Override
     public void onFirstPositionUpdate() {
+        // TODO document why this method is empty
     }
 
     private void startKismet() {

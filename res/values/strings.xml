@@ -542,4 +542,5 @@
     <!-- dummy_accessibility_service -->
     <string name="dummy_accessibility_service">dummy_accessibility_service</string>
     <string name="bootanimation_path_not_found">Bootanimation path not found</string>
+    <string name="launch_kismet_nhterm">Launch Kismet in NH Terminal</string>
 </resources>

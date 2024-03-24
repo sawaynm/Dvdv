@@ -50,7 +50,6 @@
             android:id="@+id/wlan_interface"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
-
     </LinearLayout>
 
     <LinearLayout
@@ -66,13 +65,10 @@
             android:padding="10dp"
             />
 
-        <EditText
+        <Spinner
             android:id="@+id/bt_interface"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="text"
-            android:hint="hci0" />
-
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
 
