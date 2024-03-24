@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -25,8 +26,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Objects;
 
-    public class DeAuthFragment  extends Fragment {
+
+public class DeAuthFragment  extends Fragment {
     private final ShellExecuter exe = new ShellExecuter();
     private Context context;
     private Activity activity;
@@ -53,7 +61,23 @@ import androidx.fragment.app.Fragment;
         SharedPreferences sharedpreferences = context.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
         setHasOptionsMenu(true);
         final Button scan = rootView.findViewById(R.id.scan_networks);
-        final Spinner wlan = rootView.findViewById(R.id.wlan_interface);
+            Spinner wlan = (Spinner) rootView.findViewById(R.id.wlan_interface);
+
+            try {
+                List<String> wifiAdapters = new ArrayList<>();
+                Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+                while (interfaces.hasMoreElements()) {
+                    NetworkInterface networkInterface = interfaces.nextElement();
+                    if (networkInterface.isUp() && !networkInterface.isLoopback() && networkInterface.getName().startsWith("wlan")) {
+                        wifiAdapters.add(networkInterface.getName());
+                    }
+                }
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, wifiAdapters);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                wlan.setAdapter(adapter);
+            } catch (SocketException e) {
+                e.printStackTrace();
+            }
         final EditText term = rootView.findViewById(R.id.TerminalOutputDeAuth);
         final Button start = rootView.findViewById(R.id.StartDeAuth);
         final EditText channel = rootView.findViewById(R.id.channel);
@@ -62,7 +86,7 @@ import androidx.fragment.app.Fragment;
         whitelist.setChecked(false);
         start.setOnClickListener(v -> {
             String whitelist_command;
-            new BootKali("ip link set " + wlan.toString() + " up");
+            new BootKali("ip link set " + wlan.getSelectedItem()+ " up");
             try {
                 Thread.sleep(1000);
                 new BootKali("airmon-ng start  " + wlan.getSelectedItem()).run_bg();
