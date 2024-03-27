@@ -55,6 +55,7 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
     private SwitchCompat switch_gps_provider = null;
     private SwitchCompat switch_gpsd = null;
     private String rtlsdr = "";
+    private String rtlais = "";
     private String rtlamr = "";
     private String rtladsb = "";
     private String mousejack = "";
@@ -125,7 +126,8 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
         button_launch_app.setText(R.string.launch_kismet_nhterm);
         if (!wantHelpView)
             gpsHelpView.setVisibility(View.GONE);
-        Log.d(TAG, "reattachedToRunningService: " + reattachedToRunningService);
+        final String REATTACHED_MSG = "reattachedToRunningService: ";
+        Log.d(TAG, REATTACHED_MSG + reattachedToRunningService);
         if (reattachedToRunningService) {
             // gpsTextView.append("Service already running\n");
             setCheckedQuietly(switch_gps_provider, true);
@@ -333,8 +335,8 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
                 DataOutputStream os = new DataOutputStream(p.getOutputStream());
                 os.writeBytes("exit\n");
                 os.flush();
-            } catch (IOException ignored) {
-                // do nothing
+            } catch (IOException e) {
+                Log.e(TAG, "Error executing RunAsRoot", e);
             }
         }
     }

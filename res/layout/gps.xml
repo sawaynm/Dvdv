@@ -71,7 +71,6 @@
             android:layout_height="wrap_content" />
     </LinearLayout>
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -85,8 +84,17 @@
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
             android:layout_weight="1"
-            android:text="RTL SDR" />
+            android:text="RTL-SDR" />
 
+        <CheckBox
+            android:id="@+id/rtlais"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_weight="1"
+            android:text="RTL-AIS
+" />
 
         <CheckBox
             android:id="@+id/rtlamr"
@@ -96,7 +104,6 @@
             android:layout_marginEnd="10dp"
             android:layout_weight="1"
             android:text="RTL AMR" />
-
     </LinearLayout>
 
     <LinearLayout
@@ -112,8 +119,7 @@
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
             android:layout_weight="1"
-            android:text="RTL ADSB" />
-
+            android:text="RTL-ADSB" />
 
         <CheckBox
             android:id="@+id/mousejack"
@@ -123,7 +129,6 @@
             android:layout_marginEnd="10dp"
             android:layout_weight="1"
             android:text="Mousejack" />
-
     </LinearLayout>
 
     <android.widget.Space
@@ -146,6 +151,7 @@
             android:id="@+id/gps_button_settings"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:contentDescription="None"
             android:visibility="gone"
             app:srcCompat="@drawable/ic_action_settings_applications" />
     </LinearLayout>
@@ -174,5 +180,4 @@
             android:padding="16sp"
             android:textColor="@android:color/holo_green_light" />
     </ScrollView>
-
 </LinearLayout>
