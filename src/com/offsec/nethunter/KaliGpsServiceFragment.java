@@ -200,11 +200,6 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            try {
-                exe.RunAsRoot();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
             Toast.makeText(requireActivity().getApplicationContext(), "Starting Kismet.. Web UI will be available at localhost:2501\"", Toast.LENGTH_LONG).show();
             wantKismet = true;
             gpsTextView.append("Kismet will launch after next position received.  Waiting...\n");
@@ -284,8 +279,12 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
         }
         Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
         List<String> btDeviceNames = new ArrayList<>();
-        for (BluetoothDevice device : pairedDevices) {
-            btDeviceNames.add(device.getName());
+        if (pairedDevices.isEmpty()) {
+            btDeviceNames.add("No HCI adapters found and/or started");
+        } else {
+            for (BluetoothDevice device : pairedDevices) {
+                btDeviceNames.add(device.getName());
+            }
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireActivity(), android.R.layout.simple_spinner_item, btDeviceNames);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
