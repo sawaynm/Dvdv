@@ -1,6 +1,3 @@
-/**
- * Created by AnglerVonMur on 26.07.15.
- */
 package com.offsec.nethunter;
 
 import android.content.ContentValues;
@@ -40,8 +37,8 @@ class SQLPersistence extends SQLiteOpenHelper {
 
     public long addApp(final String btn_name, final String command) {
         long id = 0;
-        if (btn_name.length() > 0 &&
-                command.length() > 0) {
+        if (!btn_name.isEmpty() &&
+                !command.isEmpty()) {
 
             SQLiteDatabase db = this.getWritableDatabase();
 
@@ -74,7 +71,6 @@ class SQLPersistence extends SQLiteOpenHelper {
         }
         return apps;
     }
-
 
     public LauncherApp getApp(final long id) {
         LauncherApp app = null;

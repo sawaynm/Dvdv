@@ -43,8 +43,9 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+
 public class KaliServicesFragment extends Fragment {
-    private static final String TAG = "KaliServicesFragment";
+    public static final String TAG = "KaliServicesFragment";
     private static final String ARG_SECTION_NUMBER = "section_number";
     private Activity activity;
     private Context context;
@@ -52,8 +53,6 @@ public class KaliServicesFragment extends Fragment {
     private Button addButton;
     private Button deleteButton;
     private Button moveButton;
-    private TextView servicesDesc;
-    private HorizontalScrollView servicesButtons;
     private KaliServicesRecyclerViewAdapter kaliServicesRecyclerViewAdapter;
     private static int targetPositionId;
 
@@ -64,7 +63,6 @@ public class KaliServicesFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -84,7 +82,9 @@ public class KaliServicesFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         KaliServicesViewModel kaliServicesViewModel = new ViewModelProvider(this).get(KaliServicesViewModel.class);
         kaliServicesViewModel.init(context);
-        kaliServicesViewModel.getLiveDataKaliServicesModelList().observe(getViewLifecycleOwner(), kaliServicesModelList -> kaliServicesRecyclerViewAdapter.notifyDataSetChanged());
+        kaliServicesViewModel.getLiveDataKaliServicesModelList().observe(getViewLifecycleOwner(), kaliServicesModelList -> {
+            kaliServicesRecyclerViewAdapter.notifyDataSetChanged();
+        });
 
         kaliServicesRecyclerViewAdapter = new KaliServicesRecyclerViewAdapter(context, kaliServicesViewModel.getLiveDataKaliServicesModelList().getValue());
         RecyclerView recyclerViewServiceTitle = view.findViewById(R.id.f_kaliservices_recyclerviewServiceTitle);
@@ -96,8 +96,8 @@ public class KaliServicesFragment extends Fragment {
         addButton = view.findViewById(R.id.f_kaliservices_addItemButton);
         deleteButton = view.findViewById(R.id.f_kaliservices_deleteItemButton);
         moveButton = view.findViewById(R.id.f_kaliservices_moveItemButton);
-        servicesDesc = view.findViewById(R.id.f_kaliservices_banner);
-        servicesButtons = view.findViewById(R.id.f_kaliservices_btn_scrollView);
+        TextView servicesDesc = view.findViewById(R.id.f_kaliservices_banner);
+        HorizontalScrollView servicesButtons = view.findViewById(R.id.f_kaliservices_btn_scrollView);
 
         onRefreshItemSetup();
         onAddItemSetup();
@@ -107,7 +107,7 @@ public class KaliServicesFragment extends Fragment {
         //WearOS optimisation
         SharedPreferences sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
         Boolean iswatch = sharedpreferences.getBoolean("running_on_wearos", false);
-        if(iswatch) {
+        if (iswatch) {
             servicesDesc.setVisibility(View.GONE);
             servicesButtons.setVisibility(View.GONE);
         }
@@ -119,11 +119,12 @@ public class KaliServicesFragment extends Fragment {
         final MenuItem searchItem = menu.findItem(R.id.f_kaliservices_action_search);
         final SearchView searchView = (SearchView) searchItem.getActionView();
         //WearOS optimisation
-        boolean iswatch = getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
+        boolean iswatch = requireActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH);
         if(iswatch) {
             searchItem.setVisible(false);
         }
 
+        assert searchView != null;
         searchView.setOnSearchClickListener(v -> menu.setGroupVisible(R.id.f_kaliservices_menu_group1, false));
         searchView.setOnCloseListener(() -> {
             menu.setGroupVisible(R.id.f_kaliservices_menu_group1, true);
@@ -202,6 +203,8 @@ public class KaliServicesFragment extends Fragment {
             case R.id.f_kaliservices_menu_ResetToDefault:
                 KaliServicesData.getInstance().resetData(KaliServicesSQL.getInstance(context));
                 break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + item.getItemId());
         }
         return super.onOptionsItemSelected(item);
     }
@@ -416,7 +419,7 @@ public class KaliServicesFragment extends Fragment {
                             }
                         }
                     }
-                    if (selectedPosition.size() != 0) {
+                    if (!selectedPosition.isEmpty()) {
                         KaliServicesData.getInstance().deleteData(selectedPosition, selectedTargetIds, KaliServicesSQL.getInstance(context));
                         NhPaths.showMessage(context, "Successfully deleted " + selectedPosition.size() + " items.");
                         adDelete.dismiss();

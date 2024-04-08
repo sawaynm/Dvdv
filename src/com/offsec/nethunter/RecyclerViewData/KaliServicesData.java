@@ -1,8 +1,8 @@
 package com.offsec.nethunter.RecyclerViewData;
 
 import android.content.Context;
-import android.widget.Switch;
 
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.lifecycle.MutableLiveData;
 
 import com.offsec.nethunter.AsyncTask.KaliServicesAsyncTask;
@@ -60,7 +60,7 @@ public class KaliServicesData {
 		kaliServicesAsyncTask.execute(getInitCopyOfKaliServicesModelListFull());
 	}
 
-	public void startServiceforItem(int position, Switch mSwitch, Context context){
+	public void startServiceforItem(int position, SwitchCompat mSwitch, Context context){
 		KaliServicesAsyncTask kaliServicesAsyncTask = new KaliServicesAsyncTask(KaliServicesAsyncTask.START_SERVICE_FOR_ITEM, position);
 		kaliServicesAsyncTask.setListener(new KaliServicesAsyncTask.KaliServicesAsyncTaskListener() {
 			@Override
@@ -81,7 +81,7 @@ public class KaliServicesData {
 		kaliServicesAsyncTask.execute(getInitCopyOfKaliServicesModelListFull());
 	}
 
-	public void stopServiceforItem(int position, Switch mSwitch, Context context){
+	public void stopServiceforItem(int position, SwitchCompat mSwitch, Context context){
 		KaliServicesAsyncTask kaliServicesAsyncTask = new KaliServicesAsyncTask(KaliServicesAsyncTask.STOP_SERVICE_FOR_ITEM, position);
 		kaliServicesAsyncTask.setListener(new KaliServicesAsyncTask.KaliServicesAsyncTaskListener() {
 			@Override

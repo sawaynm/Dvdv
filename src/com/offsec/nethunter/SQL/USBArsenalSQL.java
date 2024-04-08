@@ -19,6 +19,7 @@ import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 
+
 public class USBArsenalSQL extends SQLiteOpenHelper {
     private static USBArsenalSQL instance;
     private static final String DATABASE_NAME = "USBArsenalFragment";
@@ -152,11 +153,23 @@ public class USBArsenalSQL extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + USBSWITCH_TABLE_NAME + " WHERE " + COLUMNS_USBSWITCH.get(0) + "='" + targetOSName + "'" + " AND " + COLUMNS_USBSWITCH.get(1) + "='" + functionName + "';", null);
         if (cursor.moveToFirst()) {
-            usbArsenalUSBSwitchModel.setidVendor(cursor.getString(cursor.getColumnIndex(COLUMNS_USBSWITCH.get(2))));
-            usbArsenalUSBSwitchModel.setidProduct(cursor.getString(cursor.getColumnIndex(COLUMNS_USBSWITCH.get(3))));
-            usbArsenalUSBSwitchModel.setmanufacturer(cursor.getString(cursor.getColumnIndex(COLUMNS_USBSWITCH.get(4))));
-            usbArsenalUSBSwitchModel.setproduct(cursor.getString(cursor.getColumnIndex(COLUMNS_USBSWITCH.get(5))));
-            usbArsenalUSBSwitchModel.setserialnumber(cursor.getString(cursor.getColumnIndex(COLUMNS_USBSWITCH.get(6))));
+            int columnIndex2 = cursor.getColumnIndex(COLUMNS_USBSWITCH.get(2));
+            int columnIndex3 = cursor.getColumnIndex(COLUMNS_USBSWITCH.get(3));
+            int columnIndex4 = cursor.getColumnIndex(COLUMNS_USBSWITCH.get(4));
+            int columnIndex5 = cursor.getColumnIndex(COLUMNS_USBSWITCH.get(5));
+            int columnIndex6 = cursor.getColumnIndex(COLUMNS_USBSWITCH.get(6));
+
+            String columnValue2 = columnIndex2 != -1 ? cursor.getString(columnIndex2) : null;
+            String columnValue3 = columnIndex3 != -1 ? cursor.getString(columnIndex3) : null;
+            String columnValue4 = columnIndex4 != -1 ? cursor.getString(columnIndex4) : null;
+            String columnValue5 = columnIndex5 != -1 ? cursor.getString(columnIndex5) : null;
+            String columnValue6 = columnIndex6 != -1 ? cursor.getString(columnIndex6) : null;
+
+            usbArsenalUSBSwitchModel.setidVendor(columnValue2);
+            usbArsenalUSBSwitchModel.setidProduct(columnValue3);
+            usbArsenalUSBSwitchModel.setmanufacturer(columnValue4);
+            usbArsenalUSBSwitchModel.setproduct(columnValue5);
+            usbArsenalUSBSwitchModel.setserialnumber(columnValue6);
         }
         cursor.close();
         return usbArsenalUSBSwitchModel;
@@ -167,11 +180,23 @@ public class USBArsenalSQL extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + USBNETWORK_TABLE_NAME + " WHERE " + COLUMNS_USBNETWORK.get(0) + "='" + attackModePosition + "';", null);
         if (cursor.moveToFirst()) {
-            usbArsenalUSBNetworkModel.setupstream_iface(cursor.getString(cursor.getColumnIndex(COLUMNS_USBNETWORK.get(1))));
-            usbArsenalUSBNetworkModel.setusb_iface(cursor.getString(cursor.getColumnIndex(COLUMNS_USBNETWORK.get(2))));
-            usbArsenalUSBNetworkModel.setip_address_for_target(cursor.getString(cursor.getColumnIndex(COLUMNS_USBNETWORK.get(3))));
-            usbArsenalUSBNetworkModel.setip_gateway(cursor.getString(cursor.getColumnIndex(COLUMNS_USBNETWORK.get(4))));
-            usbArsenalUSBNetworkModel.setip_subnetmask(cursor.getString(cursor.getColumnIndex(COLUMNS_USBNETWORK.get(5))));
+            int columnIndex1 = cursor.getColumnIndex(COLUMNS_USBNETWORK.get(1));
+            int columnIndex2 = cursor.getColumnIndex(COLUMNS_USBNETWORK.get(2));
+            int columnIndex3 = cursor.getColumnIndex(COLUMNS_USBNETWORK.get(3));
+            int columnIndex4 = cursor.getColumnIndex(COLUMNS_USBNETWORK.get(4));
+            int columnIndex5 = cursor.getColumnIndex(COLUMNS_USBNETWORK.get(5));
+
+            String columnValue1 = columnIndex1 != -1 ? cursor.getString(columnIndex1) : null;
+            String columnValue2 = columnIndex2 != -1 ? cursor.getString(columnIndex2) : null;
+            String columnValue3 = columnIndex3 != -1 ? cursor.getString(columnIndex3) : null;
+            String columnValue4 = columnIndex4 != -1 ? cursor.getString(columnIndex4) : null;
+            String columnValue5 = columnIndex5 != -1 ? cursor.getString(columnIndex5) : null;
+
+            usbArsenalUSBNetworkModel.setupstream_iface(columnValue1);
+            usbArsenalUSBNetworkModel.setusb_iface(columnValue2);
+            usbArsenalUSBNetworkModel.setip_address_for_target(columnValue3);
+            usbArsenalUSBNetworkModel.setip_gateway(columnValue4);
+            usbArsenalUSBNetworkModel.setip_subnetmask(columnValue5);
         }
         cursor.close();
         return usbArsenalUSBNetworkModel;

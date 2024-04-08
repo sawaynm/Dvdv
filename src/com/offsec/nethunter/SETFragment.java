@@ -2,11 +2,9 @@ package com.offsec.nethunter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,25 +19,22 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.offsec.nethunter.bridge.Bridge;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
 
-public class SETFragment extends Fragment {
 
-    private ViewPager mViewPager;
+class SETFragment extends Fragment {
     private SharedPreferences sharedpreferences;
     private NhPaths nh;
-    private Context context;
-    private static Activity activity;
+    private Activity activity;
     private static final String ARG_SECTION_NUMBER = "section_number";
 
     public static SETFragment newInstance(int sectionNumber) {
@@ -53,33 +48,32 @@ public class SETFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        context = getContext();
+        getContext();
         activity = getActivity();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         View rootView = inflater.inflate(R.layout.set, container, false);
-        SETFragment.TabsPagerAdapter tabsPagerAdapter = new TabsPagerAdapter(getChildFragmentManager());
+        SETFragment.TabsPagerAdapter tabsPagerAdapter = new TabsPagerAdapter(this);
 
-        mViewPager = rootView.findViewById(R.id.pagerBt);
+        ViewPager2 mViewPager = rootView.findViewById(R.id.pagerBt);
         mViewPager.setAdapter(tabsPagerAdapter);
         mViewPager.setOffscreenPageLimit(3);
-        mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+        mViewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
+                super.onPageSelected(position);
                 activity.invalidateOptionsMenu();
             }
         });
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
         setHasOptionsMenu(true);
         return rootView;
-
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater menuinflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater menuinflater) {
         menuinflater.inflate(R.menu.bt, menu);
     }
 
@@ -98,15 +92,13 @@ public class SETFragment extends Fragment {
     }
 
     public void SetupDialog() {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getActivity(), R.style.DialogStyleCompat);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireActivity(), R.style.DialogStyleCompat);
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
         builder.setTitle("Welcome to SET!");
         builder.setMessage("In order to make sure everything is working, an initial setup needs to be done.");
-        builder.setPositiveButton("Check & Install", new DialogInterface.OnClickListener(){
-            public void onClick(DialogInterface dialog, int which) {
-                RunSetup();
-                sharedpreferences.edit().putBoolean("set_setup_done", true).apply();
-            }
+        builder.setPositiveButton("Check & Install", (dialog, which) -> {
+            RunSetup();
+            sharedpreferences.edit().putBoolean("set_setup_done", true).apply();
         });
         builder.show();
 
@@ -125,36 +117,33 @@ public class SETFragment extends Fragment {
         sharedpreferences.edit().putBoolean("set_setup_done", true).apply();
     }
 
-    public static class TabsPagerAdapter extends FragmentPagerAdapter {
+    static class TabsPagerAdapter extends FragmentStateAdapter {
+        public TabsPagerAdapter(@NonNull SETFragment fragmentActivity) {
+            super(fragmentActivity);
+        }
 
-        TabsPagerAdapter(FragmentManager fm) {
-            super(fm);
+        @NonNull
+        @Override
+        public Fragment createFragment(int position) {
+            return new MainFragment();
         }
 
         @Override
-        public Fragment getItem(int i) {
-            switch (i) {
-                default:
-                    return new SETFragment.MainFragment();
-            }
+        public int getItemCount() {
+            return 1;
         }
 
-        @Override
-        public Parcelable saveState() {
-            return null;
+        @NonNull
+        public Fragment getItem() {
+            return new MainFragment();
         }
 
-        @Override
         public int getCount() {
             return 1;
         }
 
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position) {
-                default:
-                    return "Email Template";
-            }
+        public CharSequence getPageTitle() {
+            return "Email Template";
         }
     }
 
@@ -189,7 +178,7 @@ public class SETFragment extends Fragment {
             //Templates spinner
             String[] templates = new String[]{"Messenger", "Facebook", "Twitter"};
             Spinner template_spinner = rootView.findViewById(R.id.set_template);
-            template_spinner.setAdapter(new ArrayAdapter<>(getContext(),
+            template_spinner.setAdapter(new ArrayAdapter<>(requireContext(),
                     android.R.layout.simple_list_item_1, templates));
 
             //Select Template
@@ -198,18 +187,22 @@ public class SETFragment extends Fragment {
                 @Override
                 public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int pos, long id) {
                     selected_template = parentView.getItemAtPosition(pos).toString();
-                    if (selected_template.equals("Messenger")) {
-                        template_src =  nh.APP_SD_FILES_PATH + "/configs/set-messenger.html";
-                        template_tempfile = "set-messenger.html";
-                        PhishSubject.setText(PhishName.getText() + " sent you a message on Messenger.");
-                    } else if (selected_template.equals("Facebook")){
-                        template_src =  nh.APP_SD_FILES_PATH + "/configs/set-facebook.html";
-                        template_tempfile = "set-facebook.html";
-                        PhishSubject.setText(PhishName.getText() + " sent you a message on Facebook.");
-                    } else if (selected_template.equals("Twitter")){
-                        template_src =  nh.APP_SD_FILES_PATH + "/configs/set-twitter.html";
-                        template_tempfile = "set-twitter.html";
-                        PhishSubject.setText(PhishName.getText() + " sent you a Direct Message on Twitter!");
+                    switch (selected_template) {
+                        case "Messenger":
+                            template_src = NhPaths.APP_SD_FILES_PATH + "/configs/set-messenger.html";
+                            template_tempfile = "set-messenger.html";
+                            PhishSubject.setText(PhishName.getText() + " sent you a message on Messenger.");
+                            break;
+                        case "Facebook":
+                            template_src = NhPaths.APP_SD_FILES_PATH + "/configs/set-facebook.html";
+                            template_tempfile = "set-facebook.html";
+                            PhishSubject.setText(PhishName.getText() + " sent you a message on Facebook.");
+                            break;
+                        case "Twitter":
+                            template_src = NhPaths.APP_SD_FILES_PATH + "/configs/set-twitter.html";
+                            template_tempfile = "set-twitter.html";
+                            PhishSubject.setText(PhishName.getText() + " sent you a Direct Message on Twitter!");
+                            break;
                     }
                     myBrowser.clearCache(true);
                     myBrowser.loadUrl(template_src);
@@ -243,7 +236,7 @@ public class SETFragment extends Fragment {
                 String phish_subject = PhishSubject.getText().toString();
                 exe.RunAsChrootOutput("echo 'SUBJECT=\"" + phish_subject + "\"' > " + template_final + " && echo 'HTML=\"' >> " + template_final +
                         " && cat " + template_path + " >> " + template_final + " && echo '\\nEND\"' >> " + template_final);
-                Toast.makeText(getActivity().getApplicationContext(), "Successfully saved to SET templates folder", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireActivity().getApplicationContext(), "Successfully saved to SET templates folder", Toast.LENGTH_SHORT).show();
             });
 
             //Launch SET
@@ -256,7 +249,7 @@ public class SETFragment extends Fragment {
 
         private void refresh(View SETFragment) {
             WebView myBrowser = SETFragment.findViewById(R.id.mybrowser);
-            final String template_path = nh.SD_PATH + "/" + template_tempfile;
+            final String template_path = NhPaths.SD_PATH + "/" + template_tempfile;
 
             //Setting fields
             EditText PhishLink = SETFragment.findViewById(R.id.set_link);
@@ -264,27 +257,31 @@ public class SETFragment extends Fragment {
             EditText PhishPic = SETFragment.findViewById(R.id.set_pic);
             EditText PhishSubject = SETFragment.findViewById(R.id.set_subject);
 
-            exe.RunAsRoot(new String[]{"cp " + template_src + " " + nh.SD_PATH});
+            exe.RunAsRoot(new String[]{"cp " + template_src + " " + NhPaths.SD_PATH});
 
             String phish_link = PhishLink.getText().toString();
             String phish_name = PhishName.getText().toString();
             String phish_pic = PhishPic.getText().toString();
 
-            if (selected_template.equals("Messenger")) {
-                PhishSubject.setText(PhishName.getText() + " sent you a message on Messenger.");
-            } else if (selected_template.equals("Facebook")){
-                PhishSubject.setText(PhishName.getText() + " sent you a message on Facebook.");
-            } else if (selected_template.equals("Twitter")){
-                PhishSubject.setText(PhishName.getText() + " sent you a Direct Message on Twitter!");
+            switch (selected_template) {
+                case "Messenger":
+                    PhishSubject.setText(PhishName.getText() + " sent you a message on Messenger.");
+                    break;
+                case "Facebook":
+                    PhishSubject.setText(PhishName.getText() + " sent you a message on Facebook.");
+                    break;
+                case "Twitter":
+                    PhishSubject.setText(PhishName.getText() + " sent you a Direct Message on Twitter!");
+                    break;
             }
 
-            if (!phish_link.equals("")) {
+            if (!phish_link.isEmpty()) {
                 if (phish_link.contains("&")) phish_link = exe.RunAsRootOutput("sed 's/\\&/\\\\\\&/g' <<< \"" + phish_link + "\"");
                 phish_link = exe.RunAsRootOutput("sed 's|\\/|\\\\\\/|g' <<< \"" + phish_link + "\"");
                 exe.RunAsRoot(new String[]{"sed -i 's/https\\:\\/\\/www.google.com/" + phish_link + "/g' " + template_path});
             }
-            if (!phish_name.equals("")) exe.RunAsRoot(new String[]{"sed -i 's/E Corp/" + phish_name + "/g' " + template_path});
-            if (!phish_pic.equals("")) {
+            if (!phish_name.isEmpty()) exe.RunAsRoot(new String[]{"sed -i 's/E Corp/" + phish_name + "/g' " + template_path});
+            if (!phish_pic.isEmpty()) {
                 if (phish_pic.contains("&")) phish_pic = exe.RunAsRootOutput("sed 's/\\&/\\\\\\&/g' <<< \"" + phish_pic + "\"");
                 exe.RunAsRoot(new String[]{"sed -i \"s|id=\\\"set\\\".*|id=\\\"set\\\" src=\\\"" + phish_pic + "\\\" width=\\\"72\\\">|\" " + template_path});
             }
@@ -297,7 +294,7 @@ public class SETFragment extends Fragment {
     // Bridge side functions
     ////
 
-    public static void run_cmd(String cmd) {
+    public void run_cmd(String cmd) {
         Intent intent = Bridge.createExecuteIntent("/data/data/com.offsec.nhterm/files/usr/bin/kali", cmd);
         activity.startActivity(intent);
     }

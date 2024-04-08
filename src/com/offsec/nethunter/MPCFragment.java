@@ -3,8 +3,12 @@ package com.offsec.nethunter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
+import android.net.ConnectivityManager;
+import android.net.LinkAddress;
+import android.net.LinkProperties;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkRequest;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,13 +21,15 @@ import android.widget.Spinner;
 
 import com.offsec.nethunter.bridge.Bridge;
 
-import java.util.Locale;
+import java.net.Inet4Address;
+import java.net.InetAddress;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-public class MPCFragment extends Fragment {
 
+public class MPCFragment extends Fragment {
     private String typeVar;
     private String callbackTypeVar;
     private String payloadVar;
@@ -31,6 +37,8 @@ public class MPCFragment extends Fragment {
     private String stagerVar;
     private Context context;
     private static final String ARG_SECTION_NUMBER = "section_number";
+    private ConnectivityManager connectivityManager;
+    private NetworkRequest.Builder builder;
 
     public MPCFragment() {
     }
@@ -47,6 +55,9 @@ public class MPCFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = getContext();
+        assert context != null;
+        connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        builder = new NetworkRequest.Builder();
     }
 
     @Override
@@ -67,7 +78,7 @@ public class MPCFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
                 String selectedItemText = parent.getItemAtPosition(pos).toString();
-                Log.d("Slected: ", selectedItemText);
+                Log.d("Selected: ", selectedItemText);
                 switch (pos) {
                     case 0:
                         typeVar = "asp";
@@ -129,7 +140,7 @@ public class MPCFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
                 String selectedItemText = parent.getItemAtPosition(pos).toString();
-                Log.d("Slected: ", selectedItemText);
+                Log.d("Selected: ", selectedItemText);
                 if (selectedItemText.equals("MSF")) {
                     payloadVar = "msf";
                 } else if (selectedItemText.equals("CMD")) {
@@ -155,7 +166,7 @@ public class MPCFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
                 String selectedItemText = parent.getItemAtPosition(pos).toString();
-                Log.d("Slected: ", selectedItemText);
+                Log.d("Selected: ", selectedItemText);
                 if (selectedItemText.equals("Reverse")) {
                     callbackVar = "reverse";
                 } else if (selectedItemText.equals("Bind")) {
@@ -195,7 +206,7 @@ public class MPCFragment extends Fragment {
             }
         });
 
-        // Callback Type SPinner
+        // Callback Type Spinner
         Spinner callbackTypeSpinner = rootView.findViewById(R.id.mpc_callbacktype_spinner);
         ArrayAdapter<CharSequence> callbackTypeAdapter = ArrayAdapter.createFromResource(context,
                 R.array.mpc_callbacktype_array, R.layout.payload_maker_item);
@@ -207,8 +218,8 @@ public class MPCFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
                 String selectedItemText = parent.getItemAtPosition(pos).toString();
-                Log.d("Slected: ", selectedItemText);
-                //use swich!
+                Log.d("Selected: ", selectedItemText);
+                //use switch!
                 switch (selectedItemText) {
                     case "TCP":
                         callbackTypeVar = "tcp";
@@ -237,19 +248,28 @@ public class MPCFragment extends Fragment {
         //final String PortStr = port.getText().toString();
 
         // Get IP address for IP default IP field
-        // http://stackoverflow.com/questions/6064510/how-to-get-ip-address-of-the-device
-        WifiManager wifiMan = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        WifiInfo wifiInf = wifiMan.getConnectionInfo();
-        int ipAddress = wifiInf.getIpAddress();
-        String ip = String.format(Locale.getDefault(),"%d.%d.%d.%d", (ipAddress & 0xff), (ipAddress >> 8 & 0xff), (ipAddress >> 16 & 0xff), (ipAddress >> 24 & 0xff));
+        connectivityManager.registerNetworkCallback(
+                builder.build(),
+                new ConnectivityManager.NetworkCallback() {
+                    @Override
+                    public void onAvailable(@NonNull Network network) {
+                        NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(network);
+                        LinkProperties linkProperties = connectivityManager.getLinkProperties(network);
 
-        // IP Text Field
-        EditText ipaddress = rootView.findViewById(R.id.mpc_ip_address);
-        ipaddress.setText(ip);
-        //final String IPAddressStr = ipaddress.getText().toString();
-        // this should not be assigned like that
-        // the vaue is dinamic, create a gettet (getCmd())
-        //cmd = typeVar + " " + ipaddress.getText() + " " + port.getText() + " " + payloadVar + " " + callbackVar + " " + " " + stagerVar + " " + callbackTypeVar;
+                        if (networkCapabilities != null && linkProperties != null) {
+                            for (LinkAddress linkAddress : linkProperties.getLinkAddresses()) {
+                                InetAddress address = linkAddress.getAddress();
+                                if (address instanceof Inet4Address) {
+                                    String ip = address.getHostAddress();
+                                    // IP Text Field
+                                    EditText ipaddress = rootView.findViewById(R.id.mpc_ip_address);
+                                    ipaddress.setText(ip);
+                                }
+                            }
+                        }
+                    }
+                }
+        );
 
         Log.d("start cmd values", getCmd(rootView));
 
@@ -283,6 +303,6 @@ public class MPCFragment extends Fragment {
 
     public void run_cmd(String cmd) {
         Intent intent = Bridge.createExecuteIntent("/data/data/com.offsec.nhterm/files/usr/bin/kali", cmd);
-        getContext().startActivity(intent);
+        requireContext().startActivity(intent);
     }
 }

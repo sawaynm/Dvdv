@@ -6,6 +6,10 @@
     <queries>
         <package android:name="com.offsec.nhterm" />
     </queries>
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -13,6 +17,9 @@
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage" />
@@ -42,7 +49,8 @@
         android:resizeableActivity="true"
         android:theme="@style/Theme.Nethunter"
         android:windowSoftInputMode="adjustResize"
-        android:requestLegacyExternalStorage="true">
+        android:requestLegacyExternalStorage="true"
+        tools:targetApi="n">
         <activity
             android:name=".AppNavHomeActivity"
             android:configChanges="orientation|keyboardHidden|screenSize|keyboard"
@@ -62,7 +70,8 @@
                 android:defaultWidth="600dp"
                 android:gravity="top|end"
                 android:minHeight="320dp"
-                android:minWidth="480dp" />
+                android:minWidth="480dp"
+                tools:targetApi="n" />
         </activity>
 
         <activity
@@ -128,4 +137,3 @@
             android:exported="false" />
     </application>
 </manifest>
-

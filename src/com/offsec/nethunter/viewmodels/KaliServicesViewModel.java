@@ -13,6 +13,7 @@ import com.offsec.nethunter.models.NethunterModel;
 
 import java.util.List;
 
+
 /*
     ViewModel class for kaliservices model, this is to be observed the List of KaliServicesModel class.
     This class should be initiated every time the KaliServicesFragment is created.
