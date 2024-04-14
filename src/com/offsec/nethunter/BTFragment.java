@@ -929,6 +929,7 @@ public class BTFragment extends Fragment {
         private String selected_preset;
         private String selected_preset_uac;
         private String selected_prefix;
+        private String selected_badbt_class;
         String prefixCMD = "";
         String uacCMD = "";
         final ShellExecuter exe = new ShellExecuter();
@@ -960,10 +961,51 @@ public class BTFragment extends Fragment {
                 BadBTdesc.setVisibility(View.GONE);
             }
 
-            //Selected iface, name, bdaddr
+            //Selected iface, name, bdaddr, class
             final EditText badbt_interface = rootView.findViewById(R.id.badbt_interface);
             final EditText badbt_name = rootView.findViewById(R.id.badbt_name);
             final EditText badbt_bdaddr = rootView.findViewById(R.id.badbt_address);
+            final EditText badbt_class = rootView.findViewById(R.id.badbt_class);
+
+            //Class spinner
+            Spinner badbtclass = rootView.findViewById(R.id.badbt_class_spinner);
+            final ArrayList<String> classes = new ArrayList<>();
+            classes.add("Keyboard");
+            classes.add("Headset");
+            classes.add("Speaker");
+            classes.add("Mouse");
+            classes.add("Printer");
+            classes.add("PC");
+            classes.add("Mobile");
+            classes.add("Custom");
+            badbtclass.setAdapter(new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, classes));
+            badbtclass.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int pos, long id) {
+                    selected_prefix = parentView.getItemAtPosition(pos).toString();
+                    if (selected_prefix.equals("Keyboard")) {
+                        badbt_class.setText("0x000540");
+                    } else if (selected_prefix.equals("Headset")) {
+                        badbt_class.setText("0x000408");
+                    } else if (selected_prefix.equals("Speaker")) {
+                        badbt_class.setText("0x240414");
+                    } else if (selected_prefix.equals("Mouse")) {
+                        badbt_class.setText("0x002580");
+                    } else if (selected_prefix.equals("Printer")) {
+                        badbt_class.setText("0x040680");
+                    } else if (selected_prefix.equals("PC")) {
+                        badbt_class.setText("0x02010c");
+                    } else if (selected_prefix.equals("Mobile")) {
+                        badbt_class.setText("0x000204");
+                    } else if (selected_prefix.equals("Custom")) {
+                        badbt_class.setText("");
+                    }
+                }
+                @Override
+                public void onNothingSelected(AdapterView<?> parentView) {
+                }
+            });
+
 
             //Refresh
             refresh_badbt(rootView);
@@ -973,6 +1015,8 @@ public class BTFragment extends Fragment {
             if (!prevbadbtiface.isEmpty()) badbt_interface.setText(prevbadbtiface);
             String prevbadbtaddr = sharedpreferences.getString("badbt-bdaddr", "");
             if (!prevbadbtaddr.isEmpty()) badbt_bdaddr.setText(prevbadbtaddr);
+            String prevbadbtclass = sharedpreferences.getString("badbt-class", "");
+            if (!prevbadbtclass.isEmpty()) badbt_class.setText(prevbadbtclass);
 
             //Refresh Status
             ImageButton RefreshBadBTStatus = rootView.findViewById(R.id.refreshBadBTStatus);
@@ -987,20 +1031,20 @@ public class BTFragment extends Fragment {
                     String BadBT_name = badbt_name.getText().toString();
                     String BadBT_iface = badbt_interface.getText().toString();
                     String BadBT_bdaddr = badbt_bdaddr.getText().toString();
+                    String BadBT_class = badbt_class.getText().toString();
                     String dbus_statusCMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service dbus status | grep dbus");
                     String bt_statusCMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service bluetooth status | grep bluetooth");
                     String bt_ifaceCMD = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd hciconfig | grep hci");
                     sharedpreferences.edit().putString("badbt-name", BadBT_name).apply();
                     sharedpreferences.edit().putString("badbt-iface", BadBT_iface).apply();
                     sharedpreferences.edit().putString("badbt-bdaddr", BadBT_bdaddr).apply();
+                    sharedpreferences.edit().putString("badbt-class", BadBT_class).apply();
 
                     if (dbus_statusCMD.equals("dbus is running.") && bt_statusCMD.equals("bluetooth is running.") && !bt_ifaceCMD.isEmpty()) {
                         if (!BadBT_name.isEmpty() && !BadBT_iface.isEmpty() && !BadBT_bdaddr.isEmpty()) {
                             Toast.makeText(requireActivity().getApplicationContext(), "Starting server...", Toast.LENGTH_SHORT).show();
-                            run_cmd("echo -ne \"\\033]0;BadBT Server\\007\" && clear;sed -i -e 's/\\(MY_DEV_NAME = \\).*/\\1\\\"" + BadBT_name + "\\\"/' /root/badbt/btk_server.py &&" +
-                                    " sed -i -e 's/\\(MY_ADDRESS = \\).*/\\1\\\"" + BadBT_bdaddr + "\\\"/' /root/badbt/btk_server.py &&" +
-                                    " sed -i -e 's/\\(MY_INTERFACE = \\).*/\\1\\\"" + BadBT_iface + "\\\"/' /root/badbt/btk_server.py &&" +
-                                    " clear;python3 /root/badbt/btk_server.py &;sleep 1 && echo 'Starting agent...' && sleep 1 && bluetoothctl --agent NoInputNoOutput && exit");
+                            run_cmd("echo -ne \"\\033]0;BadBT Server\\007\" && clear;python3 /root/badbt/btk_server.py -n '"
+                                    + BadBT_name + "' -i " + BadBT_iface + " -c " + BadBT_class + " -a " + BadBT_bdaddr + "&;sleep 1 && echo 'Starting agent...' && sleep 1 && bluetoothctl --agent NoInputNoOutput && exit");
                             refresh_badbt(rootView);
                         } else {
                             Toast.makeText(requireActivity().getApplicationContext(), "Please enter interface, keyboard name, and address!", Toast.LENGTH_SHORT).show();
