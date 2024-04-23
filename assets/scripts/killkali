@@ -64,14 +64,6 @@ f_umount_fs() {
     if $BUSYBOX mountpoint -q $MNT/$1; then
         if $BUSYBOX umount -l "$MNT/$1" || $BUSYBOX umount -f "$MNT/$1"; then
             bklog "[+] umounted $MNT/$1"
-            if [ ! "$1" = "dev/pts" -a ! "$1" = "dev/shm" ]; then
-                if rm -rf $MNT/$1; then
-                    bklog "[+] removed $MNT/$1"
-                else
-                    bklog "[-] Failed to remove $MNT/$1"
-                    isAllunmounted=1
-                fi
-            fi
         else
             bklog "[-] failed to umounted $MNT/$1"
             isAllunmounted=1
@@ -79,12 +71,6 @@ f_umount_fs() {
     else
         if [ -d $MNT/$1 ]; then
             bklog "[+] $MNT/$1 is unmounted already."
-            if rm -rf $MNT/$1; then
-                bklog "[+] removed $MNT/$1"
-            else
-                bklog "[-] Failed to remove $MNT/$1"
-                isAllunmounted=1
-            fi
         fi
     fi
 
