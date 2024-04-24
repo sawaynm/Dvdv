@@ -1,5 +1,6 @@
 package com.offsec.nethunter;
 
+import android.os.Handler;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -364,8 +365,18 @@ public class BTFragment extends Fragment {
                             File bluebinder = new File(NhPaths.CHROOT_PATH() + "/usr/sbin/bluebinder");
                             if (bluebinder.exists()) {
                                 exe.RunAsRoot(new String[]{"svc bluetooth disable"});
+				// Enable airplane mode
+				exe.RunAsRoot(new String[]{"settings put global airplane_mode_on 1;am broadcast -a android.intent.action.AIRPLANE_MODE --ez state true"});
                                 run_cmd("echo -ne \"\\033]0;Bluebinder\\007\" && clear;screen -A bluebinder || bluebinder;exit");
-                                Toast.makeText(requireActivity().getApplicationContext(), "Starting bluebinder...", Toast.LENGTH_SHORT).show();
+				Toast.makeText(requireActivity().getApplicationContext(), "Starting bluebinder...", Toast.LENGTH_SHORT).show();
+
+				// Disable airplane mode
+				new Handler().postDelayed(new Runnable() {
+					@Override
+					public void run() {
+					    exe.RunAsRoot(new String[]{"settings put global airplane_mode_on 0;am broadcast -a android.intent.action.AIRPLANE_MODE --ez state false"});
+				    }
+				}, 9000); // 9000 milliseconds delay
                             } else {
                                 Toast.makeText(requireActivity().getApplicationContext(), "Bluebinder is not installed. Launching setup..", Toast.LENGTH_SHORT).show();
                                 RunSetup();
