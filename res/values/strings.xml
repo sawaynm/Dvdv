@@ -235,6 +235,9 @@
     <!-- Settings -->
     <string name="settings_description">Select your desired boot animation here. Please note that some older phones prefer 90% the size of original screen resolution, so it can run smoothly. In that case, tick convert, then set image resolution and final resolution together.</string>
 
+    <!-- Kernel -->
+    <string name="kernel_description">Flash your custom kernel straight from Android. Unknown device compatibility.</string>
+
     <!-- MITMf -->
     <string name="mitmf_description">Written by @byt3bl33d3r, MITMf aims to provide a one-stop-shop for Man-In-The-Middle and network attacks while updating and improving existing attacks and techniques.</string>
     <string-array name="mitmf_interface_array">
@@ -357,6 +360,7 @@
     <string name="drawertitlegps">Wardriving</string>
     <string name="drawertitledeauth">DeAuth</string>
     <string name="drawertitlesettings">Settings</string>
+    <string name="drawertitlekernel">Kernel</string>
     <string name="drawertitlemodules">Modules</string>
     <string name="drawertitleset">SET</string>
     <string name="InstallAndUpdateButtonText"><![CDATA[Install & Update]]></string>
