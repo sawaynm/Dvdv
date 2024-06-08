@@ -24,7 +24,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/base_listItem_LR"
+            android:layout_marginStart="@dimen/base_listItem_LR"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="numex"
             android:id="@+id/numex"
@@ -38,6 +38,14 @@
         android:layout_marginRight="@dimen/base_listItem_LR"
         android:layout_marginLeft="@dimen/base_listItem_LR"
         android:id="@+id/search_filters">
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:visibility="gone"/>
 
         <Spinner
             android:layout_width="match_parent"
@@ -89,5 +97,4 @@
         android:id="@+id/searchResultsList"
         android:divider="#333"
         android:dividerHeight="1dp" />
-
 </LinearLayout>

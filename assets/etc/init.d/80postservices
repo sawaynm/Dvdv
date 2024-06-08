@@ -6,11 +6,14 @@ if [ ! $? -eq 0 ]; then
     exit 1
 fi
 
-## Define the nethunter app package name.
+## Define the NetHunter app package name.
 APP_PGK_NAME=com.offsec.nethunter
 
-USERINIT_SCRIPT_PATH=$(readlink -f $0)
+USERINIT_SCRIPT_PATH=$(readlink -f "$0")
+# shellcheck source=/data/data/$APP_PGK_NAME/scripts/bootkali_log
 . /data/data/$APP_PGK_NAME/scripts/bootkali_log
+
+# shellcheck source=/data/data/$APP_PGK_NAME/scripts/bootkali_env
 . /data/data/$APP_PGK_NAME/scripts/bootkali_env
 
 ## Validate busybox path.
@@ -26,12 +29,12 @@ if [ ! -d "$MNT" ]; then
     exit 2
 fi
 if [ -z "$MNT" ]; then
-    bklog "[-] The \$MNT variable is not defined, please run nethunter app first."
+    bklog "[-] The \$MNT variable is not defined, please run NetHunter app first."
     exit 2
 fi
 
 ## Define chroot shell executable path.
-if [ ! -x $MNT$CHROOT_EXEC ]; then
+if [ ! -x "$MNT""$CHROOT_EXEC" ]; then
     bklog "[-] Your chroot has no \"sudo\" installed, please install it manually first."
     bklog "[-] Also make sure your Kali Chroot is not corrupted."
     exit 2
@@ -39,8 +42,13 @@ fi
 
 bklog "[!] Starting user defined Kali services"
 while IFS= read -r line; do
+    # shellcheck disable=SC2236
     if [ ! -z "$line" ]; then
-        $BUSYBOX chroot $MNT $CHROOT_EXEC -E PATH=$PATH su -c "$line"
+        $BUSYBOX chroot "$MNT" "$CHROOT_EXEC" -E PATH="$PATH" su -c "$line"
     fi
 done < /data/data/$APP_PGK_NAME/scripts/kaliservices
 bklog "[+] Kali services should be started!"
+
+su -c "rfkill unblock all"
+su -c "rfkill unblock 0"
+bklog "[!] Unblocking all rfkill devices"

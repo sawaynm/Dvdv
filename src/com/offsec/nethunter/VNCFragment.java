@@ -61,6 +61,8 @@ public class VNCFragment extends Fragment {
     private boolean localhost;
     private boolean confirm_res;
     private String prevusr = "kali";
+    private Integer prevres = 0;
+    private String prevres_string = "";
     private String delay_cmd = "";
     private Integer posu;
     private Integer posd = 0;
@@ -265,6 +267,13 @@ public class VNCFragment extends Fragment {
             }
         });
 
+        //Last selected resolution
+        prevres = sharedpreferences.getInt("last_kex_res", 0);
+        prevres_string = sharedpreferences.getString("last_kex_res_string", "");
+        if (exe.RunAsRootOutput("grep " + prevres_string + " " + nh.APP_SD_FILES_PATH + "/configs/vnc-resolutions").equals(prevres_string)){
+            vncresolution.setSelection(prevres);
+        };
+
         //Select VNC resolution
         vncresolution.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
@@ -273,8 +282,11 @@ public class VNCFragment extends Fragment {
                 selected_vncres = parentView.getItemAtPosition(pos).toString();
                 if (selected_vncres.equals("Auto") || selected_vncres.equals("")) {
                     selected_vncresCMD = "";
+
                 }
                 else selected_vncresCMD = "-geometry " + selected_vncres + " ";
+                sharedpreferences.edit().putInt("last_kex_res", pos).apply();
+                sharedpreferences.edit().putString("last_kex_res_string", selected_vncres).apply();
             }
             @Override
             public void onNothingSelected(AdapterView<?> parentView) {

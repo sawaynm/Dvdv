@@ -11,6 +11,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
+
 /**
  * Created by jmingov on 11/15/15.
  *
@@ -53,7 +54,6 @@ public class BootKali {
     private final String TERM_CMD;
     private final String KALI_ENV;
     private final String KALI_COMMAND;
-
     private final String FULL_CMD;
     private final String SPACE = " ";
     private final String SINGLEQ = "'";
@@ -82,13 +82,13 @@ public class BootKali {
                 "HOME=/root",
                 "LOGNAME=root",
                 "SHLVL=1",
-                "YOU_KNOW_WHAT=THIS_IS_KALI_LINUX_NETHUNER_FROM_JAVA_BINKY"
+                "YOU_KNOW_WHAT=THIS_IS_KALI_LINUX_NETHUNTER_FROM_JAVA_BINKY"
         };
-        String ENV_OUT = "";
+        StringBuilder ENV_OUT = new StringBuilder();
         for (String aENV : ENV) {
-            ENV_OUT = ENV_OUT + "export " + aENV + " && ";
+            ENV_OUT.append("export ").append(aENV).append(" && ");
         }
-        return ENV_OUT;
+        return ENV_OUT.toString();
     }
 
     //
@@ -116,22 +116,14 @@ public class BootKali {
             //String dns_servers = "";
             for (String name : new String[]{"net.dns1", "net.dns2", "net.dns3", "net.dns4",}) {
                 String value = (String) method.invoke(null, name);
-                if (value != null && !"".equals(value) && !servers.contains(value)) {
+                if (value != null && !value.isEmpty() && !servers.contains(value)) {
                     servers.add(value);
                     Log.d("DNS:", value);
                 }
             }
             return true;
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return false;
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-            return false;
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-            return false;
-        } catch (IllegalAccessException e) {
+        } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException |
+                 IllegalAccessException e) {
             e.printStackTrace();
             return false;
         }
@@ -143,11 +135,10 @@ public class BootKali {
     *
      */
 
-
     // blocking with output
     // sends a command to kali
     public String run() {
-        String output = "";
+        StringBuilder output = new StringBuilder();
         String line;
         try {
             Process process = Runtime.getRuntime().exec("su");
@@ -159,12 +150,12 @@ public class BootKali {
             stdin.close();
             BufferedReader br = new BufferedReader(new InputStreamReader(stdout));
             while ((line = br.readLine()) != null) {
-                output = output + line + "\n";
+                output.append(line).append("\n");
             }
             br.close();
             br = new BufferedReader(new InputStreamReader(stderr));
             while ((line = br.readLine()) != null) {
-                Log.e("Shell out:", output);
+                Log.e("Shell out:", output.toString());
                 Log.e("Shell Error:", line);
             }
             br.close();
@@ -174,7 +165,7 @@ public class BootKali {
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
-        return output;
+        return output.toString();
     }
 
     // sends a command to kali
@@ -210,7 +201,7 @@ public class BootKali {
         return "su -c \"" + TERM_CMD + "\"";
     }
 
-    // this string is the comand to pop a kaly shell (intent to the terminal, pass this a command)
+    // this string is the command to pop a Kali shell (intent to the terminal, pass this a command)
     public String GET_KALI_SHELL_CMD() {
         return "su -c \"clear && " + BOOTKALI + "/bin/login -f root \"";
     }
@@ -218,6 +209,4 @@ public class BootKali {
     public String GET_CMD() {
         return FULL_CMD;
     }
-
-
 }

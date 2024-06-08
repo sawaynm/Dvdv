@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
-import android.os.Environment;
 import android.util.Log;
 
 import com.offsec.nethunter.utils.NhPaths;
@@ -14,11 +13,11 @@ import com.offsec.nethunter.utils.ShellExecuter;
 import java.util.LinkedList;
 import java.util.List;
 
+
 class SearchSploitSQL extends SQLiteOpenHelper {
     private final ShellExecuter exe = new ShellExecuter();
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "SearchSploit";
-
     SearchSploitSQL(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
 
@@ -68,8 +67,7 @@ class SearchSploitSQL extends SQLiteOpenHelper {
         String sql = "SELECT COUNT(*) FROM " + SearchSploit.TABLE;
         SQLiteDatabase db = this.getWritableDatabase();
         SQLiteStatement statement = db.compileStatement(sql);
-        long count = statement.simpleQueryForLong();
-        return count;
+        return statement.simpleQueryForLong();
     }
 
     public List<SearchSploit> getAllExploits() {
@@ -159,5 +157,4 @@ class SearchSploitSQL extends SQLiteOpenHelper {
         cursor.close();
         return strList;
     }
-
 }

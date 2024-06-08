@@ -1,14 +1,10 @@
-/**
- * Created by AnglerVonMur on 26.07.15.
- */
 package com.offsec.nethunter;
 
-public class LauncherApp {
 
+public class LauncherApp {
     private long id;
     private String btn_label;
     private String command;
-
     final static String TABLE = "LAUNCHERS";
     final static String ID = "ID";
     final static String BTN_LABEL = "BTN_LABEL";
@@ -27,23 +23,18 @@ public class LauncherApp {
     public void setId(long id) {
         this.id = id;
     }
-
     public long getId() {
         return id;
     }
-
     String getBtn_label() {
         return btn_label;
     }
-
     void setBtn_label(String btn_label) {
         this.btn_label = btn_label;
     }
-
     public String getCommand() {
         return command;
     }
-
     public void setCommand(String command) {
         this.command = command;
     }

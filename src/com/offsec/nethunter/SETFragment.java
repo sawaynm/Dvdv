@@ -115,7 +115,7 @@ public class SETFragment extends Fragment {
     public void RunSetup() {
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
         run_cmd("echo -ne \"\\033]0;SET Setup\\007\" && clear;if [[ -d /root/setoolkit ]]; then echo 'SET is already installed'" +
-                        ";else git clone https://github.com/yesimxev/social-engineer-toolkit /root/setoolkit && echo 'Successfully installed SET!';fi; echo 'Closing in 3secs..'; sleep 3 && exit ");
+                ";else git clone https://github.com/yesimxev/social-engineer-toolkit /root/setoolkit && echo 'Successfully installed SET!';fi; echo 'Closing in 3secs..'; sleep 3 && exit ");
         sharedpreferences.edit().putBoolean("set_setup_done", true).apply();
     }
 

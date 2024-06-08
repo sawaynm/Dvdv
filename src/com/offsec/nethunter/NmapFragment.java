@@ -17,23 +17,21 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.Switch;
 
 import com.offsec.nethunter.bridge.Bridge;
 
 import java.util.ArrayList;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 
-public class NmapFragment extends Fragment {
 
+public class NmapFragment extends Fragment {
     private static final String TAG = "NMAPFragment";
     private static final String ARG_SECTION_NUMBER = "section_number";
-
     // Building command line
     private static final ArrayList<String> CommandComposed = new ArrayList<>();
-
     // Nmap switches
     private String net_interface;
     private String time_template;
@@ -47,7 +45,6 @@ public class NmapFragment extends Fragment {
     private String Ports;
     private String fastmode;
     private String topports;
-
     private EditText searchBar;
     private EditText portsBar;
     private Context context;
@@ -78,7 +75,7 @@ public class NmapFragment extends Fragment {
         SharedPreferences sharedpreferences = context.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
 
         // Switch to activate open/close of advanced options
-        Switch advswitch = rootView.findViewById(R.id.nmap_adv_switch);
+        SwitchCompat advswitch = rootView.findViewById(R.id.nmap_adv_switch);
         advswitch.setChecked(false);
         advswitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
@@ -93,7 +90,6 @@ public class NmapFragment extends Fragment {
         final Button searchButton = rootView.findViewById(R.id.nmap_scan_button);
         searchButton.setOnClickListener(
                 view -> getCmd());
-
 
         // NMAP Interface Spinner
         Spinner typeSpinner = rootView.findViewById(R.id.nmap_int_spinner);
@@ -130,6 +126,8 @@ public class NmapFragment extends Fragment {
                         net_interface = " -e rndis0";
                         addToCmd(net_interface);
                         break;
+                    default:
+                        throw new IllegalStateException("Unexpected value: " + pos);
                 }
             }
 
@@ -193,6 +191,8 @@ public class NmapFragment extends Fragment {
                         technique = " -sX";
                         addToCmd(technique);
                         break;
+                    default:
+                        throw new IllegalStateException("Unexpected value: " + pos);
                 }
             }
 
@@ -204,7 +204,6 @@ public class NmapFragment extends Fragment {
 
         // Search button
         addClickListener(v -> run_cmd("nmap " + getCmd()), rootView);
-
 
         // NMAP Timing Spinner
         Spinner timeSpinner = rootView.findViewById(R.id.nmap_timing_spinner);
@@ -250,6 +249,8 @@ public class NmapFragment extends Fragment {
                         time_template = " -T 5";
                         addToCmd(time_template);
                         break;
+                    default:
+                        throw new IllegalStateException("Unexpected value: " + pos);
                 }
             }
 
@@ -400,18 +401,18 @@ public class NmapFragment extends Fragment {
     }
 
     private String getCmd() {
-        String genCmd = "";
+        StringBuilder genCmd = new StringBuilder();
         for (int j = CommandComposed.size() - 1; j >= 0; j--) {
-            genCmd = genCmd + CommandComposed.get(j);
+            genCmd.append(CommandComposed.get(j));
         }
         //Log.d("NMAP SQL:", "nmap --script sqlite-output --script-args=dbname=/tmp/scan.sqlite,dbtable=scandata " + genCmd);
         Log.d("NMAP CMD OUTPUT: ", "nmap " + genCmd);
 
-        return genCmd;
+        return genCmd.toString();
     }
 
     private static void cleanCmd() {
-        if (CommandComposed.size() > 0) {
+        if (!CommandComposed.isEmpty()) {
             CommandComposed.subList(0, CommandComposed.size()).clear();
         }
     }
@@ -437,6 +438,6 @@ public class NmapFragment extends Fragment {
 
     public void run_cmd(String cmd) {
         Intent intent = Bridge.createExecuteIntent("/data/data/com.offsec.nhterm/files/usr/bin/kali", cmd);
-        getContext().startActivity(intent);
+        requireContext().startActivity(intent);
     }
 }

@@ -2,8 +2,8 @@ package com.offsec.nethunter;
 
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,13 +20,13 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.offsec.nethunter.AsyncTask.MacchangerAsyncTask;
 import com.offsec.nethunter.utils.NhPaths;
 
 import java.net.NetworkInterface;
 import java.security.SecureRandom;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,8 +39,8 @@ import androidx.fragment.app.Fragment;
 
 import static com.offsec.nethunter.R.id.f_nethunter_action_search;
 
-public class MacchangerFragment extends Fragment {
 
+public class MacchangerFragment extends Fragment {
     private static final String TAG = "MacchangerFragment";
     private static final String ARG_SECTION_NUMBER = "section_number";
     private static int lastSelectedIfacePosition = 0;
@@ -61,7 +61,7 @@ public class MacchangerFragment extends Fragment {
     private TextView currentMacTextView;
     private TextView currentHostNameTextView;
     private ImageButton reloadImageButton;
-    private static HashMap<String, String> iFaceAndMacHashMap = new HashMap<>();
+    private static final HashMap<String, String> iFaceAndMacHashMap = new HashMap<>();
     private Context context;
     private Activity activity;
 
@@ -213,8 +213,8 @@ public class MacchangerFragment extends Fragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 lastSelectedIfacePosition = position;
                 currentMacTextView.setText(iFaceAndMacHashMap.get(interfaceSpinner.getSelectedItem().toString().toLowerCase()));
-                changeMacButton.setText(getString(R.string.changeMAC) + " " + interfaceSpinner.getSelectedItem().toString().toUpperCase());
-                resetMacButton.setText(getString(R.string.resetMAC) + " " + interfaceSpinner.getSelectedItem().toString().toUpperCase());
+                changeMacButton.setText(MessageFormat.format("{0} {1}", getString(R.string.changeMAC), interfaceSpinner.getSelectedItem().toString().toUpperCase()));
+                resetMacButton.setText(MessageFormat.format("{0} {1}", getString(R.string.resetMAC), interfaceSpinner.getSelectedItem().toString().toUpperCase()));
             }
 
             @Override
@@ -223,7 +223,6 @@ public class MacchangerFragment extends Fragment {
             }
         });
     }
-
 
     private void setMacModeSpinner() {
         if (macModeSpinner.getSelectedItemPosition() == 0){
@@ -282,7 +281,7 @@ public class MacchangerFragment extends Fragment {
     }
 
     private static void getIfaceAndMacAddr() {
-        if (iFaceAndMacHashMap.size() != 0) iFaceAndMacHashMap.clear();
+        if (!iFaceAndMacHashMap.isEmpty()) iFaceAndMacHashMap.clear();
         try {
             List<NetworkInterface> allIface = Collections.list(NetworkInterface.getNetworkInterfaces());
             for (NetworkInterface iface : allIface) {
@@ -324,7 +323,7 @@ public class MacchangerFragment extends Fragment {
                     ad.setTitle("Warning!");
                     ad.setMessage("Are you sure to change the " + interfaceSpinner.getSelectedItem().toString().toLowerCase() +
                             "'s MAC address back to the original MAC address: " + originalMac + " ?");
-                    ad.setButton(Dialog.BUTTON_POSITIVE, "YES", (dialog, which) -> {
+                    ad.setButton(DialogInterface.BUTTON_POSITIVE, "YES", (dialog, which) -> {
                         ad.dismiss();
                         MaterialAlertDialogBuilder adb1 = new MaterialAlertDialogBuilder(activity, R.style.DialogStyle);
                         final AlertDialog ad1 = adb1.create();
@@ -399,5 +398,4 @@ public class MacchangerFragment extends Fragment {
             macchangerAsyncTask.execute(interfaceSpinner.getSelectedItem().toString().toLowerCase(), macAddress);
         });
     }
-
 }

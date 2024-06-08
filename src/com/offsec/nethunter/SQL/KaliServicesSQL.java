@@ -18,18 +18,22 @@ import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 
+
 public class KaliServicesSQL extends SQLiteOpenHelper {
 	private static KaliServicesSQL instance;
 	private static final String DATABASE_NAME = "KaliServicesFragment";
 	private static final String TAG = "KaliServicesSQL";
 	private static final String TABLE_NAME = DATABASE_NAME;
-	private static ArrayList<String> COLUMNS = new ArrayList<>();
+	private static final ArrayList<String> COLUMNS = new ArrayList<>();
 	private static final String[][] kaliserviceData = {
-			{"1", "SSH", "service ssh start", "service ssh stop", "sshd", "0"},
-			{"2", "APACHE2", "service apache2 start", "service apache2 stop", "apache2", "0"},
-			{"3", "POSTGRESQL", "service postgresql start", "service postgresql stop", "postgres", "0"},
+			{"1", "APACHE2", "service apache2 start", "service apache2 stop", "apache2", "0"},
+			{"2", "BLUETOOTH", "service bluetooth start", "service bluetooth stop", "bluetooth", "0"},
+			{"3", "DBUS", "service dbus start", "service dbus stop", "dbus", "0"},
 			{"4", "DNSMASQ", "service dnsmasq start", "service dnsmasq stop", "dnsmasq", "0"},
-			{"5", "DBUS", "service dbus start", "service dbus stop", "dbus", "0"}
+			{"5", "GPSD", "service gpsd start", "service gpsd stop", "gpsd", "0"},
+			{"6", "POSTGRESQL", "service postgresql start", "service postgresql stop", "postgres", "0"},
+			{"7", "SSH", "service ssh start", "service ssh stop", "ssh", "0"},
+			{"8", "NETWORKING", "service networking start", "service networking stop", "networking", "0"},
 	};
 
 	public synchronized static KaliServicesSQL getInstance(Context context){
@@ -81,12 +85,24 @@ public class KaliServicesSQL extends SQLiteOpenHelper {
 		SQLiteDatabase db = getWritableDatabase();
 		Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " ORDER BY " + COLUMNS.get(0) + ";", null);
 		while (cursor.moveToNext()) {
+			int columnIndex1 = cursor.getColumnIndex(COLUMNS.get(1));
+			int columnIndex2 = cursor.getColumnIndex(COLUMNS.get(2));
+			int columnIndex3 = cursor.getColumnIndex(COLUMNS.get(3));
+			int columnIndex4 = cursor.getColumnIndex(COLUMNS.get(4));
+			int columnIndex5 = cursor.getColumnIndex(COLUMNS.get(5));
+
+			String columnValue1 = columnIndex1 != -1 ? cursor.getString(columnIndex1) : null;
+			String columnValue2 = columnIndex2 != -1 ? cursor.getString(columnIndex2) : null;
+			String columnValue3 = columnIndex3 != -1 ? cursor.getString(columnIndex3) : null;
+			String columnValue4 = columnIndex4 != -1 ? cursor.getString(columnIndex4) : null;
+			String columnValue5 = columnIndex5 != -1 ? cursor.getString(columnIndex5) : null;
+
 			kaliServicesModelArrayList.add(new KaliServicesModel(
-					cursor.getString(cursor.getColumnIndex(COLUMNS.get(1))),
-					cursor.getString(cursor.getColumnIndex(COLUMNS.get(2))),
-					cursor.getString(cursor.getColumnIndex(COLUMNS.get(3))),
-					cursor.getString(cursor.getColumnIndex(COLUMNS.get(4))),
-					cursor.getString(cursor.getColumnIndex(COLUMNS.get(5))),
+					columnValue1,
+					columnValue2,
+					columnValue3,
+					columnValue4,
+					columnValue5,
 					"[-] Service is NOT running"
 			));
 		}
@@ -149,7 +165,6 @@ public class KaliServicesSQL extends SQLiteOpenHelper {
 				" WHERE " + COLUMNS.get(0) + " = " + (targetPosition + 1));
 		db.close();
 	}
-
 
 	public void resetData(){
 		SQLiteDatabase db = this.getWritableDatabase();

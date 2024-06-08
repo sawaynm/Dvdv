@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.lang.ref.WeakReference;
 
+
 public class Runner extends AppCompatActivity{
   public static AppCompatActivity activity;
   public static WeakReference<Context> context = null;
@@ -28,7 +29,7 @@ public class Runner extends AppCompatActivity{
     activity.startActivity(intent);
   }
 
-  public static void run_cmd_android_aactivity(String cmd) {
+  public static void run_cmd_android_activity(String cmd) {
     Intent intent = Bridge.createExecuteIntent("/data/data/com.offsec.nhterm/files/usr/bin/android-su", cmd);
     activity.startActivity(intent);
   }

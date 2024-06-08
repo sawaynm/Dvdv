@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 
+
 public class CustomCommandsSQL extends SQLiteOpenHelper {
     private static CustomCommandsSQL instance;
     private static final String DATABASE_NAME = "CustomCommandsFragment";
@@ -165,7 +166,6 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
                 " WHERE " + COLUMNS.get(0) + " = " + (targetPosition + 1));
         db.close();
     }
-
 
     public void resetData(){
         SQLiteDatabase db = this.getWritableDatabase();
