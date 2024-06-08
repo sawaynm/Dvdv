@@ -1,6 +1,4 @@
-<LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+<LinearLayout android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android">
@@ -29,7 +27,6 @@
                 android:layout_height="1dp"
                 android:background="?android:attr/listDivider" />
 
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -39,22 +36,17 @@
 
                 <TextView
                     android:id="@+id/textView2"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
                     android:layout_weight="3"
                     android:text="Wireless interface:"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
 
-                <EditText
+                <Spinner
                     android:id="@+id/wps_iface"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:ems="10"
-                    android:inputType="number"
-                    android:text="wlan0" />
-
+                    android:layout_height="wrap_content" />
             </LinearLayout>
 
             <Spinner
@@ -89,7 +81,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Reset interface"/>
-
             </LinearLayout>
 
             <LinearLayout
@@ -117,7 +108,6 @@
                     android:layout_weight="1"
                     android:text="Pixie Force"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
-
             </LinearLayout>
 
             <LinearLayout
@@ -145,7 +135,6 @@
                     android:layout_weight="1"
                     android:text="Custom PIN"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
-
             </LinearLayout>
 
             <LinearLayout
@@ -173,7 +162,6 @@
                     android:layout_weight="1"
                     android:text="WPS Button"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
-
             </LinearLayout>
 
             <LinearLayout
@@ -203,7 +191,6 @@
                     android:ems="10"
                     android:hint="12345678"
                     android:inputType="number" />
-
             </LinearLayout>
 
             <LinearLayout
@@ -244,9 +231,6 @@
                 android:paddingTop="10dp"
                 android:text="seconds"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
-
-
-
             </LinearLayout>
 
             <Button
@@ -270,9 +254,6 @@
                 android:singleLine="false"
                 android:textSize="13sp"
                 android:visibility="gone"/>
-
         </LinearLayout>
-
 </ScrollView>
-
 </LinearLayout>

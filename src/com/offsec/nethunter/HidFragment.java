@@ -69,7 +69,6 @@ public class HidFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         View rootView = inflater.inflate(R.layout.hid, container, false);
         HidFragment.TabsPagerAdapter tabsPagerAdapter = new TabsPagerAdapter(getChildFragmentManager());
 
@@ -251,9 +250,7 @@ public class HidFragment extends Fragment {
         NhPaths.showMessage(context,"Reseting USB");
     }
 
-
     private void openDialog() {
-
         int UACBypassIndex = sharedpreferences.getInt("UACBypassIndex", 0);
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
         builder.setTitle("UAC Bypass:");
@@ -390,15 +387,15 @@ public class HidFragment extends Fragment {
                 String[] lines = text.split("\n");
                 final String line = lines[lines.length - 1];
 
-                String regExPatIp = "-Lhost\\ (.*)\\ -Lport";
+                String regExPatIp = "-Lhost (.*) -Lport";
                 Pattern patternIp = Pattern.compile(regExPatIp, Pattern.MULTILINE);
                 final Matcher matcherIp = patternIp.matcher(line);
 
-                String regExPatPort = "-Lport\\ (.*)\\ -Force";
+                String regExPatPort = "-Lport (.*) -Force";
                 Pattern patternPort = Pattern.compile(regExPatPort, Pattern.MULTILINE);
                 final Matcher matcherPort = patternPort.matcher(line);
 
-                String regExPatPayload = "-Payload\\ (.*)\\ -Lhost";
+                String regExPatPayload = "-Payload (.*) -Lhost";
                 Pattern patternPayload = Pattern.compile(regExPatPayload, Pattern.MULTILINE);
                 final Matcher matcherPayload = patternPayload.matcher(line);
 
@@ -431,7 +428,6 @@ public class HidFragment extends Fragment {
             }).start();
         }
     }
-
 
     public static class WindowsCmdFragment extends HidFragment implements OnClickListener {
         private Context context;
@@ -510,7 +506,7 @@ public class HidFragment extends Fragment {
 
                     alert.setPositiveButton("Ok", (dialog, whichButton) -> {
                         String value = input.getText().toString();
-                        if (!value.isEmpty() && value.length() > 0) {
+                        if (!value.isEmpty()) {
                             //FIXME Save file (ask name)
                             File scriptFile = new File(loadFilePath + File.separator + value + ".conf");
                             if (!scriptFile.exists()) {

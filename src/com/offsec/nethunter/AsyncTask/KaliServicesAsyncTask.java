@@ -12,9 +12,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+
 public class KaliServicesAsyncTask extends AsyncTask<List<KaliServicesModel>, Void, List<KaliServicesModel>> {
 	private KaliServicesAsyncTaskListener listener;
-	private int actionCode;
+	private final int actionCode;
 	private int position;
 	private int originalPositionIndex;
 	private int targetPositionIndex;
@@ -134,7 +135,7 @@ public class KaliServicesAsyncTask extends AsyncTask<List<KaliServicesModel>, Vo
 			case DELETEDATA:
 				kaliServicesModelList = copyOfkaliServicesModelList[0];
 				if (kaliServicesModelList != null){
-					Collections.sort(selectedPositionsIndex, Collections.<Integer>reverseOrder());
+					Collections.sort(selectedPositionsIndex, Collections.reverseOrder());
 					for (Integer selectedPosition: selectedPositionsIndex) {
 						int i = selectedPosition;
 						kaliServicesModelList.remove(i);

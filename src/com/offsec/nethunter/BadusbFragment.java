@@ -46,10 +46,11 @@ public class BadusbFragment extends Fragment {
         super.onCreate(savedInstanceState);
         context = getContext();
         activity = getActivity();
+        // kimocoder: removed check for API 19, as minimum supported API is 21.
+        // then, we need to check badusb support in that startbadusb-lollipop.sh and how it's working today
+        // to possibly remove the check for API 21 and use the same script for all versions.
         if (Build.VERSION.SDK_INT >= 21) {
             sourcePath = NhPaths.APP_SD_FILES_PATH + "/configs/startbadusb-lollipop.sh";
-        } else if (Build.VERSION.SDK_INT >= 19) {
-            sourcePath = NhPaths.APP_SD_FILES_PATH + "/configs/startbadusb-kitkat.sh";
         }
     }
 
@@ -134,8 +135,6 @@ public class BadusbFragment extends Fragment {
         String[] command = new String[1];
         if (Build.VERSION.SDK_INT >= 21) {
             command[0] = NhPaths.APP_SCRIPTS_PATH + "/start-badusb-lollipop &> " + NhPaths.APP_SD_FILES_PATH + "/badusb.log &";
-        } else if (Build.VERSION.SDK_INT >= 19) {
-            command[0] = NhPaths.APP_SCRIPTS_PATH + "/start-badusb-kitkat &> " + NhPaths.APP_SD_FILES_PATH + "/badusb.log &";
         }
         exe.RunAsRoot(command);
         NhPaths.showMessage(context,"BadUSB attack started! Check /sdcard/nh_files/badusb.log");
@@ -146,8 +145,6 @@ public class BadusbFragment extends Fragment {
         String[] command = new String[1];
         if (Build.VERSION.SDK_INT >= 21) {
             command[0] = NhPaths.APP_SCRIPTS_PATH + "/stop-badusb-lollipop";
-        } else if (Build.VERSION.SDK_INT >= 19) {
-            command[0] = NhPaths.APP_SCRIPTS_PATH + "/stop-badusb-kitkat";
         }
         exe.RunAsRoot(command);
         NhPaths.showMessage(context,"BadUSB attack stopped!");

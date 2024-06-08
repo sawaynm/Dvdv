@@ -142,10 +142,12 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
             //WLAN interface
             String wlaniface = wlan_interface.getText().toString() ;
             if (!wlaniface.isEmpty()) wlaniface = "source=" + wlaniface + "\n";
+            else wlaniface = "";
 
             //BT interface
             String btiface = bt_interface.getText().toString();
             if (!btiface.isEmpty()) btiface = "source=" + btiface + "\n";
+            else btiface = "";
 
             //SDR sensors interface
             if (sdrcheckbox.isChecked()) rtlsdr = "source=rtl433-0\n";

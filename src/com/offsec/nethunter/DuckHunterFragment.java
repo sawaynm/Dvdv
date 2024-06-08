@@ -229,6 +229,8 @@ public class DuckHunterFragment extends Fragment {
             switch (i) {
                 case 1:
                     return new DuckHunterPreviewFragment(duckyInputFile, duckyOutputFile);
+                case 2:
+                    return new BtDuckyFragment();
                 default:
                     return new DuckHunterConvertFragment(duckyInputFile, duckyOutputFile);
             }
@@ -241,7 +243,7 @@ public class DuckHunterFragment extends Fragment {
 
         @Override
         public int getCount() {
-            return 2;
+            return 3;
         }
 
         @Override
@@ -249,6 +251,8 @@ public class DuckHunterFragment extends Fragment {
             switch (position) {
                 case 1:
                     return "Preview";
+                case 2:
+                    return "BT Ducky";
                 default:
                     return "Convert";
             }

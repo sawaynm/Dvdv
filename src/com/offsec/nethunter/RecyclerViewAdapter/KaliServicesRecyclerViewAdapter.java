@@ -15,11 +15,11 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -33,6 +33,7 @@ import com.offsec.nethunter.utils.NhPaths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
 
 public class KaliServicesRecyclerViewAdapter extends RecyclerView.Adapter<KaliServicesRecyclerViewAdapter.ItemViewHolder> implements Filterable {
 	public static final String TAG = "KaliServiceRecycleView";
@@ -229,7 +230,7 @@ public class KaliServicesRecyclerViewAdapter extends RecyclerView.Adapter<KaliSe
 	class ItemViewHolder extends RecyclerView.ViewHolder{
 		private final TextView nametextView;
 		//private Button editbutton;
-		private final Switch mSwitch;
+		private final SwitchCompat mSwitch;
 		private final CheckBox runOnChrootStartCheckbox;
 		private final TextView statustextView;
 

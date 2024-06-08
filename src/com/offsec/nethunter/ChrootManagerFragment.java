@@ -70,7 +70,7 @@ public class ChrootManagerFragment extends Fragment {
     private static final int NEED_TO_INSTALL = 2;
     public static boolean isAsyncTaskRunning = false;
     private Context context;
-    private static Activity activity;
+    private Activity activity;
 
     public static ChrootManagerFragment newInstance(int sectionNumber) {
         ChrootManagerFragment fragment = new ChrootManagerFragment();
@@ -192,7 +192,7 @@ public class ChrootManagerFragment extends Fragment {
             ad.setView(ll);
             ad.setButton(DialogInterface.BUTTON_POSITIVE, "Apply", (dialogInterface, i) -> {
                 if (chrootPathEditText.getText().toString().matches("^\\.(.*$)|^\\.\\.(.*$)|^/+(.*$)|^.*/+(.*$)|^$")){
-                    NhPaths.showMessage(activity, "Invilad Name, please try again.");
+                    NhPaths.showMessage(activity, "Invalid Name, please try again.");
                 } else {
                     NhPaths.ARCH_FOLDER = chrootPathEditText.getText().toString();
                     kaliFolderTextView.setText(NhPaths.ARCH_FOLDER);
@@ -310,13 +310,7 @@ public class ChrootManagerFragment extends Fragment {
                         } else MINORFULL = "minimal";
                         String targetDownloadFileName = "kalifs-" + ARCH + "-" + MINORFULL + ".tar.xz";
                         if (new File(downloadDir.getAbsoluteFile() + "/" + targetDownloadFileName).exists()){
-                            MaterialAlertDialogBuilder adb3 = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
-                            adb3.setMessage(downloadDir.getAbsoluteFile() + "/" + targetDownloadFileName + " exists. Do you want to overwrite it?");
-                            adb3.setPositiveButton("YES", (dialogInterface1, i1) -> {
-                                context.startService(new Intent(context, NotificationChannelService.class).setAction(NotificationChannelService.DOWNLOADING));
-                                startDownloadChroot(targetDownloadFileName, downloadDir);
-                            });
-                            adb3.setNegativeButton("NO", (dialogInterface12, i12) -> dialogInterface12.dismiss());
+                            MaterialAlertDialogBuilder adb3 = getMaterialAlertDialogBuilder(downloadDir, targetDownloadFileName);
                             adb3.create().show();
                         } else {
 
@@ -379,6 +373,18 @@ public class ChrootManagerFragment extends Fragment {
                 ad.cancel();
             });
         });
+    }
+
+    @NonNull
+    private MaterialAlertDialogBuilder getMaterialAlertDialogBuilder(File downloadDir, String targetDownloadFileName) {
+        MaterialAlertDialogBuilder adb3 = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
+        adb3.setMessage(downloadDir.getAbsoluteFile() + "/" + targetDownloadFileName + " exists. Do you want to overwrite it?");
+        adb3.setPositiveButton("YES", (dialogInterface1, i1) -> {
+            context.startService(new Intent(context, NotificationChannelService.class).setAction(NotificationChannelService.DOWNLOADING));
+            startDownloadChroot(targetDownloadFileName, downloadDir);
+        });
+        adb3.setNegativeButton("NO", (dialogInterface12, i12) -> dialogInterface12.dismiss());
+        return adb3;
     }
 
     private void setRemoveChrootButton(){
@@ -703,7 +709,7 @@ public class ChrootManagerFragment extends Fragment {
     // Bridge side functions
     ////
 
-    public static void run_cmd(String cmd) {
+    public void run_cmd(String cmd) {
         Intent intent = Bridge.createExecuteIntent("/data/data/com.offsec.nhterm/files/usr/bin/kali", cmd);
         activity.startActivity(intent);
     }
