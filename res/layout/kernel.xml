@@ -1,0 +1,68 @@
+<LinearLayout android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/wps_desc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|center"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="@string/kernel_description" />
+
+            <View
+                android:id="@+id/divider2"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Select kernel to flash"
+                android:layout_margin="10dp"
+                android:padding="4dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/kernelpath"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:hint="/sdcard/kernel_nethunter.zip"
+                        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/kernelfilebrowse"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="5"
+                        android:text="..."
+                        android:textColor="#ffffffff" />
+
+                </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/flash_kernel"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Flash kernel"
+                android:layout_margin="5dp"
+                android:textColor="#ffffffff" />
+
+        </LinearLayout>
+
+</LinearLayout>

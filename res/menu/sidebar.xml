@@ -15,6 +15,10 @@
             android:icon="@drawable/ic_action_settings_applications"
             android:title="@string/drawertitlesettings" />
         <item
+            android:id="@+id/kernel_item"
+            android:icon="@drawable/ic_action_kernel"
+            android:title="@string/drawertitlekernel" />
+        <item
         android:id="@+id/modules_item"
         android:icon="@drawable/ic_action_extension"
         android:title="@string/drawertitlemodules" />

@@ -381,15 +381,16 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
             snowfall = prefs.getBoolean("snowfall_enabled", false);
             navigationView.getMenu().getItem(2).setVisible(false);
             navigationView.getMenu().getItem(3).setVisible(false);
-            if (model.equals("catfish") || model.equals("catshark") || model.equals("catshark-4g")) navigationView.getMenu().getItem(7).setVisible(false);
-            navigationView.getMenu().getItem(12).setVisible(false);
-            navigationView.getMenu().getItem(15).setVisible(false);
+            navigationView.getMenu().getItem(4).setVisible(false);
+            if (model.equals("catfish") || model.equals("catshark") || model.equals("catshark-4g")) navigationView.getMenu().getItem(8).setVisible(false);
+            navigationView.getMenu().getItem(13).setVisible(false);
             navigationView.getMenu().getItem(16).setVisible(false);
-            navigationView.getMenu().getItem(18).setVisible(false);
+            navigationView.getMenu().getItem(17).setVisible(false);
             navigationView.getMenu().getItem(19).setVisible(false);
             navigationView.getMenu().getItem(20).setVisible(false);
             navigationView.getMenu().getItem(21).setVisible(false);
             navigationView.getMenu().getItem(22).setVisible(false);
+            navigationView.getMenu().getItem(23).setVisible(false);
         } else {
             snowfall = prefs.getBoolean("snowfall_enabled", true);
         }
@@ -615,6 +616,9 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                             break;
                         case R.id.settings_item:
                             changeFragment(fragmentManager, SettingsFragment.newInstance(itemId));
+                            break;
+                        case R.id.kernel_item:
+                            changeFragment(fragmentManager, KernelFragment.newInstance(itemId));
                             break;
                         case R.id.modules_item:
                             changeFragment(fragmentManager, ModulesFragment.newInstance(itemId));
