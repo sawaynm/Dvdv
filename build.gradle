@@ -38,8 +38,8 @@ android {
         //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 28
         //noinspection HighAppVersionCode
-        versionCode 2024030020
-        versionName "2024.2"
+        versionCode 2024030300
+        versionName "2024.2-rc2"
         multiDexEnabled true
     }
 
