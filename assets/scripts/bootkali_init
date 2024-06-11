@@ -64,7 +64,6 @@ f_mount_sdcard() {
     fi
     mkdir -p $MNT/sdcard
     for sdcard in \
-        /data/media/0 \
         "$EXTERNAL_STORAGE" \
         /storage/emulated/0 \
         /storage/emulated/legacy \
