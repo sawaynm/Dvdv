@@ -66,8 +66,8 @@ public class VNCFragment extends Fragment {
     private String delay_cmd = "";
     private Integer posu;
     private Integer posd = 0;
-    private static final int MIN_UID = 100000;
-    private static final int MAX_UID = 101000;
+    private static final int MIN_UID = 9000;
+    private static final int MAX_UID = 9999;
     NhPaths nh; //= new NhPaths();
     String BUSYBOX_NH= nh.getBusyboxPath();
     private Boolean iswatch;
