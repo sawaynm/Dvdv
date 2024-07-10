@@ -4,9 +4,11 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 
 import com.offsec.nethunter.AppNavHomeActivity;
+import com.offsec.nethunter.BuildConfig;
 import com.offsec.nethunter.R;
 import com.offsec.nethunter.utils.CheckForRoot;
 import com.offsec.nethunter.utils.NhPaths;
@@ -24,6 +26,7 @@ public class RunAtBootService extends JobIntentService {
     private static final String TAG = "Nethunter: Startup";
     static final int SERVICE_JOB_ID = 1;
     private NotificationCompat.Builder n = null;
+    private SharedPreferences sharedPreferences;
 
     @Override
     public void onCreate() {
@@ -31,6 +34,7 @@ public class RunAtBootService extends JobIntentService {
         NhPaths.getInstance(getApplicationContext());
         // Create notification channel first.
         createNotificationChannel();
+        sharedPreferences = getApplicationContext().getSharedPreferences(BuildConfig.APPLICATION_ID, MODE_PRIVATE);
     }
 
     private void doNotification(String contents) {
@@ -77,6 +81,10 @@ public class RunAtBootService extends JobIntentService {
         }
 
         ShellExecuter exe = new ShellExecuter();
+
+        // Check if selinux is in permissive mode, if not, set it to permissive mode, unless it was manually disabled in settings.
+        if (sharedPreferences.getBoolean("SELinuxOnBoot", true)) new ShellExecuter().RunAsRootOutput("[ ! \"$(getenforce | grep Permissive)\" ] && setenforce 0");
+
         exe.RunAsRootOutput(NhPaths.BUSYBOX + " run-parts " + NhPaths.APP_INITD_PATH);
         if (exe.RunAsRootReturnValue(NhPaths.APP_SCRIPTS_PATH + "/chrootmgr -c \"status\"") == 0){
             // remove possible vnc locks (if the phone is rebooted with the vnc server running)
