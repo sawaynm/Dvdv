@@ -40,6 +40,7 @@ import com.offsec.nethunter.utils.CheckForRoot;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.PermissionCheck;
 import com.offsec.nethunter.utils.SharePrefTag;
+import com.offsec.nethunter.utils.ShellExecuter;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -84,6 +85,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     private int desiredFragment = -1;
     public CopyBootFilesAsyncTask copyBootFilesAsyncTask;
     public static MenuItem customCMDitem;
+    private final ShellExecuter exe = new ShellExecuter();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -565,7 +567,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                             changeFragment(fragmentManager, DuckHunterFragment.newInstance(itemId));
                             break;
                         case R.id.usbarsenal_item:
-                            if (new File("/config/usb_gadget/g1").exists()) {
+                            if (exe.RunAsRootReturnValue("ls /config/usb_gadget/g1") == 0) {
                                 changeFragment(fragmentManager, USBArsenalFragment.newInstance(itemId));
                             } else {
                                 showWarningDialog("", "USB Arsenal (ConfigFS) is only supported by kernels above 4.x. Please note that HID, RNDIS, and Mass Storage should be automatically enabled on older devices with NetHunter patches.", false);
