@@ -272,9 +272,9 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
         Log.d(TAG, "/data is " + encrypted);
         if (encrypted.equals("encrypted")) {
             Log.d(TAG, "Fixing pam.d and inet in chroot");
-            exe.RunAsRoot(new String[]{"sed -i \"s/pam_keyinit.so/pam_keyinit.so #/\" /data/local/nhsystem/kalifs/etc/pam.d/*"});
-            exe.RunAsRoot(new String[]{"echo 'APT::Sandbox::User \"root\";' > /etc/apt/apt.conf.d/01-android-nosandbox"});
-            exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd groupadd -g 3003 aid_inet\\;usermod -G nogroup -g aid_inet _apt"});
+            exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd sed -i \"s/pam_keyinit.so/pam_keyinit.so #/\" /etc/pam.d/*"});
+            exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd echo 'APT::Sandbox::User \"root\";' > /etc/apt/apt.conf.d/01-android-nosandbox"});
+            exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd groupadd -g 3003 aid_inet;usermod -G nogroup -g aid_inet _apt"});
         }
     }
 
