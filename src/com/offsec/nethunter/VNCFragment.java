@@ -66,8 +66,8 @@ public class VNCFragment extends Fragment {
     private String delay_cmd = "";
     private Integer posu;
     private Integer posd = 0;
-    private static final int MIN_UID = 100000;
-    private static final int MAX_UID = 101000;
+    private static final int MIN_UID = 9000;
+    private static final int MAX_UID = 9999;
     NhPaths nh; //= new NhPaths();
     String BUSYBOX_NH= nh.getBusyboxPath();
     private Boolean iswatch;
@@ -204,7 +204,7 @@ public class VNCFragment extends Fragment {
 
         //Users
         File passwd = new File(nh.CHROOT_PATH() + "/etc/passwd");
-        String commandUSR = ("echo root && " + BUSYBOX_NH + " awk -F':' -v \"min=" + MIN_UID + "\" -v \"max=" + MAX_UID + "\" '{ if ( $3 >= min && $3 <= max ) print $0}' " + passwd + " | " + BUSYBOX_NH + " cut -d: -f1");
+        String commandUSR = ("echo root && " + BUSYBOX_NH + " awk -F':' -v \"min=" + MIN_UID + "\" -v \"max=" + MAX_UID + "\" '{ if ( ( $3 >= min && $3 <= max ) || ( $3 >= 100000 && $3 <= 101000 ) ) print $0}' " + passwd + " | " + BUSYBOX_NH + " cut -d: -f1");
         String outputUSR = exe.RunAsRootOutput(commandUSR);
         final String[] userArray = outputUSR.split("\n");
         Arrays.sort(userArray);
@@ -577,7 +577,7 @@ public class VNCFragment extends Fragment {
 
         //Users
         File passwd = new File(nh.CHROOT_PATH() + "/etc/passwd");
-        String commandUSR = ("echo root && " + BUSYBOX_NH + " awk -F':' -v \"min=" + MIN_UID + "\" -v \"max=" + MAX_UID + "\" '{ if ( $3 >= min && $3 <= max ) print $0}' " + passwd + " | " + BUSYBOX_NH + " cut -d: -f1");
+        String commandUSR = ("echo root && " + BUSYBOX_NH + " awk -F':' -v \"min=" + MIN_UID + "\" -v \"max=" + MAX_UID + "\" '{ if ( ( $3 >= min && $3 <= max ) || ( $3 >= 100000 && $3 <= 101000 ) ) print $0}' " + passwd + " | " + BUSYBOX_NH + " cut -d: -f1");
         String outputUSR = exe.RunAsRootOutput(commandUSR);
         final String[] userArray = outputUSR.split("\n");
         Arrays.sort(userArray);
