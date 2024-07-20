@@ -21,7 +21,7 @@ fi
 
 echo "Checking default rule number.."
 for table in $(ip rule list | awk -F"lookup" '{print $2}'); do
-DEF=`ip route show table $table|grep default|grep wlan0`
+DEF=`ip route show table $table|grep default|grep $NETIFACE`
   if ! [ -z "$DEF" ]; then
      break
   fi
