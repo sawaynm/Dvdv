@@ -53,7 +53,7 @@ ip rule add from all iif lo oif $NETIFACE lookup $table pref 17000 2> /dev/null
 ip rule add from all iif lo oif $APIFACE lookup 97 pref 17000 2> /dev/null
 ip rule add from all iif $APIFACE lookup $table pref 21000 2> /dev/null
 echo "Starting wifipumpkin3 and dnschef.."
-sleep 15 && dnschef --interface 10.0.0.1 --fakeip 10.0.0.1 &
+sleep 15 && dnschef --interface 10.0.0.1 &
 if [[ ! $TEMPLATE == "" ]]; then
   TemplateCMD=" set captiveflask.$TEMPLATE true;"
   CaptiveCMD=" set proxy captiveflask true;"
