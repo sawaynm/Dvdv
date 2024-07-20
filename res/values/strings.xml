@@ -90,7 +90,7 @@
     <string name="badusb_description">This is our implementation of the BadUSB attack as demonstrated at Black Hat USA 2014. Enabling this USB gadget mode will allow your device to act as a USB network interface when plugged into a target computer. Connecting the USB cable to a PC will force all traffic from that PC (Windows or Linux) through the NetHunter device, where the traffic can be MITM\'ed.</string>
 
 
-    <string name="mana_hostapd">The hostapd configuration file used by Mana.</string>
+    <string name="wifipumpkin_description">Start an Evil-Twin Access Point and intercept HTTP traffic. Custom captive portals, featuring mobile network upstream (rmnet_data2), internal wlan0 upstream, internal wlan0/wlan1 AP mode, and external adapters. Custom portals are also supported. Testing version. Preview will be added soon.</string>
     <string name="mana_hostapd_wpe">The hostapd configuration file used for 802.1x/EAP authentication attack (hostapd-wpe)  This is not used with MANA.</string>
     <string name="mana_hostapd_wpe_certs">Generate certificates (1st time only)</string>
     <string name="mana_dhcpd">The dhcpd configuration file used by Mana.</string>
@@ -349,7 +349,7 @@
     <string name="drawertitlehid">HID Attacks</string>
     <string name="drawertitleduckhunter">DuckHunter HID</string>
     <string name="drawertitlebadusb">Bad USB MITM Attack</string>
-    <string name="drawertitlemana">Mana Wireless Toolkit</string>
+    <string name="drawertitlewifipumpkin">Wifipumpkin</string>
     <string name="drawertitlewps">WPS Attacks</string>
     <string name="drawertitlebt">Bluetooth Arsenal</string>
     <string name="drawertitlemitmf">MITM Framework</string>

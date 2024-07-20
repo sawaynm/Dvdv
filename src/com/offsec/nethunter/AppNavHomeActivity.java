@@ -574,8 +574,8 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                         case R.id.badusb_item:
                             changeFragment(fragmentManager, BadusbFragment.newInstance(itemId));
                             break;
-                        case R.id.mana_item:
-                            changeFragment(fragmentManager, ManaFragment.newInstance(itemId));
+                        case R.id.wifipumpkin_item:
+                            changeFragment(fragmentManager, WifipumpkinFragment.newInstance(itemId));
                             break;
                         case R.id.wps_item:
                             changeFragment(fragmentManager, WPSFragment.newInstance(itemId));
