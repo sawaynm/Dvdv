@@ -17,17 +17,18 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class NethunterSQL extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "NethunterFragment";
     private static NethunterSQL instance;
-    private static final String TAG = "NethunterSQL";
+    public static final String TAG = "NethunterSQL";
     private static final String TABLE_NAME = DATABASE_NAME;
     private static final ArrayList<String> COLUMNS = new ArrayList<>();
     private static final String[][] nethunterData = {
             {"1", "Kernel Version", "uname -a", "\\n", "1"},
-            {"2", "Busybox Version", "/data/data/com.offsec.nethunter/scripts/bin/busybox_nh | head -n1", "\\n", "1"},
+            {"2", "Busybox Version", Environment.getDataDirectory().getAbsolutePath() + "/data/com.offsec.nethunter/scripts/bin/busybox_nh | head -n1", "\\n", "1"},
             {"3", "Root Status", "su -v", "\\n", "1"},
             {"4", "HID status", "ls /dev/hidg* || { echo \"HID interface not found.\" && if [[ $(uname -r | cut -d. -f1) -ge 4 ]]; then echo \"Please enable in USB Arsenal\";fi }", "\\n", "1"},
             {"5", "NetHunter Terminal Status", "[ \"$(pm list packages | grep 'com.offsec.nhterm')\" ] && echo \"NetHunter Terminal is installed.\" || echo \"NetHunter Terminal is NOT yet installed.\"", "\\n", "1"},
@@ -76,7 +77,7 @@ public class NethunterSQL extends SQLiteOpenHelper {
         this.onCreate(db);
     }
 
-    public ArrayList<NethunterModel> bindData(ArrayList<NethunterModel> nethunterModelArrayList) {
+    public List<NethunterModel> bindData(List<NethunterModel> nethunterModelArrayList) {
         SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " ORDER BY " + COLUMNS.get(0) + ";", null);
         while (cursor.moveToNext()) {
@@ -103,7 +104,7 @@ public class NethunterSQL extends SQLiteOpenHelper {
         return nethunterModelArrayList;
     }
 
-    public void addData(int targetPositionId, ArrayList<String> addData){
+    public void addData(int targetPositionId, List<String> addData){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues initialValues = new ContentValues();
         db.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(0) + " = " + COLUMNS.get(0) + " + 1 WHERE " + COLUMNS.get(0) + " >= " + targetPositionId + ";");
@@ -119,7 +120,7 @@ public class NethunterSQL extends SQLiteOpenHelper {
         db.close();
     }
 
-    public void deleteData(ArrayList<Integer> selectedTargetIds){
+    public void deleteData(List<Integer> selectedTargetIds){
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM " + TABLE_NAME + " WHERE " + COLUMNS.get(0) + " in (" + TextUtils.join(",", selectedTargetIds) + ");");
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " ORDER BY " + COLUMNS.get(0) + ";", null);
@@ -146,7 +147,7 @@ public class NethunterSQL extends SQLiteOpenHelper {
         db.close();
     }
 
-    public void editData(Integer targetPosition, ArrayList<String> editData){
+    public void editData(Integer targetPosition, List<String> editData){
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(1) + " = '" + editData.get(0).replace("'", "''") + "', " +
                 COLUMNS.get(2) + " = '" + editData.get(1).replace("'", "''") + "', " +
@@ -178,8 +179,10 @@ public class NethunterSQL extends SQLiteOpenHelper {
 
     public String backupData(String storedDBpath) {
         try {
-            String currentDBPath = NhPaths.APP_DATABASE_PATH + "/" + getDatabaseName();
-            if (Environment.getExternalStorageDirectory().canWrite()) {
+            File data = Environment.getDataDirectory();
+            File sd = Environment.getExternalStorageDirectory();
+            String currentDBPath = data.getAbsolutePath() + "/data/" + BuildConfig.APPLICATION_ID + "/databases/" + getDatabaseName();
+            if (sd.canWrite()) {
                 File currentDB = new File(currentDBPath);
                 File backupDB = new File(storedDBpath);
                 if (currentDB.exists()) {
@@ -210,8 +213,10 @@ public class NethunterSQL extends SQLiteOpenHelper {
             return "invalid columns format.";
         }
         try {
-            String currentDBPath = NhPaths.APP_DATABASE_PATH + "/" + getDatabaseName();
-            if (Environment.getExternalStorageDirectory().canWrite()) {
+            File data = Environment.getDataDirectory();
+            File sd = Environment.getExternalStorageDirectory();
+            String currentDBPath = data.getAbsolutePath() + "/data/" + BuildConfig.APPLICATION_ID + "/databases/" + getDatabaseName();
+            if (sd.canWrite()) {
                 File currentDB = new File(currentDBPath);
                 File backupDB = new File(storedDBpath);
                 if (backupDB.exists()) {

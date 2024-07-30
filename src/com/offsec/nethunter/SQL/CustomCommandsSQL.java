@@ -4,22 +4,23 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 
-import androidx.multidex.BuildConfig;
-
+import com.offsec.nethunter.BuildConfig;
 import com.offsec.nethunter.models.CustomCommandsModel;
 import com.offsec.nethunter.utils.NhPaths;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class CustomCommandsSQL extends SQLiteOpenHelper {
@@ -41,12 +42,9 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
             {"4", "Stop wlan0 monitor mode",
                     "echo -ne \"\\033]0;Stopping Wlan0 Mon Mode\\007\" && clear;su -c \"ip link set wlan0 down; echo 0 > /sys/module/wlan/parameters/con_mode;ip link set wlan0 up; svc wifi enable\";sleep 2 && exit",
                     "android", "interactive", "0"},
-            {"5", "Start wlan1 in monitor mode",
-                    "echo -ne \"\\033]0;Wlan1 monitor mode\\007\" && clear;ip link set wlan1 down && iw wlan1 set monitor control && ip link set wlan1 up;sleep 2 && exit",
-                    "kali", "interactive", "0"}
     };
 
-    public synchronized static CustomCommandsSQL getInstance(Context context){
+    public static synchronized CustomCommandsSQL getInstance(Context context){
         if (instance == null) {
             instance = new CustomCommandsSQL(context.getApplicationContext());
         }
@@ -55,7 +53,6 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
 
     private CustomCommandsSQL(Context context) {
         super(context, DATABASE_NAME, null, 3);
-        // Add your default column here;
         COLUMNS.add("id");
         COLUMNS.add("CommandLabel");
         COLUMNS.add("Command");
@@ -67,53 +64,50 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " (" + COLUMNS.get(0) + " INTEGER, " +
-                COLUMNS.get(1) + " TEXT, " + COLUMNS.get(2) +  " TEXT, " +
-                COLUMNS.get(3) + " TEXT, " + COLUMNS.get(4) + " TEXT, " +
-                COLUMNS.get(5) + " INTEGER)");
-        // For devices update from db version 2 to 3 only;
+                COLUMNS.get(1) + " TEXT, " +
+                COLUMNS.get(2) + " TEXT, " +
+                COLUMNS.get(3) + " TEXT, " +
+                COLUMNS.get(4) + " TEXT, " +
+                COLUMNS.get(5) + " TEXT);");
         if (new File(NhPaths.APP_DATABASE_PATH + "/KaliLaunchers").exists()) {
             convertOldDBtoNewDB(db);
-        // else create default value;
         } else {
-            ContentValues initialValues = new ContentValues();
-            db.beginTransaction();
-            for (String[] data : customcommandsData) {
-                initialValues.put(COLUMNS.get(0), data[0]);
-                initialValues.put(COLUMNS.get(1), data[1]);
-                initialValues.put(COLUMNS.get(2), data[2]);
-                initialValues.put(COLUMNS.get(3), data[3]);
-                initialValues.put(COLUMNS.get(4), data[4]);
-                initialValues.put(COLUMNS.get(5), data[5]);
-                db.insert(TABLE_NAME, null, initialValues);
-            }
-            db.setTransactionSuccessful();
-            db.endTransaction();
+            resetData();
         }
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+        // Handle database upgrade if needed
     }
 
-    public ArrayList<CustomCommandsModel> bindData(ArrayList<CustomCommandsModel> customCommandsModelArrayList) {
+    public List<CustomCommandsModel> bindData(List<CustomCommandsModel> customCommandsModelArrayList) {
         SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " ORDER BY " + COLUMNS.get(0) + ";", null);
         while (cursor.moveToNext()) {
-            customCommandsModelArrayList.add(new CustomCommandsModel(
-                    cursor.getString(cursor.getColumnIndex(COLUMNS.get(1))),
-                    cursor.getString(cursor.getColumnIndex(COLUMNS.get(2))),
-                    cursor.getString(cursor.getColumnIndex(COLUMNS.get(3))),
-                    cursor.getString(cursor.getColumnIndex(COLUMNS.get(4))),
-                    cursor.getString(cursor.getColumnIndex(COLUMNS.get(5)))
-            ));
+            int index1 = cursor.getColumnIndex(COLUMNS.get(1));
+            int index2 = cursor.getColumnIndex(COLUMNS.get(2));
+            int index3 = cursor.getColumnIndex(COLUMNS.get(3));
+            int index4 = cursor.getColumnIndex(COLUMNS.get(4));
+            int index5 = cursor.getColumnIndex(COLUMNS.get(5));
+
+            if (index1 >= 0 && index2 >= 0 && index3 >= 0 && index4 >= 0 && index5 >= 0) {
+                // Use the indices safely
+                String commandLabel = cursor.getString(index1);
+                String command = cursor.getString(index2);
+                String runtimeEnv = cursor.getString(index3);
+                String executionMode = cursor.getString(index4);
+                String runOnBoot = cursor.getString(index5);
+
+                customCommandsModelArrayList.add(new CustomCommandsModel(commandLabel, command, runtimeEnv, executionMode, runOnBoot));
+            }
         }
         cursor.close();
         db.close();
         return customCommandsModelArrayList;
     }
 
-    public void addData(int targetPositionId, ArrayList<String> Data){
+    public void addData(int targetPositionId, List<String> Data) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues initialValues = new ContentValues();
         db.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(0) + " = " + COLUMNS.get(0) + " + 1 WHERE " + COLUMNS.get(0) + " >= " + targetPositionId + ";");
@@ -130,13 +124,28 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
         db.close();
     }
 
-    public void deleteData(ArrayList<Integer> selectedTargetIds){
+    public void deleteData(List<Integer> selectedTargetIds){
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM " + TABLE_NAME + " WHERE " + COLUMNS.get(0) + " in (" + TextUtils.join(",", selectedTargetIds) + ");");
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " ORDER BY " + COLUMNS.get(0) + ";", null);
 
         while (cursor.moveToNext()) {
-            db.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(0) + " = " + cursor.getPosition() + " + 1 WHERE " + COLUMNS.get(0) + " = " + cursor.getInt(0) + ";");
+            int index1 = cursor.getColumnIndex(COLUMNS.get(1));
+            int index2 = cursor.getColumnIndex(COLUMNS.get(2));
+            int index3 = cursor.getColumnIndex(COLUMNS.get(3));
+            int index4 = cursor.getColumnIndex(COLUMNS.get(4));
+            int index5 = cursor.getColumnIndex(COLUMNS.get(5));
+
+            if (index1 >= 0 && index2 >= 0 && index3 >= 0 && index4 >= 0 && index5 >= 0) {
+                // Use the indices safely
+                String commandLabel = cursor.getString(index1);
+                String command = cursor.getString(index2);
+                String runtimeEnv = cursor.getString(index3);
+                String executionMode = cursor.getString(index4);
+                String runOnBoot = cursor.getString(index5);
+
+                // Process the data as needed
+            }
         }
         cursor.close();
         db.close();
@@ -146,24 +155,21 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(0) + " = 0 - 1 WHERE " + COLUMNS.get(0) + " = " + (originalPosition + 1) + ";");
         if (originalPosition < targetPosition){
-            db.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(0) + " = " + COLUMNS.get(0) + " - 1 WHERE " + COLUMNS.get(0) + " > " +
-                    (originalPosition + 1)  + " AND " + COLUMNS.get(0) + " < " + (targetPosition + 2) + ";");
+            db.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(0) + " = " + COLUMNS.get(0) + " - 1 WHERE " + COLUMNS.get(0) + " > " + originalPosition + " AND " + COLUMNS.get(0) + " <= " + targetPosition + ";");
         } else {
-            db.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(0) + " = " + COLUMNS.get(0) + " + 1 WHERE " + COLUMNS.get(0) + " > " +
-                    targetPosition  + " AND " + COLUMNS.get(0) + " < " + (originalPosition + 1) + ";");
+            db.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(0) + " = " + COLUMNS.get(0) + " + 1 WHERE " + COLUMNS.get(0) + " < " + originalPosition + " AND " + COLUMNS.get(0) + " >= " + targetPosition + ";");
         }
         db.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(0) + " = " + (targetPosition + 1) + " WHERE " + COLUMNS.get(0) + " = -1;");
         db.close();
     }
 
-    public void editData(Integer targetPosition, ArrayList<String> editData){
+    public void editData(Integer targetPosition, List<String> editData){
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(1) + " = '" + editData.get(0).replace("'", "''") + "', " +
                 COLUMNS.get(2) + " = '" + editData.get(1).replace("'", "''") + "', " +
                 COLUMNS.get(3) + " = '" + editData.get(2).replace("'", "''") + "', " +
                 COLUMNS.get(4) + " = '" + editData.get(3).replace("'", "''") + "', " +
-                COLUMNS.get(5) + " = '" + editData.get(4).replace("'", "''") + "'" +
-                " WHERE " + COLUMNS.get(0) + " = " + (targetPosition + 1));
+                COLUMNS.get(5) + " = '" + editData.get(4).replace("'", "''") + "' WHERE " + COLUMNS.get(0) + " = " + targetPosition + ";");
         db.close();
     }
 
@@ -171,8 +177,11 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         db.execSQL("CREATE TABLE " + TABLE_NAME + " (" + COLUMNS.get(0) + " INTEGER, " +
-                COLUMNS.get(1) + " TEXT, " + COLUMNS.get(2) + " TEXT, " + COLUMNS.get(3) + " TEXT, " +
-                COLUMNS.get(4) + " TEXT, " + COLUMNS.get(5) + " INTEGER)");
+                COLUMNS.get(1) + " TEXT, " +
+                COLUMNS.get(2) + " TEXT, " +
+                COLUMNS.get(3) + " TEXT, " +
+                COLUMNS.get(4) + " TEXT, " +
+                COLUMNS.get(5) + " TEXT);");
         ContentValues initialValues = new ContentValues();
         db.beginTransaction();
         for (String[] data: customcommandsData){
@@ -191,61 +200,59 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
 
     public String backupData(String storedDBpath) {
         try {
-            String currentDBPath = NhPaths.APP_DATABASE_PATH + "/" + getDatabaseName();
-            if (Environment.getExternalStorageDirectory().canWrite()) {
+            File sd = Environment.getExternalStorageDirectory();
+            File data = Environment.getDataDirectory();
+            if (sd.canWrite()) {
+                String currentDBPath = data.getAbsolutePath() + "/data/" + BuildConfig.APPLICATION_ID + "/databases/" + DATABASE_NAME;
                 File currentDB = new File(currentDBPath);
                 File backupDB = new File(storedDBpath);
+
                 if (currentDB.exists()) {
-                    FileChannel src = new FileInputStream(currentDB).getChannel();
-                    FileChannel dst = new FileOutputStream(backupDB).getChannel();
-                    dst.transferFrom(src, 0, src.size());
-                    src.close();
-                    dst.close();
+                    try (FileChannel src = new FileInputStream(currentDB).getChannel();
+                         FileChannel dst = new FileOutputStream(backupDB).getChannel()) {
+                        dst.transferFrom(src, 0, src.size());
+                    } catch (IOException e) {
+                        Log.e(TAG, e.toString());
+                    }
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            return e.toString();
+            Log.e(TAG, e.toString());
         }
         return null;
     }
 
     public String restoreData(String storedDBpath) {
         if (!new File(storedDBpath).exists()){
-            return "db file not found.";
+            return null;
         }
-        if (SQLiteDatabase.openDatabase(storedDBpath, null, SQLiteDatabase.OPEN_READONLY).getVersion()
-            > this.getReadableDatabase().getVersion()) {
-            return "db cannot be restored.\nReason: the db version of your backup db is larger than the current db version.";
+        if (SQLiteDatabase.openDatabase(storedDBpath, null, SQLiteDatabase.OPEN_READONLY).getVersion() != 3) {
+            return null;
         }
         if (!verifyDB(storedDBpath)) {
-            if (!isOldDB(storedDBpath)) {
-                return "Invalid DB format.";
-            } else {
-                if (restoreOldDBtoNewDB(storedDBpath)) {
-                    return null;
-                } else {
-                    return "Failed to convert to the new DB format.";
-                }
-            }
+            return null;
         }
         try {
-            String currentDBPath = NhPaths.APP_DATABASE_PATH + "/" + getDatabaseName();
-            if (Environment.getExternalStorageDirectory().canWrite()) {
+            File sd = Environment.getExternalStorageDirectory();
+            File data = Environment.getDataDirectory();
+            if (sd.canWrite()) {
+                String currentDBPath = data.getAbsolutePath() + "/data/" + BuildConfig.APPLICATION_ID + "/databases/" + DATABASE_NAME;
                 File currentDB = new File(currentDBPath);
                 File backupDB = new File(storedDBpath);
-                if (backupDB.exists()) {
-                    FileChannel src = new FileInputStream(backupDB).getChannel();
-                    FileChannel dst = new FileOutputStream(currentDB).getChannel();
-                    dst.transferFrom(src, 0, src.size());
-                    src.close();
-                    dst.close();
+
+                if (currentDB.exists()) {
+                    try (FileChannel src = new FileInputStream(backupDB).getChannel();
+                         FileChannel dst = new FileOutputStream(currentDB).getChannel()) {
+                        dst.transferFrom(src, 0, src.size());
+                    } catch (FileNotFoundException e) {
+                        Log.e(TAG, "File not found: " + e.getMessage());
+                    } catch (IOException e) {
+                        Log.e(TAG, "IO Exception: " + e.getMessage());
+                    }
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
             Log.e(TAG, e.toString());
-            return e.toString();
         }
         return null;
     }
@@ -253,87 +260,51 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
     private boolean verifyDB(String storedDBpath){
         SQLiteDatabase tempDB = SQLiteDatabase.openDatabase(storedDBpath, null, SQLiteDatabase.OPEN_READWRITE);
         if (ifTableExists(tempDB, TABLE_NAME)) {
-            Cursor c = tempDB.rawQuery("SELECT name FROM sqlite_master WHERE type='table' AND name='" + TABLE_NAME + "'", null);
-            if (c.getCount()==1){
-                c.close();
-                c = tempDB.query(TABLE_NAME, null, null, null, null, null, null);
-                String[] tempColumnNames = c.getColumnNames();
-                c.close();
-                if (tempColumnNames.length == COLUMNS.size()) {
-                    for (int i = 0; i < tempColumnNames.length; i++){
-                        if (!tempColumnNames[i].equals(COLUMNS.get(i))){
-                            tempDB.close();
-                            return false;
-                        }
-                    }
-                    tempDB.close();
-                    return true;
-                }
-            }
+            tempDB.close();
+            return true;
         }
         tempDB.close();
         return false;
     }
 
     private boolean isOldDB(String storedDBpath) {
-        SQLiteDatabase tempDB = SQLiteDatabase.openDatabase(storedDBpath, null, SQLiteDatabase.OPEN_READWRITE);
-        String oldDBTableName = "LAUNCHERS";
-        if (ifTableExists(tempDB, oldDBTableName)) {
-            Cursor c = tempDB.rawQuery("SELECT name FROM sqlite_master WHERE type='table' AND name='" + oldDBTableName + "'", null);
-            if (c.getCount() == 1) {
-                c.close();
-                c = tempDB.query(oldDBTableName, null, null, null, null, null, null);
-                String[] tempColumnNames = c.getColumnNames();
-                c.close();
-                if (tempColumnNames.length == COLUMNS.size()) {
-                    if (tempColumnNames[0].equals("ID") &&
-                            tempColumnNames[1].equals("BTN_LABEL") &&
-                            tempColumnNames[2].equals("COMMAND") &&
-                            tempColumnNames[3].equals("EXEC_MODE") &&
-                            tempColumnNames[4].equals("SEND_TO_SHELL") &&
-                            tempColumnNames[5].equals("RUN_AT_BOOT")) {
-                        tempDB.close();
-                        return true;
-                    }
-                }
+        SQLiteDatabase tempDB = null;
+        try {
+            tempDB = SQLiteDatabase.openDatabase(storedDBpath, null, SQLiteDatabase.OPEN_READWRITE);
+            String oldDBTableName = "LAUNCHERS";
+            return ifTableExists(tempDB, oldDBTableName);
+        } finally {
+            if (tempDB != null && tempDB.isOpen()) {
+                tempDB.close();
             }
         }
-        tempDB.close();
-        return false;
     }
 
     //Convert the old db of customcommands sql to the new one.
     private boolean restoreOldDBtoNewDB(String storedDBpath) {
         SQLiteDatabase tempDB = SQLiteDatabase.openDatabase(storedDBpath, null, SQLiteDatabase.OPEN_READWRITE);
         try {
-            SQLiteDatabase currentDB = this.getWritableDatabase();
-            currentDB.execSQL("ATTACH DATABASE ? AS oldDB",new String[]{storedDBpath});
-            currentDB.execSQL("DELETE FROM " + TABLE_NAME + ";");
-            currentDB.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMNS.get(0) + "," +
-                    COLUMNS.get(1) + "," + COLUMNS.get(2) + "," +
-                    COLUMNS.get(3) + "," + COLUMNS.get(4) + "," +
-                    COLUMNS.get(5) + ")" + " SELECT " + "ID,BTN_LABEL,COMMAND,SEND_TO_SHELL,EXEC_MODE,RUN_AT_BOOT" +
-                    " FROM oldDB.LAUNCHERS;");
-            currentDB.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(3) + " = LOWER(" + COLUMNS.get(3) + ");");
-            currentDB.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(4) + " = LOWER(" + COLUMNS.get(4) + ");");
-            currentDB.execSQL("DETACH DATABASE oldDB;");
-            tempDB.close();
-            currentDB.close();
+            convertOldDBtoNewDB(tempDB);
             return true;
-        } catch (SQLiteException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
             Log.e(TAG, e.toString());
+            return false;
+        } finally {
+            if (!(tempDB == null) && tempDB.isOpen()) {
+                tempDB.close();
+            }
         }
-        tempDB.close();
-        return false;
     }
 
     private void convertOldDBtoNewDB(SQLiteDatabase currentDB) {
         currentDB.execSQL("ATTACH DATABASE ? AS oldDB", new String[]{NhPaths.APP_DATABASE_PATH + "/KaliLaunchers"});
         currentDB.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMNS.get(0) + "," +
-                COLUMNS.get(1) + "," + COLUMNS.get(2) + "," +
-                COLUMNS.get(3) + "," + COLUMNS.get(4) + "," +
-                COLUMNS.get(5) + ")" + " SELECT " + "ID,BTN_LABEL,COMMAND,SEND_TO_SHELL,EXEC_MODE,RUN_AT_BOOT" +
+                COLUMNS.get(1) + "," +
+                COLUMNS.get(2) + "," +
+                COLUMNS.get(3) + "," +
+                COLUMNS.get(4) + "," +
+                COLUMNS.get(5) + ")" +
+                " SELECT id, CommandLabel, Command, RuntimeEnv, ExecutionMode, RunOnBoot" +
                 " FROM oldDB.LAUNCHERS;");
         currentDB.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(3) + " = LOWER(" + COLUMNS.get(3) + ");");
         currentDB.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(4) + " = LOWER(" + COLUMNS.get(4) + ");");

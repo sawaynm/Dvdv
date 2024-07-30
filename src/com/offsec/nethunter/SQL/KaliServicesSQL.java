@@ -17,12 +17,13 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class KaliServicesSQL extends SQLiteOpenHelper {
 	private static KaliServicesSQL instance;
 	private static final String DATABASE_NAME = "KaliServicesFragment";
-	private static final String TAG = "KaliServicesSQL";
+	public static final String TAG = "KaliServicesSQL";
 	private static final String TABLE_NAME = DATABASE_NAME;
 	private static final ArrayList<String> COLUMNS = new ArrayList<>();
 	private static final String[][] kaliserviceData = {
@@ -36,7 +37,7 @@ public class KaliServicesSQL extends SQLiteOpenHelper {
 			{"8", "NETWORKING", "service networking start", "service networking stop", "networking", "0"},
 	};
 
-	public synchronized static KaliServicesSQL getInstance(Context context){
+	public static synchronized KaliServicesSQL getInstance(Context context){
 		if (instance == null) {
 			instance = new KaliServicesSQL(context.getApplicationContext());
 		}
@@ -81,7 +82,7 @@ public class KaliServicesSQL extends SQLiteOpenHelper {
 		this.onCreate(db);
 	}
 
-	public ArrayList<KaliServicesModel> bindData(ArrayList<KaliServicesModel> kaliServicesModelArrayList) {
+	public List<KaliServicesModel> bindData(List<KaliServicesModel> kaliServicesModelArrayList) {
 		SQLiteDatabase db = getWritableDatabase();
 		Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " ORDER BY " + COLUMNS.get(0) + ";", null);
 		while (cursor.moveToNext()) {
@@ -111,7 +112,7 @@ public class KaliServicesSQL extends SQLiteOpenHelper {
 		return kaliServicesModelArrayList;
 	}
 
-	public void addData(int targetPositionId, ArrayList<String> Data){
+	public void addData(int targetPositionId, List<String> Data) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		ContentValues initialValues = new ContentValues();
 		db.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(0) + " = " + COLUMNS.get(0) + " + 1 WHERE " + COLUMNS.get(0) + " >= " + targetPositionId + ";");
@@ -128,7 +129,7 @@ public class KaliServicesSQL extends SQLiteOpenHelper {
 		db.close();
 	}
 
-	public void deleteData(ArrayList<Integer> selectedTargetIds){
+	public void deleteData(List<Integer> selectedTargetIds){
 		SQLiteDatabase db = this.getWritableDatabase();
 		db.execSQL("DELETE FROM " + TABLE_NAME + " WHERE " + COLUMNS.get(0) + " in (" + TextUtils.join(",", selectedTargetIds) + ");");
 		Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " ORDER BY " + COLUMNS.get(0) + ";", null);
@@ -155,7 +156,7 @@ public class KaliServicesSQL extends SQLiteOpenHelper {
 		db.close();
 	}
 
-	public void editData(Integer targetPosition, ArrayList<String> editData){
+	public void editData(Integer targetPosition, List<String> editData){
 		SQLiteDatabase db = this.getWritableDatabase();
 		db.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(1) + " = '" + editData.get(0).replace("'", "''") + "', " +
 				COLUMNS.get(2) + " = '" + editData.get(1).replace("'", "''") + "', " +
@@ -190,8 +191,10 @@ public class KaliServicesSQL extends SQLiteOpenHelper {
 
 	public String backupData(String storedDBpath) {
 		try {
-			String currentDBPath = NhPaths.APP_DATABASE_PATH + "/" + getDatabaseName();
-			if (Environment.getExternalStorageDirectory().canWrite()) {
+			File data = Environment.getDataDirectory();
+			File sd = Environment.getExternalStorageDirectory();
+			String currentDBPath = data.getAbsolutePath() + "/data/" + BuildConfig.APPLICATION_ID + "/databases/" + getDatabaseName();
+			if (sd.canWrite()) {
 				File currentDB = new File(currentDBPath);
 				File backupDB = new File(storedDBpath);
 				if (currentDB.exists()) {
@@ -217,8 +220,10 @@ public class KaliServicesSQL extends SQLiteOpenHelper {
 			return "invalid columns format.";
 		}
 		try {
-			String currentDBPath = NhPaths.APP_DATABASE_PATH + "/" + getDatabaseName();
-			if (Environment.getExternalStorageDirectory().canWrite()) {
+			File data = Environment.getDataDirectory();
+			File sd = Environment.getExternalStorageDirectory();
+			String currentDBPath = data.getAbsolutePath() + "/data/" + BuildConfig.APPLICATION_ID + "/databases/" + getDatabaseName();
+			if (sd.canWrite()) {
 				File currentDB = new File(currentDBPath);
 				File backupDB = new File(storedDBpath);
 				if (backupDB.exists()) {
@@ -236,7 +241,7 @@ public class KaliServicesSQL extends SQLiteOpenHelper {
 		return null;
 	}
 
-	private boolean verifyDB(String storedDBpath){
+	private boolean verifyDB(String storedDBpath) {
 		SQLiteDatabase tempDB = SQLiteDatabase.openDatabase(storedDBpath, null, SQLiteDatabase.OPEN_READWRITE);
 		Cursor c = tempDB.rawQuery("SELECT name FROM sqlite_master WHERE type='table' AND name='" + TABLE_NAME + "'", null);
 		if (c.getCount()==1){
