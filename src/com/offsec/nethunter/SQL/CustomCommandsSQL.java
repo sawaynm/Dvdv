@@ -69,15 +69,26 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " (" + COLUMNS.get(0) + " INTEGER, " +
-                COLUMNS.get(1) + " TEXT, " +
-                COLUMNS.get(2) + " TEXT, " +
-                COLUMNS.get(3) + " TEXT, " +
-                COLUMNS.get(4) + " TEXT, " +
-                COLUMNS.get(5) + " TEXT);");
+                COLUMNS.get(1) + " TEXT, " + COLUMNS.get(2) +  " TEXT, " +
+                COLUMNS.get(3) + " TEXT, " + COLUMNS.get(4) + " TEXT, " +
+                COLUMNS.get(5) + " INTEGER)");
+        // For devices update from db version 2 to 3 only;
         if (new File(NhPaths.APP_DATABASE_PATH + "/KaliLaunchers").exists()) {
             convertOldDBtoNewDB(db);
         } else {
-            resetData();
+            ContentValues initialValues = new ContentValues();
+            db.beginTransaction();
+            for (String[] data : customcommandsData) {
+                initialValues.put(COLUMNS.get(0), data[0]);
+                initialValues.put(COLUMNS.get(1), data[1]);
+                initialValues.put(COLUMNS.get(2), data[2]);
+                initialValues.put(COLUMNS.get(3), data[3]);
+                initialValues.put(COLUMNS.get(4), data[4]);
+                initialValues.put(COLUMNS.get(5), data[5]);
+                db.insert(TABLE_NAME, null, initialValues);
+            }
+            db.setTransactionSuccessful();
+            db.endTransaction();
         }
     }
 
