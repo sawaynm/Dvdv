@@ -53,7 +53,6 @@ ip rule add from all iif lo oif $NETIFACE lookup $table pref 17000 2> /dev/null
 ip rule add from all iif lo oif $APIFACE lookup 97 pref 17000 2> /dev/null
 ip rule add from all iif $APIFACE lookup $table pref 21000 2> /dev/null
 echo "Starting wifipumpkin3 and dnschef.."
-sleep 15 && dnschef --interface 10.0.0.1 &
 if [[ ! $TEMPLATE == "" ]]; then
   TemplateCMD=" set captiveflask.$TEMPLATE true;"
   CaptiveCMD=" set proxy captiveflask true;"
@@ -62,7 +61,8 @@ fi
 #echo $SSID
 #echo $CaptiveCMD
 #echo $TemplateCMD
-wifipumpkin3 --xpulp "set interface $APIFACE; set interface_net $NETIFACE; set ssid $SSID; set channel $CHANNEL; $CaptiveCMD $TemplateCMD ap; start"
+sleep 20 && dnschef --interface 10.0.0.1 &
+wifipumpkin3 --xpulp "set interface $APIFACE; set interface_net $NETIFACE; set ssid $SSID; set channel $CHANNEL; $CaptiveCMD $TemplateCMD start; ap"
 pkill python3
 echo "Restoring iptables rules.."
 ip rule del from all lookup main pref 1 2> /dev/null
