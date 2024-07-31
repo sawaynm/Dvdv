@@ -9,6 +9,8 @@ import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.offsec.nethunter.BuildConfig;
 import com.offsec.nethunter.models.CustomCommandsModel;
 import com.offsec.nethunter.utils.NhPaths;
@@ -31,15 +33,18 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
     private static final ArrayList<String> COLUMNS = new ArrayList<>();
     private static final String[][] customcommandsData = {
             {"1", "Update Kali Metapackages",
-                    "echo -ne \"\\033]0;Updating Kali\\007\" && clear;apt update && apt-get -y upgrade",
+                    "echo -ne \"\\033]0;Updating Kali\\007\" && clear;apt update && apt -y upgrade",
                     "kali", "interactive", "0"},
             {"2", "Launch Wifite",
                     "echo -ne \"\\033]0;Wifite\\007\" && clear;wifite",
                     "kali", "interactive", "0"},
-            {"3", "Start wlan0 in monitor mode",
+            {"3", "Launch hcxdumptool",
+                    "echo -ne \"\\033]0;hcxdumptool\\007\" && clear;hcxdumptool -i wlan1 -w $HOME/$(date +\"%Y-%m-%d_%H-%M-%S\").pcapng",
+                    "kali", "interactive", "0"},
+            {"4", "Start wlan0 in monitor mode",
                     "echo -ne \"\\033]0;Wlan0 Monitor Mode\\007\" && clear;su -c \"echo 4 > /sys/module/wlan/parameters/con_mode;ip link set wlan0 down;ip link set wlan0 up\";sleep 2 && exit",
                     "android", "interactive", "0"},
-            {"4", "Stop wlan0 monitor mode",
+            {"5", "Stop wlan0 monitor mode",
                     "echo -ne \"\\033]0;Stopping Wlan0 Mon Mode\\007\" && clear;su -c \"ip link set wlan0 down; echo 0 > /sys/module/wlan/parameters/con_mode;ip link set wlan0 up; svc wifi enable\";sleep 2 && exit",
                     "android", "interactive", "0"},
     };
@@ -107,7 +112,7 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
         return customCommandsModelArrayList;
     }
 
-    public void addData(int targetPositionId, List<String> Data) {
+    public void addData(int targetPositionId, @NonNull List<String> Data) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues initialValues = new ContentValues();
         db.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(0) + " = " + COLUMNS.get(0) + " + 1 WHERE " + COLUMNS.get(0) + " >= " + targetPositionId + ";");
@@ -268,31 +273,20 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
     }
 
     private boolean isOldDB(String storedDBpath) {
-        SQLiteDatabase tempDB = null;
-        try {
-            tempDB = SQLiteDatabase.openDatabase(storedDBpath, null, SQLiteDatabase.OPEN_READWRITE);
+        try (SQLiteDatabase tempDB = SQLiteDatabase.openDatabase(storedDBpath, null, SQLiteDatabase.OPEN_READWRITE)) {
             String oldDBTableName = "LAUNCHERS";
             return ifTableExists(tempDB, oldDBTableName);
-        } finally {
-            if (tempDB != null && tempDB.isOpen()) {
-                tempDB.close();
-            }
         }
     }
 
     //Convert the old db of customcommands sql to the new one.
     private boolean restoreOldDBtoNewDB(String storedDBpath) {
-        SQLiteDatabase tempDB = SQLiteDatabase.openDatabase(storedDBpath, null, SQLiteDatabase.OPEN_READWRITE);
-        try {
+        try (SQLiteDatabase tempDB = SQLiteDatabase.openDatabase(storedDBpath, null, SQLiteDatabase.OPEN_READWRITE)) {
             convertOldDBtoNewDB(tempDB);
             return true;
         } catch (Exception e) {
             Log.e(TAG, e.toString());
             return false;
-        } finally {
-            if (!(tempDB == null) && tempDB.isOpen()) {
-                tempDB.close();
-            }
         }
     }
 
