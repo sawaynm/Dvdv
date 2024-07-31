@@ -130,7 +130,7 @@ public class WifipumpkinFragment extends Fragment {
         final EditText SSID = rootView.findViewById(R.id.ssid);
         final EditText BSSID = rootView.findViewById(R.id.bssid);
         final EditText Channel = rootView.findViewById(R.id.channel);
-        CheckBox Wlan0to1Checkbox = rootView.findViewById(R.id.wlan0to1_checkbox);
+        final CheckBox Wlan0to1Checkbox = rootView.findViewById(R.id.wlan0to1_checkbox);
 
         //Templates spinner
         refresh_wp3_templates(rootView);
