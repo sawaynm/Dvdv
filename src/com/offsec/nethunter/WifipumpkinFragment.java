@@ -203,13 +203,6 @@ public class WifipumpkinFragment extends Fragment {
 
         //Wlan0to1 Checkbox
         final String[] Wlan0to1_string = {""};
-        Wlan0to1Checkbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                Wlan0to1_string[0] = "1";
-            } else {
-                Wlan0to1_string[0] = "0";
-            }
-        });
 
         //Preview Checkbox
         View PreView = rootView.findViewById(R.id.pre_view);
@@ -229,6 +222,11 @@ public class WifipumpkinFragment extends Fragment {
                 String SSID_string = SSID.getText().toString();
                 String BSSID_string = BSSID.getText().toString();
                 String Channel_string = Channel.getText().toString();
+                if (Wlan0to1Checkbox.isChecked) {
+                    Wlan0to1_string[0] = "1";
+                } else {
+                    Wlan0to1_string[0] = "0";
+                }
                 Toast.makeText(getActivity().getApplicationContext(), "Starting.. type 'exit' into the terminal to stop Wifipumpkin3", Toast.LENGTH_LONG).show();
 
                 exe.RunAsRoot(new String[]{"sed -i '/^APIFACE=/c\\APIFACE=" + APiface_string + "' " + NhPaths.APP_SD_FILES_PATH + "/modules/start-wp3.sh"});
