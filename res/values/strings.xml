@@ -224,7 +224,7 @@
     <string name="bt_carwhisperer">Carwhisperer script from the way back. Listen to, or inject audio to various devices like speakers, headsets, watches or even cars. Carwshisperer is not supported by internal bluetooth (VHCI or bt_smd) yet.</string>
     <string name="bt_spoof">Spoof your BT adapters address, class, and name.</string>
     <string name="bt_tools">Brute force BT device addresses, ping, and discover their services.</string>
-    <string name="bt_badbt">Inspired by the Mr.Robot police car scene and the Flipper XFW Team, you can now create a Bluetooth keyboard server and send keystrokes straight from NetHunter. You may need to run setup again from the top right menu to install BadBT. Running this on a smartwatch against your paired phone may dispair your watch from phone/wearos app. Prefixes are experimental.</string>
+    <string name="bt_badbt">Inspired by the Mr.Robot police car scene and the Flipper XFW Team, you can now create a Bluetooth keyboard server and send keystrokes straight from NetHunter. You may need to run setup again from the top right menu to install BadBT. Running this on a smartwatch against your paired phone may despair your watch from phone/wearos app. Prefixes are experimental.</string>
 
     <!-- SET -->
     <string name="set_description">Social Engineering Toolkit email template builder by yesimxev. Please note you need to have a working Gmail or email relay configuration for SET in order to use these templates. It is recommended not to have account picture if you use Gmail.</string>
@@ -551,4 +551,8 @@
     <string name="dummy_accessibility_service">dummy_accessibility_service</string>
     <string name="bootanimation_path_not_found">Bootanimation path not found</string>
     <string name="launch_kismet_nhterm">Launch Kismet in NH Terminal</string>
+    <string name="list_of_available_folders">\n List of available folder(s) in\n\"%s/\":\n\n</string>
+    <string name="not_yet_installed">Not yet installed!</string>
+    <string name="running">Running!</string>
+    <string name="stopped">Stopped</string>
 </resources>
