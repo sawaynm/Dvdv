@@ -3035,42 +3035,65 @@ function command_interpreter(){
     local TMP_CONTENT="$2"
     local TMP_HEX_CHAR
 
-    if echo "$TMP_CMD" | $BUSYBOX grep -q -E "^[A-Z]+$"; then
-        if [ "$TMP_CMD" = "STRING" ]; then
-            #### Thanks to the tools 'fold' and 'xxd' from busybox that make things easier
-            ## convert the whole string to a non-space hex string with '0a' between each unicode characters.
-            TMP_CONTENT=$(echo "$TMP_CONTENT" | $BUSYBOX fold -w1 | $BUSYBOX xxd -p)
-            ## split the string into array by the delimiter '0a'
-            TMP_CONTENT=(${TMP_CONTENT//0a/ })
-            ## loop each hex string and then pass it to convert_ducky function to do the match
-            for TMP_HEX_CHAR in ${TMP_CONTENT[@]}; do
-                convert_ducky $TMP_HEX_CHAR
+    if [ "$TMP_CMD" = "" ]; then
+        echo "" >> $OUTFILE
+    elif [ "$TMP_CMD" = "STRING" ]; then
+        #### Thanks to the tools 'fold' and 'xxd' from busybox that make things easier
+        ## convert the whole string to a non-space hex string with '0a' between each unicode characters.
+        TMP_CONTENT=$(echo "$TMP_CONTENT" | $BUSYBOX fold -w1 | $BUSYBOX xxd -p)
+        ## split the string into array by the delimiter '0a'
+        TMP_CONTENT=(${TMP_CONTENT//0a/ })
+        ## loop each hex string and then pass it to convert_ducky function to do the match
+        for TMP_HEX_CHAR in ${TMP_CONTENT[@]}; do
+            convert_ducky $TMP_HEX_CHAR
+        done
+    elif [ "$TMP_CMD" = "DELAY" ]; then
+        if ! echo "$TMP_CONTENT" | $BUSYBOX grep -q -E "^[0-9]*$"; then
+            echo "Invalid DELAY format, should be an integer >= 0."
+            exit 1
+        fi
+        echo "$BUSYBOX usleep ${TMP_CONTENT}000" >> $OUTFILE
+    elif [ "$TMP_CMD" = "REM" ]; then
+        echo "#### \"${TMP_CONTENT[@]}\" ####" >> $OUTFILE
+    elif [ "$TMP_CMD" = "REPEAT" ]; then
+        if ! echo "$TMP_CONTENT" | $BUSYBOX grep -q -E "^[0-9]*$"; then
+            echo "Invalid DELAY format, should be like: [123]"
+            exit 1
+        fi
+        read -r CMD CONTENT <<< $LAST_CMD
+        echo "REPEAT: $CMD ${CONTENT[@]}"
+        for i in $(seq 1 $TMP_CONTENT); do
+            command_interpreter "$CMD" "${CONTENT[@]}"
+        done
+        LAST_CMD="$CMD ${CONTENT[@]}"
+    elif [ "$TMP_CMD" = "COMBO" ]; then
+        TMP_CONTENT=(${TMP_CONTENT[@]})
+        local FULL_CMD
+        FULL_CMD=()
+        for i in "${TMP_CONTENT[@]}"; do
+            ERROR_CODE=1
+            local KEY="`tr '[:upper:]' '[:lower:]' <<< $i`"
+            for j in "${COMBO_KEYS[@]}"; do
+                if [ "$j" = "$KEY" ]; then
+                    ERROR_CODE=0
+                    break
+                fi
             done
-        elif [ "$TMP_CMD" = "DELAY" ]; then
-            if ! echo "$TMP_CONTENT" | $BUSYBOX grep -q -E "^[0-9]*$"; then
-                echo "Invalid DELAY format, should be an integer >= 0."
-                exit 1
-            fi
-            echo "$BUSYBOX usleep ${TMP_CONTENT}000" >> $OUTFILE
-        elif [ "$TMP_CMD" = "REM" ]; then
-            echo "#### \"${TMP_CONTENT[@]}\" ####" >> $OUTFILE
-        elif [ "$TMP_CMD" = "REPEAT" ]; then
-            if ! echo "$TMP_CONTENT" | $BUSYBOX grep -q -E "^[0-9]*$"; then
-                echo "Invalid DELAY format, should be like: [123]"
-                exit 1
-            fi
-            read -r CMD CONTENT <<< $LAST_CMD
-            echo "REPEAT: $CMD ${CONTENT[@]}"
-            for i in $(seq 1 $TMP_CONTENT); do
-                command_interpreter "$CMD" "${CONTENT[@]}"
-            done
-            LAST_CMD="$CMD ${CONTENT[@]}"
-        elif [ "$TMP_CMD" = "COMBO" ]; then
-            TMP_CONTENT=(${TMP_CONTENT[@]})
-            local FULL_CMD
-            FULL_CMD=()
-            for i in "${TMP_CONTENT[@]}"; do
-                ERROR_CODE=1
+            [ $ERROR_CODE -eq 1 ] && echo "$i is not a valid key combination, please check." | tee $OUTFILE && exit 1
+            FULL_CMD+=($(translate_combo_key $KEY))
+        done
+        write_kb_code_bin "${FULL_CMD[@]}"
+    elif [ "$TMP_CMD" = "MOUSE" ]; then
+        write_mouse_code ${TMP_CONTENT}
+    else
+        TMP_CONTENT=($TMP_CMD ${TMP_CONTENT[@]})
+        local FULL_CMD
+        FULL_CMD=()
+        for i in "${TMP_CONTENT[@]}"; do
+            ERROR_CODE=1
+            if echo $i | $BUSYBOX grep -q -E "^[a-zA-Z]$"; then
+                FULL_CMD+=($i)
+            else
                 local KEY="`tr '[:upper:]' '[:lower:]' <<< $i`"
                 for j in "${COMBO_KEYS[@]}"; do
                     if [ "$j" = "$KEY" ]; then
@@ -3080,34 +3103,9 @@ function command_interpreter(){
                 done
                 [ $ERROR_CODE -eq 1 ] && echo "$i is not a valid key combination, please check." | tee $OUTFILE && exit 1
                 FULL_CMD+=($(translate_combo_key $KEY))
-            done
-            write_kb_code_bin "${FULL_CMD[@]}"
-        elif [ "$TMP_CMD" = "MOUSE" ]; then
-            write_mouse_code ${TMP_CONTENT}
-        else
-            TMP_CONTENT=($TMP_CMD ${TMP_CONTENT[@]})
-            local FULL_CMD
-            FULL_CMD=()
-            for i in "${TMP_CONTENT[@]}"; do
-                ERROR_CODE=1
-                if echo $i | $BUSYBOX grep -q -E "^[a-zA-Z]$"; then
-                    FULL_CMD+=($i)
-                else
-                    local KEY="`tr '[:upper:]' '[:lower:]' <<< $i`"
-                    for j in "${COMBO_KEYS[@]}"; do
-                        if [ "$j" = "$KEY" ]; then
-                            ERROR_CODE=0
-                            break
-                        fi
-                    done
-                    [ $ERROR_CODE -eq 1 ] && echo "$i is not a valid key combination, please check." | tee $OUTFILE && exit 1
-                    FULL_CMD+=($(translate_combo_key $KEY))
-                fi
-            done
-            write_kb_code_bin "${FULL_CMD[@]}"
-        fi
-    else
-        echo "$TMP_CMD ${TMP_CONTENT[@]}" >> $OUTFILE
+            fi
+        done
+        write_kb_code_bin "${FULL_CMD[@]}"
     fi
 }
 

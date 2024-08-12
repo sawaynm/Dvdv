@@ -90,7 +90,7 @@
     <string name="badusb_description">This is our implementation of the BadUSB attack as demonstrated at Black Hat USA 2014. Enabling this USB gadget mode will allow your device to act as a USB network interface when plugged into a target computer. Connecting the USB cable to a PC will force all traffic from that PC (Windows or Linux) through the NetHunter device, where the traffic can be MITM\'ed.</string>
 
 
-    <string name="mana_hostapd">The hostapd configuration file used by Mana.</string>
+    <string name="wifipumpkin_description">Start an Evil-Twin Access Point and intercept HTTP traffic. Custom captive portals, featuring mobile network upstream (rmnet_data2), internal wlan0 upstream, internal wlan0/wlan1 AP mode, and external adapters. Custom portals are also supported. Testing version. Preview will be added soon.</string>
     <string name="mana_hostapd_wpe">The hostapd configuration file used for 802.1x/EAP authentication attack (hostapd-wpe)  This is not used with MANA.</string>
     <string name="mana_hostapd_wpe_certs">Generate certificates (1st time only)</string>
     <string name="mana_dhcpd">The dhcpd configuration file used by Mana.</string>
@@ -224,7 +224,7 @@
     <string name="bt_carwhisperer">Carwhisperer script from the way back. Listen to, or inject audio to various devices like speakers, headsets, watches or even cars. Carwshisperer is not supported by internal bluetooth (VHCI or bt_smd) yet.</string>
     <string name="bt_spoof">Spoof your BT adapters address, class, and name.</string>
     <string name="bt_tools">Brute force BT device addresses, ping, and discover their services.</string>
-    <string name="bt_badbt">Inspired by the Mr.Robot police car scene and the Flipper XFW Team, you can now create a Bluetooth keyboard server and send keystrokes straight from NetHunter. You may need to run setup again from the top right menu to install BadBT. Running this on a smartwatch against your paired phone may dispair your watch from phone/wearos app. Prefixes are experimental.</string>
+    <string name="bt_badbt">Inspired by the Mr.Robot police car scene and the Flipper XFW Team, you can now create a Bluetooth keyboard server and send keystrokes straight from NetHunter. You may need to run setup again from the top right menu to install BadBT. Running this on a smartwatch against your paired phone may despair your watch from phone/wearos app. Prefixes are experimental.</string>
 
     <!-- SET -->
     <string name="set_description">Social Engineering Toolkit email template builder by yesimxev. Please note you need to have a working Gmail or email relay configuration for SET in order to use these templates. It is recommended not to have account picture if you use Gmail.</string>
@@ -234,6 +234,9 @@
 
     <!-- Settings -->
     <string name="settings_description">Select your desired boot animation here. Please note that some older phones prefer 90% the size of original screen resolution, so it can run smoothly. In that case, tick convert, then set image resolution and final resolution together.</string>
+
+    <!-- Kernel -->
+    <string name="kernel_description">Flash your custom kernel straight from Android. Unknown device compatibility.</string>
 
     <!-- MITMf -->
     <string name="mitmf_description">Written by @byt3bl33d3r, MITMf aims to provide a one-stop-shop for Man-In-The-Middle and network attacks while updating and improving existing attacks and techniques.</string>
@@ -346,7 +349,7 @@
     <string name="drawertitlehid">HID Attacks</string>
     <string name="drawertitleduckhunter">DuckHunter HID</string>
     <string name="drawertitlebadusb">Bad USB MITM Attack</string>
-    <string name="drawertitlemana">Mana Wireless Toolkit</string>
+    <string name="drawertitlewifipumpkin">Wifipumpkin</string>
     <string name="drawertitlewps">WPS Attacks</string>
     <string name="drawertitlebt">Bluetooth Arsenal</string>
     <string name="drawertitlemitmf">MITM Framework</string>
@@ -357,6 +360,7 @@
     <string name="drawertitlegps">Wardriving</string>
     <string name="drawertitledeauth">DeAuth</string>
     <string name="drawertitlesettings">Settings</string>
+    <string name="drawertitlekernel">Kernel</string>
     <string name="drawertitlemodules">Modules</string>
     <string name="drawertitleset">SET</string>
     <string name="InstallAndUpdateButtonText"><![CDATA[Install & Update]]></string>
@@ -547,4 +551,8 @@
     <string name="dummy_accessibility_service">dummy_accessibility_service</string>
     <string name="bootanimation_path_not_found">Bootanimation path not found</string>
     <string name="launch_kismet_nhterm">Launch Kismet in NH Terminal</string>
+    <string name="list_of_available_folders">\n List of available folder(s) in\n\"%s/\":\n\n</string>
+    <string name="not_yet_installed">Not yet installed!</string>
+    <string name="running">Running!</string>
+    <string name="stopped">Stopped</string>
 </resources>
