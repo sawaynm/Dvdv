@@ -16,7 +16,6 @@ import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.SharePrefTag;
 import com.offsec.nethunter.utils.ShellExecuter;
 
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,20 +25,21 @@ import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Objects;
+
 
 public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
-
-    private final String TAG = "CopyBootFilesAsyncTask";
-    private File sdCardDir;
-    private File scriptsDir;
-    private File etcDir;
-    private String buildTime;
+    public static final String TAG = "CopyBootFilesAsyncTask";
+    private final File sdCardDir;
+    private final File scriptsDir;
+    private final File etcDir;
+    private final String buildTime;
     private Boolean shouldRun;
     private final WeakReference<ProgressDialog> progressDialogRef;
     private CopyBootFilesAsyncTaskListener listener;
-    private String result = "";
-    private SharedPreferences prefs;
-    private ShellExecuter exe = new ShellExecuter();
+    private static final String result = "";
+    private final SharedPreferences prefs;
+    private final ShellExecuter exe = new ShellExecuter();
     private final WeakReference<Context> context;
 
     public CopyBootFilesAsyncTask(Context context, Activity activity, ProgressDialog progressDialog){
@@ -80,7 +80,7 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
     @Override
     protected String doInBackground(String ...strings) {
         // setup
-        if(shouldRun){
+        if (shouldRun) {
             if (!CheckForRoot.isRoot()) {
                 prefs.edit().putBoolean(AppNavHomeActivity.CHROOT_INSTALLED_TAG, false).apply();
                 return "Root permission is required!!";
@@ -114,7 +114,7 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
             if (_res.equals("1")) {
                 ed = prefs.edit();
                 ed.putBoolean(AppNavHomeActivity.CHROOT_INSTALLED_TAG, true);
-                ed.commit();
+                ed.apply();
                 publishProgress("Chroot Found!");
 
                 // Mount suid /data && fix sudo - this is definitely needed as of 02/2020, Re4son
@@ -131,7 +131,6 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
             publishProgress("Installing additional apps....");
             String ApkCachePath= NhPaths.APP_SD_FILES_PATH + "/cache/apk/";
             ArrayList<String> filenames = FetchFiles(ApkCachePath);
-            int i, x;
 
             for (String object: filenames) {
                 if (object.contains(".apk")){
@@ -149,12 +148,12 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
         // never copy images, sounds or webkit
         if (!path.startsWith("images") && !path.startsWith("sounds") && !path.startsWith("webkit")) {
             if (copyType.equals("sdcard")) {
-                if (path.equals("")) {
+                if (path.isEmpty()) {
                     return true;
                 } else return path.startsWith(NhPaths.NH_SD_FOLDER_NAME);
             }
             if (copyType.equals("data")) {
-                if (path.equals("")) {
+                if (path.isEmpty()) {
                     return true;
                 } else if (path.startsWith("scripts")) {
                     return true;
@@ -174,6 +173,7 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
         try {
             // Log.i("tag", "assetsTo" + copyType +"() "+path);
             assets = assetManager.list(path);
+            assert assets != null;
             if (assets.length == 0) {
                 copyFile(TARGET_BASE_PATH, path);
             } else {
@@ -181,18 +181,17 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
                 // Log.i("tag", "path="+fullPath)
 
                 File dir = new File(fullPath);
-                if (!dir.exists() && pathIsAllowed(path, copyType)) { // copy those dirs
-                    if (!dir.mkdirs()) {
+                if (!dir.exists() && pathIsAllowed(path, copyType) && !dir.mkdirs()) {
                         ShellExecuter create = new ShellExecuter();
                         create.RunAsRoot(new String[]{"mkdir " + fullPath});
                         if (!dir.exists()) {
                             Log.i(TAG, "could not create dir " + fullPath);
                         }
                     }
-                }
+
                 for (String asset : assets) {
                     String p;
-                    if (path.equals("")) {
+                    if (path.isEmpty()) {
                         p = "";
                     } else {
                         p = path + "/";
@@ -232,7 +231,7 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
             out.close();
         } catch (Exception e) {
             Log.e(TAG, "Exception in copyFile() of " + newFileName);
-            Log.e(TAG, "Exception in copyFile() " + e.toString());
+            Log.e(TAG, "Exception in copyFile() " + e);
             Log.e(TAG, "Trying to copy as root next");
             // Trying runasroot
             ShellExecuter copy = new ShellExecuter();
@@ -250,23 +249,23 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
         if (file.getParent() == null) {
             canon = file;
         } else {
-            File canonDir = file.getParentFile().getCanonicalFile();
+            File canonDir = Objects.requireNonNull(file.getParentFile()).getCanonicalFile();
             canon = new File(canonDir, file.getName());
         }
         return !canon.getCanonicalFile().equals(canon.getAbsoluteFile());
     }
 
-    private void MakeSYSWriteable(){
+    private void MakeSYSWriteable() {
         Log.d(TAG, "Making /system writeable for symlink");
         exe.RunAsRoot(new String[]{"if [ \"$(getprop ro.build.system_root_image)\" == \"true\" ]; then export SYSTEM=/; else export SYSTEM=/system;fi;mount -o rw,remount,rw $SYSTEM"});
     }
 
-    private void MakeSYSReadOnly(){
+    private void MakeSYSReadOnly() {
         Log.d(TAG, "Making /system readonly for symlink");
         exe.RunAsRoot(new String[]{"if [ \"$(getprop ro.build.system_root_image)\" == \"true\" ]; then export SYSTEM=/; else export SYSTEM=/system;fi;mount -o ro,remount,ro $SYSTEM"});
     }
 
-    private void CheckEncrypted(){
+    private void CheckEncrypted() {
         Log.d(TAG, "Checking if /data is encrypted...");
         String encrypted = exe.RunAsRootOutput("getprop ro.crypto.state");
         Log.d(TAG, "/data is " + encrypted);
@@ -293,7 +292,7 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
     // Get a list of files from a directory
     private ArrayList<String> FetchFiles(String folder) {
 
-        ArrayList<String> filenames = new ArrayList<String>();
+        ArrayList<String> filenames = new ArrayList<>();
         File directory = new File(folder);
 
         if (directory.exists()) {
@@ -313,16 +312,22 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
     }
 
     // This rename the filename which suffix is either [name]-arm64 or [name]-armhf to [name] according to the user's CPU ABI.
-    private String renameAssetIfneeded(String asset){
-        if (asset.matches("^.*-arm64$")){
-            if (Build.CPU_ABI.equals("arm64-v8a")){
-                return (asset.replaceAll("-arm64$",""));
-            }
-        } else if (asset.matches("^.*-armeabi$")){
-            if (!Build.CPU_ABI.equals("arm64-v8a")){
-                return (asset.replaceAll("-armeabi$",""));
-            }
+    private String renameAssetIfneeded(String asset) {
+        String cpuAbi;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            cpuAbi = Build.SUPPORTED_ABIS[0];
+        } else {
+            cpuAbi = Build.CPU_ABI;
         }
+
+        if (asset.matches("^.*-arm64$")) {
+            if (cpuAbi.equals("arm64-v8a")) {
+                return asset.replaceAll("-arm64$", "");
+            }
+        } else if (asset.matches("^.*-armeabi$") && !cpuAbi.equals("arm64-v8a")) {
+            return asset.replaceAll("-armeabi$", "");
+        }
+
         return asset;
     }
 
