@@ -11,7 +11,6 @@ import android.util.Log;
 import com.offsec.nethunter.BuildConfig;
 import com.offsec.nethunter.models.USBArsenalUSBNetworkModel;
 import com.offsec.nethunter.models.USBArsenalUSBSwitchModel;
-import com.offsec.nethunter.utils.NhPaths;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,11 +25,10 @@ public class USBArsenalSQL extends SQLiteOpenHelper {
     private static final String TAG = "USBArsenalSQLSQL";
     private static final String USBSWITCH_TABLE_NAME = "USBSwitch";
     private static final String USBNETWORK_TABLE_NAME = "USBNetwork";
-    private static ArrayList<String> COLUMNS_USBSWITCH = new ArrayList<>();
-    private static ArrayList<String> COLUMNS_USBNETWORK = new ArrayList<>();
-    private boolean isDBValid;
+    private static final ArrayList<String> COLUMNS_USBSWITCH = new ArrayList<>();
+    private static final ArrayList<String> COLUMNS_USBNETWORK = new ArrayList<>();
 
-    public synchronized static USBArsenalSQL getInstance(Context context){
+    public static synchronized USBArsenalSQL getInstance(Context context){
         if (instance == null) {
             instance = new USBArsenalSQL(context.getApplicationContext());
         }
@@ -39,7 +37,6 @@ public class USBArsenalSQL extends SQLiteOpenHelper {
 
     private USBArsenalSQL(Context context) {
         super(context, DATABASE_NAME, null, 1);
-        // Add your default column here;
         COLUMNS_USBSWITCH.add("target");
         COLUMNS_USBSWITCH.add("functions");
         COLUMNS_USBSWITCH.add("idVendor");
@@ -145,7 +142,7 @@ public class USBArsenalSQL extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+        // TODO document why this method is empty
     }
 
     public USBArsenalUSBSwitchModel getUSBSwitchColumnData(String targetOSName, String functionName){
@@ -247,8 +244,10 @@ public class USBArsenalSQL extends SQLiteOpenHelper {
 
     public String backupData(String storedDBpath) {
         try {
-            String currentDBPath = NhPaths.APP_DATABASE_PATH + "/" + getDatabaseName();
-            if (Environment.getExternalStorageDirectory().canWrite()) {
+            File data = Environment.getDataDirectory();
+            File sd = Environment.getExternalStorageDirectory();
+            String currentDBPath = data.getAbsolutePath() + "/data/" + BuildConfig.APPLICATION_ID + "/databases/" + getDatabaseName();
+            if (sd.canWrite()) {
                 File currentDB = new File(currentDBPath);
                 File backupDB = new File(storedDBpath);
                 if (currentDB.exists()) {
@@ -283,8 +282,10 @@ public class USBArsenalSQL extends SQLiteOpenHelper {
         }
 
         try {
-            String currentDBPath = NhPaths.APP_DATABASE_PATH + "/" + getDatabaseName();
-            if (Environment.getExternalStorageDirectory().canWrite()) {
+            File data = Environment.getDataDirectory();
+            File sd = Environment.getExternalStorageDirectory();
+            String currentDBPath = data.getAbsolutePath() + "/data/" + BuildConfig.APPLICATION_ID + "/databases/" + getDatabaseName();
+            if (sd.canWrite()) {
                 File currentDB = new File(currentDBPath);
                 File backupDB = new File(storedDBpath);
                 if (backupDB.exists()) {
@@ -305,7 +306,7 @@ public class USBArsenalSQL extends SQLiteOpenHelper {
 
     private boolean verifyDB(String storedDBpath){
         SQLiteDatabase tempDB = SQLiteDatabase.openDatabase(storedDBpath, null, SQLiteDatabase.OPEN_READWRITE);
-        isDBValid = true;
+        boolean isDBValid = true;
         if (ifTableExists(tempDB, USBSWITCH_TABLE_NAME)) {
             Cursor c = tempDB.rawQuery("SELECT name FROM sqlite_master WHERE type='table' AND name='" + USBSWITCH_TABLE_NAME + "'", null);
             if (c.getCount()==1){
@@ -316,14 +317,10 @@ public class USBArsenalSQL extends SQLiteOpenHelper {
                 if (tempColumnNames.length == COLUMNS_USBSWITCH.size()) {
                     for (int i = 0; i < tempColumnNames.length; i++){
                         if (!tempColumnNames[i].equals(COLUMNS_USBSWITCH.get(i))){
-                            //tempDB.close();
-                            //return false;
                             isDBValid = false;
                             break;
                         }
                     }
-                    //tempDB.close();
-                    //return true;
                 } else isDBValid = false;
             } else isDBValid = false;
         } else isDBValid = false;
@@ -338,14 +335,10 @@ public class USBArsenalSQL extends SQLiteOpenHelper {
                     if (tempColumnNames.length == COLUMNS_USBNETWORK.size()) {
                         for (int i = 0; i < tempColumnNames.length; i++){
                             if (!tempColumnNames[i].equals(COLUMNS_USBNETWORK.get(i))){
-                                //tempDB.close();
-                                //return false;
                                 isDBValid = false;
                                 break;
                             }
                         }
-                        //tempDB.close();
-                        //return true;
                     } else isDBValid = false;
                 } else isDBValid = false;
             } else isDBValid = false;

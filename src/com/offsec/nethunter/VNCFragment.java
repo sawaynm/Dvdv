@@ -66,8 +66,8 @@ public class VNCFragment extends Fragment {
     private String delay_cmd = "";
     private Integer posu;
     private Integer posd = 0;
-    private static final int MIN_UID = 100000;
-    private static final int MAX_UID = 101000;
+    private static final int MIN_UID = 9000;
+    private static final int MAX_UID = 9999;
     NhPaths nh; //= new NhPaths();
     String BUSYBOX_NH= nh.getBusyboxPath();
     private Boolean iswatch;
@@ -204,7 +204,7 @@ public class VNCFragment extends Fragment {
 
         //Users
         File passwd = new File(nh.CHROOT_PATH() + "/etc/passwd");
-        String commandUSR = ("echo root && " + BUSYBOX_NH + " awk -F':' -v \"min=" + MIN_UID + "\" -v \"max=" + MAX_UID + "\" '{ if ( $3 >= min && $3 <= max ) print $0}' " + passwd + " | " + BUSYBOX_NH + " cut -d: -f1");
+        String commandUSR = ("echo root && " + BUSYBOX_NH + " awk -F':' -v \"min=" + MIN_UID + "\" -v \"max=" + MAX_UID + "\" '{ if ( ( $3 >= min && $3 <= max ) || ( $3 >= 100000 && $3 <= 101000 ) ) print $0}' " + passwd + " | " + BUSYBOX_NH + " cut -d: -f1");
         String outputUSR = exe.RunAsRootOutput(commandUSR);
         final String[] userArray = outputUSR.split("\n");
         Arrays.sort(userArray);
@@ -344,7 +344,7 @@ public class VNCFragment extends Fragment {
                     File rootvncpasswd = new File(nh.CHROOT_PATH() + "/root/.vnc/passwd");
                     String vnc_passwd = exe.RunAsRootOutput("cat " + rootvncpasswd);
                     if(!vnc_passwd.equals("")) {
-                        String arch_path = exe.RunAsRootOutput("ls " + nh.CHROOT_PATH() + "/usr/lib/ | grep linux-gnu");
+                        String arch_path = exe.RunAsRootOutput("ls " + nh.CHROOT_PATH() + "/usr/lib/ | grep linux-gnu | head -n1");
                         String shebang = "#!/system/bin/sh\n";
                         String kex_prep = "\n# KeX architecture path: " + arch_path + "\n# Commands to run at boot:\nHOME=/root\nUSER=root";
                         String kex_cmd = "su -c \'" + nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd LD_PRELOAD=/usr/lib/" + arch_path + "/libgcc_s.so.1 vncserver :1 " + localhostonly + " " + selected_vncresCMD + "\'";
@@ -436,7 +436,7 @@ public class VNCFragment extends Fragment {
             if(vnc_passwd.equals("")) {
                 Toast.makeText(getActivity().getApplicationContext(), "Please setup local server first!", Toast.LENGTH_SHORT).show();
             } else {
-                String arch_path = exe.RunAsRootOutput("ls " + nh.CHROOT_PATH() + "/usr/lib/ | grep linux-gnu");
+                String arch_path = exe.RunAsRootOutput("ls " + nh.CHROOT_PATH() + "/usr/lib/ | grep linux-gnu | head -n1");
                 Toast.makeText(getActivity().getApplicationContext(), "Starting server.. Please refresh the status in NetHunter app.", Toast.LENGTH_LONG).show();
                 if(selected_user.equals("root")) {
                         exe.RunAsRoot(new String[]{NhPaths.APP_SCRIPTS_PATH + "/bootkali custom_cmd service dbus start"});
@@ -577,7 +577,7 @@ public class VNCFragment extends Fragment {
 
         //Users
         File passwd = new File(nh.CHROOT_PATH() + "/etc/passwd");
-        String commandUSR = ("echo root && " + BUSYBOX_NH + " awk -F':' -v \"min=" + MIN_UID + "\" -v \"max=" + MAX_UID + "\" '{ if ( $3 >= min && $3 <= max ) print $0}' " + passwd + " | " + BUSYBOX_NH + " cut -d: -f1");
+        String commandUSR = ("echo root && " + BUSYBOX_NH + " awk -F':' -v \"min=" + MIN_UID + "\" -v \"max=" + MAX_UID + "\" '{ if ( ( $3 >= min && $3 <= max ) || ( $3 >= 100000 && $3 <= 101000 ) ) print $0}' " + passwd + " | " + BUSYBOX_NH + " cut -d: -f1");
         String outputUSR = exe.RunAsRootOutput(commandUSR);
         final String[] userArray = outputUSR.split("\n");
         Arrays.sort(userArray);

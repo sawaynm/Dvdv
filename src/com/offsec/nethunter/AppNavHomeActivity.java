@@ -40,6 +40,7 @@ import com.offsec.nethunter.utils.CheckForRoot;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.PermissionCheck;
 import com.offsec.nethunter.utils.SharePrefTag;
+import com.offsec.nethunter.utils.ShellExecuter;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -84,6 +85,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     private int desiredFragment = -1;
     public CopyBootFilesAsyncTask copyBootFilesAsyncTask;
     public static MenuItem customCMDitem;
+    private final ShellExecuter exe = new ShellExecuter();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -381,15 +383,16 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
             snowfall = prefs.getBoolean("snowfall_enabled", false);
             navigationView.getMenu().getItem(2).setVisible(false);
             navigationView.getMenu().getItem(3).setVisible(false);
-            if (model.equals("catfish") || model.equals("catshark") || model.equals("catshark-4g")) navigationView.getMenu().getItem(7).setVisible(false);
-            navigationView.getMenu().getItem(12).setVisible(false);
-            navigationView.getMenu().getItem(15).setVisible(false);
+            navigationView.getMenu().getItem(4).setVisible(false);
+            if (model.equals("catfish") || model.equals("catshark") || model.equals("catshark-4g")) navigationView.getMenu().getItem(8).setVisible(false);
+            navigationView.getMenu().getItem(13).setVisible(false);
             navigationView.getMenu().getItem(16).setVisible(false);
-            navigationView.getMenu().getItem(18).setVisible(false);
+            navigationView.getMenu().getItem(17).setVisible(false);
             navigationView.getMenu().getItem(19).setVisible(false);
             navigationView.getMenu().getItem(20).setVisible(false);
             navigationView.getMenu().getItem(21).setVisible(false);
             navigationView.getMenu().getItem(22).setVisible(false);
+            navigationView.getMenu().getItem(23).setVisible(false);
         } else {
             snowfall = prefs.getBoolean("snowfall_enabled", true);
         }
@@ -564,7 +567,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                             changeFragment(fragmentManager, DuckHunterFragment.newInstance(itemId));
                             break;
                         case R.id.usbarsenal_item:
-                            if (new File("/config/usb_gadget/g1").exists()) {
+                            if (exe.RunAsRootReturnValue("ls /config/usb_gadget/g1") == 0) {
                                 changeFragment(fragmentManager, USBArsenalFragment.newInstance(itemId));
                             } else {
                                 showWarningDialog("", "USB Arsenal (ConfigFS) is only supported by kernels above 4.x. Please note that HID, RNDIS, and Mass Storage should be automatically enabled on older devices with NetHunter patches.", false);
@@ -573,8 +576,8 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                         case R.id.badusb_item:
                             changeFragment(fragmentManager, BadusbFragment.newInstance(itemId));
                             break;
-                        case R.id.mana_item:
-                            changeFragment(fragmentManager, ManaFragment.newInstance(itemId));
+                        case R.id.wifipumpkin_item:
+                            changeFragment(fragmentManager, WifipumpkinFragment.newInstance(itemId));
                             break;
                         case R.id.wps_item:
                             changeFragment(fragmentManager, WPSFragment.newInstance(itemId));
@@ -615,6 +618,9 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                             break;
                         case R.id.settings_item:
                             changeFragment(fragmentManager, SettingsFragment.newInstance(itemId));
+                            break;
+                        case R.id.kernel_item:
+                            changeFragment(fragmentManager, KernelFragment.newInstance(itemId));
                             break;
                         case R.id.modules_item:
                             changeFragment(fragmentManager, ModulesFragment.newInstance(itemId));

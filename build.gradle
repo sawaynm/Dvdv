@@ -13,7 +13,7 @@ buildscript {
 repositories {
     mavenCentral()
     maven { url "https://maven.google.com" }
-    //Snowfall
+    // Snowfall
     maven { url 'https://jitpack.io' }
     google()
 }
@@ -38,8 +38,8 @@ android {
         //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 28
         //noinspection HighAppVersionCode
-        versionCode 2024020500
-        versionName "2024.2"
+        versionCode 2024030200
+        versionName "2024.3"
         multiDexEnabled true
     }
 
@@ -99,6 +99,8 @@ dependencies {
     implementation 'androidx.preference:preference:1.2.1'
     //Snowfall
     implementation 'com.github.jetradarmobile:android-snowfall:1.2.1'
+    // debugImplementation because LeakCanary should only run in debug builds.
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.14'
 }
 
 java {
