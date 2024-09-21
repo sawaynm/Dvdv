@@ -382,7 +382,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         if(iswatch){
             snowfall = prefs.getBoolean("snowfall_enabled", false);
             navigationView.getMenu().getItem(2).setVisible(false);
-            navigationView.getMenu().getItem(3).setVisible(false);
+            //navigationView.getMenu().getItem(3).setVisible(false);
             navigationView.getMenu().getItem(4).setVisible(false);
             if (model.equals("catfish") || model.equals("catshark") || model.equals("catshark-4g")) navigationView.getMenu().getItem(8).setVisible(false);
             navigationView.getMenu().getItem(13).setVisible(false);
