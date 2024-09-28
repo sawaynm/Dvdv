@@ -346,7 +346,7 @@ public class WifipumpkinFragment extends Fragment {
                 run_cmd("echo -ne \"\\033]0;Upgrading iptables\\007\" && clear;" +
                         "apt-mark unhold libip* > /dev/null 2>&1 && " +
                         "apt-mark unhold libxtables* > /dev/null 2>&1 && " +
-                        "apt-mark unhold iptables*l > /dev/null 2>&1 && " +
+                        "apt-mark unhold iptables* > /dev/null 2>&1 && " +
                         "apt install iptables -y && sleep 2 && echo 'Closing window..' && exit");
             });
             builder.setNegativeButton("Close", (dialog, which) -> {
