@@ -1,6 +1,6 @@
 # NetHunter App (for Android)
 
-This is the next-gen [Kali NetHunter application](http://store.nethunter.com/packages/com.offsec.nethunter/), which acts as an installer, updater, and interface for the [Kali Linux chroot](https://gitlab.com/kalilinux/nethunter/build-scripts/kali-nethunter-project/-/tree/master/nethunter-fs).
+This is the next-gen [Kali NetHunter application](http://store.nethunter.com/packages/com.offsec.nethunter/), which acts as an installer, updater, and interface for the [Kali Linux chroot](https://gitlab.com/kalilinux/nethunter/build-scripts/kali-nethunter-rootfs).
 
 ## Setting up Android Studio
 
