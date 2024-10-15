@@ -1,10 +1,11 @@
 package com.offsec.nethunter;
 
 import android.Manifest;
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,7 +32,6 @@ import androidx.fragment.app.Fragment;
 
 import java.io.File;
 
-
 public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.Receiver {
     private static final String TAG = "KaliGpsServiceFragment";
     private static final String ARG_SECTION_NUMBER = "section_number";
@@ -43,7 +43,6 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
     private boolean reattachedToRunningService = false;
     private SwitchCompat switch_gps_provider = null;
     private SwitchCompat switch_gpsd = null;
-    private Button button_launch_app = null;
     private String rtlsdr = "";
     private String rtlamr = "";
     private String rtladsb = "";
@@ -77,6 +76,7 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
         button.setTag(null);
     }
 
+    @SuppressLint("StaticFieldLeak")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -84,7 +84,7 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
         TextView gpsHelpView = view.findViewById(R.id.gps_help);
         switch_gps_provider = view.findViewById(R.id.switch_gps_provider);
         switch_gpsd = view.findViewById(R.id.switch_gpsd);
-        button_launch_app = view.findViewById(R.id.gps_button_launch_app);
+        Button button_launch_app = view.findViewById(R.id.gps_button_launch_app);
         ShellExecuter exe = new ShellExecuter();
         EditText wlan_interface = view.findViewById(R.id.wlan_interface);
         EditText bt_interface = view.findViewById(R.id.bt_interface);
@@ -95,10 +95,10 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
 
         // TODO: make this text dynamic so we can launch other apps besides Kismet
         button_launch_app.setText("Launch Kismet in NH Terminal");
-        if(!wantHelpView)
+        if (!wantHelpView)
             gpsHelpView.setVisibility(View.GONE);
         Log.d(TAG, "reattachedToRunningService: " + reattachedToRunningService);
-        if(reattachedToRunningService) {
+        if (reattachedToRunningService) {
             // gpsTextView.append("Service already running\n");
             setCheckedQuietly(switch_gps_provider, true);
         }
@@ -107,10 +107,10 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
         check_gpsd();
 
         switch_gps_provider.setOnCheckedChangeListener((compoundButton, isChecked) -> {
-            if(switch_gps_provider.getTag() != null)
+            if (switch_gps_provider.getTag() != null)
                 return;
             Log.d(TAG, "switch_gps_provider clicked: " + isChecked);
-            if(isChecked) {
+            if (isChecked) {
                 startGpsProvider();
             } else {
                 stopGpsProvider();
@@ -118,7 +118,7 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
         });
 
         switch_gpsd.setOnCheckedChangeListener((compoundButton, isChecked) -> {
-            if(switch_gpsd.getTag() != null)
+            if (switch_gpsd.getTag() != null)
                 return;
             Log.d(TAG, "switch_gpsd clicked: " + isChecked);
             if (isChecked) {
@@ -139,35 +139,41 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
                 switch_gpsd.setChecked(true);
                 startChrootGpsd();
             }
-            //WLAN interface
+            // WLAN interface
             String wlaniface = wlan_interface.getText().toString() ;
             if (!wlaniface.isEmpty()) wlaniface = "source=" + wlaniface + "\n";
             else wlaniface = "";
 
-            //BT interface
+            // BT interface
             String btiface = bt_interface.getText().toString();
             if (!btiface.isEmpty()) btiface = "source=" + btiface + "\n";
             else btiface = "";
 
-            //SDR sensors interface
+            // SDR sensors interface
             if (sdrcheckbox.isChecked()) rtlsdr = "source=rtl433-0\n";
             else rtlsdr = "";
 
-            //SDR AMR interface
+            // SDR AMR interface
             if (sdramrcheckbox.isChecked()) rtlamr = "source=rtlamr-0\n";
             else rtlamr = "";
 
-            //SDR ADSB interface
+            // SDR ADSB interface
             if (sdradsbcheckbox.isChecked()) rtladsb = "source=rtladsb-0\n";
             else rtladsb = "";
 
-            //Mousejack interface
+            // Mousejack interface
             if (mousejackcheckbox.isChecked()) mousejack = "source=mousejack:name=nRF,channel_hoprate=100/sec\n";
             else mousejack = "";
 
             String conf = "log_template=%p/%n\nlog_prefix=/captures/kismet/\ngps=gpsd:host=localhost,port=2947\n" + wlaniface + btiface + rtlsdr + rtlamr + rtladsb + mousejack;
-            exe.RunAsRoot(new String[]{"echo \"" + conf + "\" > " + NhPaths.SD_PATH + "/kismet_site.conf"});
-            exe.RunAsRoot(new String[]{"bootkali custom_cmd mv /sdcard/kismet_site.conf /etc/kismet/"});
+            new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    exe.RunAsRoot(new String[]{"echo \"" + conf + "\" > " + NhPaths.SD_PATH + "/kismet_site.conf"});
+                    exe.RunAsRoot(new String[]{"bootkali custom_cmd mv /sdcard/kismet_site.conf /etc/kismet/"});
+                    return null;
+                }
+            }.execute();
             Toast.makeText(requireActivity().getApplicationContext(), "Starting Kismet.. Web UI will be available at localhost:2501\"", Toast.LENGTH_LONG).show();
             wantKismet = true;
             gpsTextView.append("Kismet will launch after next position received.  Waiting...\n");
@@ -216,13 +222,14 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
     public void onResume() {
         super.onResume();
         Log.d(TAG, "onResume");
-        if(LocationUpdateService.isInstanceCreated()) {
+        if (LocationUpdateService.isInstanceCreated()) {
             // a LocationUpdateService is already running
             setCheckedQuietly(switch_gps_provider, true);
             // make sure it has a handle to this fragment so it can display updates
-            reattachedToRunningService = this.gpsProvider.onReceiverReattach(this);
-        } else
-        {
+            if (gpsProvider != null) {
+                reattachedToRunningService = this.gpsProvider.onReceiverReattach(this);
+            }
+        } else {
             setCheckedQuietly(switch_gps_provider, false);
         }
 
@@ -245,13 +252,10 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
             this.gpsProvider = (KaliGPSUpdates.Provider) context;
             reattachedToRunningService = this.gpsProvider.onReceiverReattach(this);
         }
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             // we've already granted permissions, make the nag message go away
             wantHelpView = false;
         }
-
         super.onAttach(context);
     }
 
@@ -260,19 +264,19 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
         CharSequence charSequence = gpsTextView.getText();
         int lineCnt = 0;
         int i;
-        for(i=charSequence.length()-1; i >= 0; i--) {
+        for (i = charSequence.length() - 1; i >= 0; i--) {
             if (charSequence.charAt(i) == '\n')
                 lineCnt++;
             if (lineCnt >= 20)
                 break;
         }
         // delete anything more than X lines previous so this doesn't get huge
-        if(i > 0) {
+        if (i > 0) {
             gpsTextView.getEditableText().delete(0, i);
         }
 
         gpsTextView.append(nmeaSentences + "\n");
-        if(wantKismet) {
+        if (wantKismet) {
             wantKismet = false;
             gpsTextView.append("Launching kismet in NetHunter Terminal\n");
             startKismet();
@@ -292,8 +296,9 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
     }
 
     public void run_cmd(String cmd) {
-        Intent intent = Bridge.createExecuteIntent("/data/data/com.offsec.nhterm/files/usr/bin/kali", cmd);
-        context.startActivity(intent);
+        if (context != null) {
+            Intent intent = Bridge.createExecuteIntent("/data/data/com.offsec.nhterm/files/usr/bin/kali", cmd);
+            context.startActivity(intent);
+        }
     }
 }
-
