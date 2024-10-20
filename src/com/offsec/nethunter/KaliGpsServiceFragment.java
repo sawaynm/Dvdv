@@ -94,7 +94,7 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
         CheckBox mousejackcheckbox = view.findViewById(R.id.mousejack);
 
         // TODO: make this text dynamic so we can launch other apps besides Kismet
-        button_launch_app.setText("Launch Kismet in NH Terminal");
+        button_launch_app.setText(R.string.launch_kismet);
         if (!wantHelpView)
             gpsHelpView.setVisibility(View.GONE);
         Log.d(TAG, "reattachedToRunningService: " + reattachedToRunningService);
@@ -226,7 +226,7 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
             // a LocationUpdateService is already running
             setCheckedQuietly(switch_gps_provider, true);
             // make sure it has a handle to this fragment so it can display updates
-            if (gpsProvider != null) {
+            if (this.gpsProvider != null) {
                 reattachedToRunningService = this.gpsProvider.onReceiverReattach(this);
             }
         } else {
