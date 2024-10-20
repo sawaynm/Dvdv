@@ -555,4 +555,22 @@
     <string name="not_yet_installed">Not yet installed!</string>
     <string name="running">Running!</string>
     <string name="stopped">Stopped</string>
+    <string name="launch_kismet">Launch Kismet</string>
+    <string name="full_path_to_where_you_want_to_save_the_database">Full path to where you want to save the database:</string>
+    <string name="full_path_of_the_db_file_from_where_you_want_to_restore2">Full path of the db file from where you want to restore:</string>
+    <string name="download_latest_kali_chroot_from_official_image">DOWNLOAD LATEST KALI CHROOT FROM OFFICIAL IMAGE</string>
+    <string name="download_latest_kali_chroot_from_official_image2">DOWNLOAD LATEST KALI CHROOT FROM OFFICIAL IMAGE</string>
+    <string name="type_the_full_path_of_your_kali_chroot_tarball_file">Type the full path of your Kali Chroot tarball file:</string>
+    <string name="long_press_to_manage_a_command_dont_forget_to_backup_use_double_quotes_if_needed">Long press to manage a command, dont forget to backup!. Use double quotes if needed.</string>
+    <string name="search_command">search command</string>
+    <string name="add_command">Add Command</string>
+    <string name="add">Add</string>
+    <string name="delete">Delete</string>
+    <string name="move">Move</string>
+    <string name="not_supported">Not supported</string>
+    <string name="supported">Supported</string>
+    <string name="setup_done_key">wp3_setup_done</string>
+    <string name="good">Good</string>
+    <string name="nope">Nope</string>
+    <string name="wpe_description">wpe_description</string>
 </resources>
