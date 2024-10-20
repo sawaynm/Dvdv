@@ -573,4 +573,14 @@
     <string name="good">Good</string>
     <string name="nope">Nope</string>
     <string name="wpe_description">wpe_description</string>
+    <string name="change_path">Change path</string>
+    <string name="data_local_nhsystem">/data/local/nhsystem/</string>
+    <string name="kali_arm64">kali-arm64</string>
+    <string name="loading_dot_dot_dot">Loading ...</string>
+    <string name="chroot_manager_install">Install</string>
+    <string name="chroot_manager_add_metapackage">Add Metapackge</string>
+    <string name="chroot_manager_backup">Backup</string>
+    <string name="chroot_manager_start">Start</string>
+    <string name="chroot_manager_stop">Stop</string>
+    <string name="chroot_manager_remove">Remove</string>
 </resources>

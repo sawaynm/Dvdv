@@ -45,7 +45,6 @@
             android:id="@+id/installButton"
             android:paddingLeft="16sp"
             android:paddingRight="16sp" />
-
     </LinearLayout>
 
     <TextView
@@ -53,8 +52,8 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="@string/statusText"
-        android:paddingLeft="16sp"
-        android:paddingTop="16sp" />
+        android:paddingStart="16sp"
+        android:paddingEnd="16sp"/>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -71,5 +70,4 @@
             android:textColor="@android:color/holo_green_light"
             android:fontFamily="monospace" />
     </ScrollView>
-
 </LinearLayout>
