@@ -308,7 +308,7 @@ public class ChrootManagerFragment extends Fragment {
                                 ARCH = archSpinner.getSelectedItemPosition() == 0 ? "arm64" : "armhf";
                                 assert minorfullSpinner != null;
                                 MINORFULL = minorfullSpinner.getSelectedItemPosition() == 0 ? "full" : "minimal";
-                                String targetDownloadFileName = "kalifs-" + ARCH + "-" + MINORFULL + ".tar.xz";
+                                String targetDownloadFileName = "kali-nethunter-daily-dev-rootfs-" + MINORFULL + "-" + ARCH + ".tar.xz";
 
                                 if (new File(downloadDir, targetDownloadFileName).exists()) {
                                     new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat)
