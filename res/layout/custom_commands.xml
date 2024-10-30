@@ -12,16 +12,16 @@
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Add Command"
+            android:text="@string/add_command"
             android:id="@+id/addCommand"
             android:layout_alignParentTop="true"
             android:layout_alignParentStart="false" />
 
-        <SearchView
+        <androidx.appcompat.widget.SearchView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:id="@+id/searchCommand"
-            android:hint="search command"
+            android:hint="@string/search_command"
             android:queryHint="search command"
             android:iconifiedByDefault="false"
             android:baselineAligned="false"
@@ -37,7 +37,7 @@
         android:id="@+id/customComandsInfo"
         android:layout_gravity="center_horizontal|center"
 		android:gravity="center"
-        android:text="Long press to manage a command, dont forget to backup!. Use double quotes if needed." />
+        android:text="@string/long_press_to_manage_a_command_dont_forget_to_backup_use_double_quotes_if_needed" />
 
     <ListView
         android:layout_width="fill_parent"
@@ -45,7 +45,4 @@
         android:id="@+id/commandList"
         android:divider="#333"
         android:dividerHeight="1dp" />
-
-
-
 </LinearLayout>

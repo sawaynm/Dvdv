@@ -27,7 +27,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
-                android:text="Change path"/>
+                android:text="@string/change_path"/>
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/f_chrootmanager_base_path_tv"
@@ -35,12 +35,11 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 android:gravity="center"
-                android:text="/data/local/nhsystem/"
+                android:text="@string/data_local_nhsystem"
                 android:singleLine="false"
                 android:textSize="12sp"
                 android:textColor="@android:color/background_light"
                 android:enabled="false"/>
-
         </androidx.appcompat.widget.LinearLayoutCompat>
 
         <androidx.appcompat.widget.LinearLayoutCompat
@@ -69,10 +68,9 @@
                     android:layout_height="match_parent"
                     android:layout_margin="8dp"
                     android:gravity="center"
-                    android:text="kali-arm64"
+                    android:text="@string/kali_arm64"
                     android:singleLine="true"
                     android:textColor="@android:color/background_light"/>
-
             </LinearLayout>
 
             <LinearLayout
@@ -89,15 +87,12 @@
                     android:id="@+id/f_chrootmanager_mountresult_tv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Loading..."
+                    android:text="@string/loading_dot_dot_dot"
                     android:textColor="@android:color/background_light"
                     android:layout_margin="8dp"
                     android:gravity="center"/>
-
             </LinearLayout>
-
         </androidx.appcompat.widget.LinearLayoutCompat>
-
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <com.google.android.material.textview.MaterialTextView
@@ -146,7 +141,7 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toEndOf="@+id/f_chrootmanager_unmount_btn"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:text="Install"
+                android:text="@string/chroot_manager_install"
                 android:layout_marginStart="2dp"
                 android:layout_marginBottom="2dp"
                 android:layout_marginTop="2dp"
@@ -159,7 +154,7 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toEndOf="@+id/f_chrootmanager_install_btn"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:text="Add Metapackge"
+                android:text="@string/chroot_manager_add_metapackage"
                 android:layout_marginStart="2dp"
                 android:layout_marginBottom="2dp"
                 android:layout_marginTop="2dp"
@@ -172,7 +167,7 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toEndOf="@+id/f_chrootmanager_addmetapkg_btn"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:text="Backup"
+                android:text="@string/chroot_manager_backup"
                 android:layout_marginStart="2dp"
                 android:layout_marginBottom="2dp"
                 android:layout_marginTop="2dp"
@@ -185,7 +180,7 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:text="Start"
+                android:text="@string/chroot_manager_start"
                 android:layout_marginStart="2dp"
                 android:layout_marginBottom="2dp"
                 android:layout_marginTop="2dp"
@@ -198,7 +193,7 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toEndOf="@+id/f_chrootmanager_mount_btn"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:text="Stop"
+                android:text="@string/chroot_manager_stop"
                 android:layout_marginStart="2dp"
                 android:layout_marginBottom="2dp"
                 android:layout_marginTop="2dp"
@@ -211,15 +206,12 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toEndOf="@+id/f_chrootmanager_backupchroot_btn"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:text="Remove"
+                android:text="@string/chroot_manager_remove"
                 android:layout_marginStart="2dp"
                 android:layout_marginBottom="2dp"
                 android:layout_marginTop="2dp"
                 android:layout_marginEnd="2dp"
                 android:visibility="gone"/>
-
         </LinearLayout>
-
     </HorizontalScrollView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

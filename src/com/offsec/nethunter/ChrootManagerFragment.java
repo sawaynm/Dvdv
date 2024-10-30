@@ -291,12 +291,11 @@ public class ChrootManagerFragment extends Fragment {
             downloadButton.setOnClickListener(view1 -> {
                 ad.dismiss();
                 AlertDialog ad1;
-                ad1 = null;
-                AlertDialog finalAd = ad1;
                 ad1 = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat)
                         .setView(getLayoutInflater().inflate(R.layout.chroot_manager_download_diaglog, null))
                         .setMessage("Select the options below:")
                         .setPositiveButton("OK", (dialogInterface, i) -> {
+                            AlertDialog finalAd = (AlertDialog) dialogInterface;
                             EditText storepathEditText = finalAd.findViewById(R.id.f_chrootmanager_storepath_et);
                             Spinner archSpinner = finalAd.findViewById(R.id.f_chrootmanager_arch_adb_spr);
                             Spinner minorfullSpinner = finalAd.findViewById(R.id.f_chrootmanager_minorfull_adb_spr);
@@ -379,7 +378,7 @@ public class ChrootManagerFragment extends Fragment {
     }
 
     @NonNull
-    private MaterialAlertDialogBuilder getMaterialAlertDialogBuilder(File downloadDir, String targetDownloadFileName) {
+    public MaterialAlertDialogBuilder getMaterialAlertDialogBuilder(File downloadDir, String targetDownloadFileName) {
         MaterialAlertDialogBuilder adb3 = new MaterialAlertDialogBuilder(activity, R.style.DialogStyleCompat);
         adb3.setMessage(downloadDir.getAbsoluteFile() + "/" + targetDownloadFileName + " exists. Do you want to overwrite it?");
         adb3.setPositiveButton("YES", (dialogInterface1, i1) -> {
@@ -635,14 +634,19 @@ public class ChrootManagerFragment extends Fragment {
     }
 
     private void setButtonVisibility(int MODE) {
+        SharedPreferences sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+        Boolean iswatch = sharedpreferences.getBoolean("running_on_wearos", false);
+
         switch (MODE) {
             case IS_MOUNTED:
                 mountChrootButton.setVisibility(View.GONE);
                 unmountChrootButton.setVisibility(View.VISIBLE);
                 installChrootButton.setVisibility(View.GONE);
-                SharedPreferences sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-                Boolean iswatch = sharedpreferences.getBoolean("running_on_wearos", false);
-                if (iswatch) addMetaPkgButton.setVisibility(View.GONE); else addMetaPkgButton.setVisibility(View.VISIBLE);
+                if (iswatch) {
+                    addMetaPkgButton.setVisibility(View.GONE);
+                } else {
+                    addMetaPkgButton.setVisibility(View.VISIBLE);
+                }
                 removeChrootButton.setVisibility(View.GONE);
                 backupChrootButton.setVisibility(View.GONE);
                 break;
@@ -665,7 +669,7 @@ public class ChrootManagerFragment extends Fragment {
         }
     }
 
-    private void setAllButtonEnable(boolean isEnable){
+    private void setAllButtonEnable(boolean isEnable) {
         mountChrootButton.setEnabled(isEnable);
         unmountChrootButton.setEnabled(isEnable);
         installChrootButton.setEnabled(isEnable);
