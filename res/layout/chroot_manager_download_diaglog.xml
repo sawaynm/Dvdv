@@ -46,7 +46,7 @@
             android:layout_marginTop="18dp"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
-            android:text="Path of the folder you want to donwload to:"
+            android:text="Path of the folder you want to download to:"
             android:textSize="18sp"
             android:textColor="@color/clearTitle"/>
 
@@ -57,6 +57,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:autofillHints="none"
+            android:text="/sdcard"
             android:textSize="18sp"
             android:textColor="@color/clearTitle"/>
 </LinearLayout>
