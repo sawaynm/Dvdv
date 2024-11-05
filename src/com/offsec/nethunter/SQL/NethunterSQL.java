@@ -30,7 +30,7 @@ public class NethunterSQL extends SQLiteOpenHelper {
             {"1", "Kernel Version", "uname -a", "\\n", "1"},
             {"2", "Busybox Version", Environment.getDataDirectory().getAbsolutePath() + "/data/com.offsec.nethunter/scripts/bin/busybox_nh | head -n1", "\\n", "1"},
             {"3", "Root Status", "su -v", "\\n", "1"},
-            {"4", "HID status", "[ -e /dev/hidg* ] && ls /dev/hidg* || { echo \"HID interface not found.\"; if [[ $(uname -r | cut -d. -f1) -ge 4 ]]; then echo \"Please enable in USB Arsenal\"; fi }", "\\n", "1"},
+            {"4", "HID status", "[ -n \"$(ls /dev/hidg* 2>/dev/null)\" ] && ls /dev/hidg* || { echo \"HID interface not found.\"; if [[ $(uname -r | cut -d. -f1) -ge 4 ]]; then echo \"Please enable in USB Arsenal\"; fi }", "\\n", "1"},
             {"5", "NetHunter Terminal Status", "[ \"$(pm list packages | grep 'com.offsec.nhterm')\" ] && echo \"NetHunter Terminal is installed.\" || echo \"NetHunter Terminal is NOT yet installed.\"", "\\n", "1"},
             {"6", "Network Interface Status", " ip -o addr show | " + NhPaths.BUSYBOX + " awk '{print $2, $3, $4}'", "\\n", "1"},
             {"7", "External IP", NhPaths.BUSYBOX + " which wget > /dev/null 2>&1 && " + NhPaths.BUSYBOX + " wget -qO - icanhazip.com || " + NhPaths.BUSYBOX + " curl -s ipv4.icanhazip.com", "\\n", "0"}
