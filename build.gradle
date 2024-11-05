@@ -100,7 +100,7 @@ dependencies {
     // Snowfall
     implementation 'com.github.jetradarmobile:android-snowfall:1.2.1'
     // debugImplementation because LeakCanary should only run in debug builds.
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.14'
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:3.0-alpha-8'
 }
 
 java {
