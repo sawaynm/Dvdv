@@ -103,8 +103,9 @@ public class ChrootManagerAsynctask extends AsyncTask<Object, Integer, Void> {
                     assert writer != null;
                     writer.close();
                     reader.close();
-                    exe.RunAsRootOutput("echo \"[+] Download completed.\"", ((TextView)objects[0]));
-                    resultCode = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/chrootmgr -c \"checksha512 " + objects[1].toString() + objects[2].toString().replace(".tar.xz","") + ".sha512sum " + objects[3].toString() + "\"", ((TextView)objects[0]));
+                    exe.RunAsRootOutput("echo \"[+] Download completed. It's time to install from storage.\"", ((TextView)objects[0]));
+                    // Skip sha512 check until it's added to daily builds
+                    //resultCode = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/chrootmgr -c \"checksha512 " + objects[1].toString() + objects[2].toString().replace(".tar.xz","") + ".sha512sum " + objects[3].toString() + "\"", ((TextView)objects[0]));
                 } catch (Exception e) {
                     exe.RunAsRootOutput("echo \"[-] " + e.getMessage() + "\"", ((TextView)objects[0]));
                     resultCode = 1;
