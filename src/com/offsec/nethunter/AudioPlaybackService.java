@@ -117,6 +117,7 @@ public class AudioPlaybackService extends Service implements AudioPlaybackWorker
             } else {
                 Log.d("AudioFragment", "WakeLock was not held.");
             }
+            wakeLock = null;
         } else {
             Log.d("AudioFragment", "WakeLock is null.");
         }
@@ -124,6 +125,7 @@ public class AudioPlaybackService extends Service implements AudioPlaybackWorker
         if (handler != null) {
             handler.removeCallbacksAndMessages(null);
             Log.d("AudioFragment", "Handler callbacks removed.");
+            handler = null;
         } else {
             Log.d("AudioFragment", "Handler is null.");
         }
