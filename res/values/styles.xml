@@ -119,5 +119,12 @@
         <item name="android:textColorPrimary">@color/textColor</item>
     </style>
 
+    <style name="TextAppearance.VersionInfo" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:textColor">?android:textColorHint</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="NHAudio.Theme.Notification" parent="Theme.AppCompat.DayNight" />
+
 </resources>
 

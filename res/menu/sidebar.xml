@@ -41,6 +41,10 @@
              android:icon="@drawable/ic_action_home"
              android:title="@string/drawertitlevncmanager" />
         <item
+             android:id="@+id/audio_item"
+             android:icon="@drawable/ic_speaker"
+             android:title="@string/drawertitleaudio" />
+        <item
             android:id="@+id/usbarsenal_item"
             android:icon="@drawable/ic_usb"
             android:title="@string/drawertitleusbarsenal" />

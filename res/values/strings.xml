@@ -346,6 +346,7 @@
     <string name="drawertitlecustomcommands">Custom Commands</string>
     <string name="drawertitlemacchanger">MAC Changer</string>
     <string name="drawertitlevncmanager">KeX Manager</string>
+    <string name="drawertitleaudio">Audio Manager</string>
     <string name="drawertitlehid">HID Attacks</string>
     <string name="drawertitleduckhunter">DuckHunter HID</string>
     <string name="drawertitlebadusb">Bad USB MITM Attack</string>
@@ -583,4 +584,34 @@
     <string name="chroot_manager_start">Start</string>
     <string name="chroot_manager_stop">Stop</string>
     <string name="chroot_manager_remove">Remove</string>
+
+    <!-- Nethunter Audio -->
+    <string name="module_name">NetHunter Audio</string>
+    <string name="audio_description">This module allow Chroot audio playback to Android environment over local server, ensuring seamless playback of HQ-Audio output through the main speakers.</string>
+    <string name="auto_start">Auto Start</string>
+    <string name="playback_service_status">NH Playback %1$s</string>
+    <string name="playback_status_starting">Starting</string>
+    <string name="playback_status_buffering">Buffering</string>
+    <string name="playback_status_playing">Playing</string>
+    <string name="playback_status_stopping">Stopping</string>
+    <string name="playback_status_stopped">Stopped</string>
+    <string name="playback_service_label">PulseDroid Playback</string>
+    <string name="service_notification_channel">pulsedroid_service</string>
+    <string name="btn_play">Play</string>
+    <string name="btn_starting">Starting…</string>
+    <string name="btn_buffering">Buffering…</string>
+    <string name="btn_stop">Stop</string>
+    <string name="btn_stopping">Stopping…</string>
+    <string name="btn_waiting">Waiting…</string>
+    <string name="btn_exit">Exit</string>
+    <string name="input_port">Port</string>
+    <string name="input_host">Host</string>
+    <string name="play_error">Playback error:\n%1$s</string>
+    <string name="buffer_infinite">infinite</string>
+    <string name="buffer_none">none</string>
+    <string name="input_buffer_headroom">Buffer headroom</string>
+    <string name="input_target_latency">Target latency</string>
+    <string name="builderinfo">IamCOD3X</string>
+    <string name="build_version">1.0</string>
+    <string name="moduleInfo">Module Based on PulseDroid by dront78</string>
 </resources>
