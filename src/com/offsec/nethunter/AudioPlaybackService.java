@@ -24,6 +24,8 @@ import androidx.core.app.ServiceCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import android.util.Log;
+
 import static com.offsec.nethunter.AudioPlayState.BUFFERING;
 import static com.offsec.nethunter.AudioPlayState.STARTING;
 
@@ -104,19 +106,27 @@ public class AudioPlaybackService extends Service implements AudioPlaybackWorker
 
     @Override
     public void onDestroy() {
+        super.onDestroy();
+
         stop();
 
-        // Release the WakeLock if it's held
-        if (wakeLock != null && wakeLock.isHeld()) {
-            wakeLock.release();
+        if (wakeLock != null) {
+            if (wakeLock.isHeld()) {
+                wakeLock.release();
+                Log.d("AudioFragment", "WakeLock released.");
+            } else {
+                Log.d("AudioFragment", "WakeLock was not held.");
+            }
+        } else {
+            Log.d("AudioFragment", "WakeLock is null.");
         }
 
-        // Remove any pending callbacks from the handler
         if (handler != null) {
             handler.removeCallbacksAndMessages(null);
+            Log.d("AudioFragment", "Handler callbacks removed.");
+        } else {
+            Log.d("AudioFragment", "Handler is null.");
         }
-
-        super.onDestroy();
     }
 
     @SuppressLint("InlinedApi")
