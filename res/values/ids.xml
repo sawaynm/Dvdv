@@ -12,4 +12,6 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<resources></resources>
+<resources>
+     <item name="intent_toggle_service" type="id" />
+</resources>
