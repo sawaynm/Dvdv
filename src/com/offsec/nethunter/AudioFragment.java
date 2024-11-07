@@ -15,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.text.SpannableString;
@@ -44,6 +45,7 @@ public class AudioFragment extends Fragment {
     private EditText portInput;
     private CheckBox autoStartCheckBox;
     private TextView errorText;
+    private ScrollView fullScrollView;
 
     private Throwable error;
 
@@ -99,6 +101,7 @@ public class AudioFragment extends Fragment {
         View view = inflater.inflate(R.layout.audio, container, false);
 
         // Initialize UI elements
+        fullScrollView = view.findViewById(R.id.fullScrollView);
         serverInput = view.findViewById(R.id.EditTextServer);
         portInput = view.findViewById(R.id.EditTextPort);
         autoStartCheckBox = view.findViewById(R.id.auto_start);
@@ -150,6 +153,13 @@ public class AudioFragment extends Fragment {
     public void onStop() {
         requireActivity().unbindService(mConnection);
         super.onStop();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Clear view references
+        fullScrollView = null;
     }
 
     private void setupDefaultAudioConfig() {
