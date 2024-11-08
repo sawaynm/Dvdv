@@ -40,7 +40,7 @@ public class AudioPlaybackService extends Service implements AudioPlaybackWorker
     public static final String KEY_BUFFER_HEADROOM = "buffer_ms_ahead";
     public static final String KEY_TARGET_LATENCY = "buffer_ms_behind";
 
-    private final IBinder binder = new LocalBinder();
+    private final IBinder binder = new LocalBinder(this);
 
     private Handler handler = new Handler();
     private NotificationManager notifManager;
@@ -203,7 +203,7 @@ public class AudioPlaybackService extends Service implements AudioPlaybackWorker
         if (playWorkerThread != null) {
             playWorkerThread.interrupt();
         }
-    
+
         // Nullify references to help with garbage collection
         playWorker = null;
         playWorkerThread = null;
@@ -343,10 +343,16 @@ public class AudioPlaybackService extends Service implements AudioPlaybackWorker
      * runs in the same process as its clients, we don't need to deal with
      * IPC.
      */
-    public class LocalBinder extends Binder {
-        AudioPlaybackService getService() {
-            return AudioPlaybackService.this;
+    public static class LocalBinder extends Binder {
+        private final AudioPlaybackService service;
+
+        public LocalBinder(AudioPlaybackService service) {
+            this.service = service;
+        }
+
+        public AudioPlaybackService getService() {
+            return service;
         }
     }
-
+    
 }
