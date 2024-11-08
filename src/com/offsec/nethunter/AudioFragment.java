@@ -1,5 +1,6 @@
 package com.offsec.nethunter;
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -49,10 +50,11 @@ public class AudioFragment extends Fragment {
 
     private Throwable error;
 
+    private boolean isServiceBound = false;
     private AudioPlaybackService boundService;
     private int itemId; // Store the itemId passed via newInstance
 
-    private final ServiceConnection mConnection = new ServiceConnection() {
+    private ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             boundService = ((AudioPlaybackService.LocalBinder) service).getService();
             if (boundService != null) {
@@ -65,10 +67,12 @@ public class AudioFragment extends Fragment {
                     play(); // Optionally start playback if autostart is enabled
                 }
             }
+            isServiceBound = true;
         }
 
         public void onServiceDisconnected(ComponentName className) {
-            boundService = null;  // Clear the reference when the service is disconnected
+            boundService = null;
+            isServiceBound = false; // Clear the reference when the service is disconnected
         }
     };
 
@@ -151,7 +155,10 @@ public class AudioFragment extends Fragment {
 
     @Override
     public void onStop() {
-        requireActivity().unbindService(mConnection);
+        if (isServiceBound) {
+            requireActivity().unbindService(mConnection);
+            isServiceBound = false;
+        }
         super.onStop();
     }
 
@@ -162,6 +169,13 @@ public class AudioFragment extends Fragment {
         autoStartCheckBox = null;
         fullScrollView = null;
         playButton = null;
+        portInput = null;
+        bufferHeadroomSpinner = null;
+
+        if (isServiceBound) {
+            requireActivity().unbindService(mConnection);
+            isServiceBound = false;
+        }
     }
 
     private void setupDefaultAudioConfig() {

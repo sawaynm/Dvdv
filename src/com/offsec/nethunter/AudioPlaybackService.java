@@ -40,7 +40,7 @@ public class AudioPlaybackService extends Service implements AudioPlaybackWorker
     public static final String KEY_BUFFER_HEADROOM = "buffer_ms_ahead";
     public static final String KEY_TARGET_LATENCY = "buffer_ms_behind";
 
-    private final IBinder binder = new LocalBinder();
+    private final IBinder binder = new LocalBinder(this);
 
     private Handler handler = new Handler();
     private NotificationManager notifManager;
@@ -108,27 +108,33 @@ public class AudioPlaybackService extends Service implements AudioPlaybackWorker
     public void onDestroy() {
         super.onDestroy();
 
+        // Stop playback and nullify worker references
         stop();
+        stopWorker();
 
-        if (wakeLock != null) {
-            if (wakeLock.isHeld()) {
-                wakeLock.release();
-                Log.d("AudioFragment", "WakeLock released.");
-            } else {
-                Log.d("AudioFragment", "WakeLock was not held.");
-            }
-            wakeLock = null;
-        } else {
-            Log.d("AudioFragment", "WakeLock is null.");
+        // Release the WakeLock if it is held
+        if (wakeLock != null && wakeLock.isHeld()) {
+            wakeLock.release();
+            Log.d("AudioFragment", "WakeLock released.");
         }
+        wakeLock = null;
 
+        // Remove all callbacks and messages from the Handler to avoid memory leaks
         if (handler != null) {
             handler.removeCallbacksAndMessages(null);
             Log.d("AudioFragment", "Handler callbacks removed.");
-            handler = null;
-        } else {
-            Log.d("AudioFragment", "Handler is null.");
         }
+        handler = null;
+
+        // Cancel notifications to release resources in the NotificationManager
+        if (notifManager != null) {
+            notifManager.cancel(NOTIFICATION);
+        }
+
+        // Ensure that the play state LiveData is cleared to release observers
+        playState.setValue(AudioPlayState.STOPPED);
+
+        Log.d("AudioFragment", "AudioPlaybackService destroyed and cleaned up.");
     }
 
     @SuppressLint("InlinedApi")
@@ -203,7 +209,7 @@ public class AudioPlaybackService extends Service implements AudioPlaybackWorker
         if (playWorkerThread != null) {
             playWorkerThread.interrupt();
         }
-    
+
         // Nullify references to help with garbage collection
         playWorker = null;
         playWorkerThread = null;
@@ -343,10 +349,16 @@ public class AudioPlaybackService extends Service implements AudioPlaybackWorker
      * runs in the same process as its clients, we don't need to deal with
      * IPC.
      */
-    public class LocalBinder extends Binder {
-        AudioPlaybackService getService() {
-            return AudioPlaybackService.this;
+    public static class LocalBinder extends Binder {
+        private final AudioPlaybackService service;
+
+        public LocalBinder(AudioPlaybackService service) {
+            this.service = service;
+        }
+
+        public AudioPlaybackService getService() {
+            return service;
         }
     }
-
+    
 }

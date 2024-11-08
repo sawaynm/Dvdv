@@ -409,13 +409,11 @@ public class VNCFragment extends Fragment {
                     if (selected_user.equals("root")) {
                         Log.d("KeXAudio", "Running audio enable command as root");
                         exe.RunAsRoot(new String[]{nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd audio start"});
-                        Toast.makeText(getActivity().getApplicationContext(), "Audio enabled for user:" + selected_user, Toast.LENGTH_SHORT).show();
                     } else {
                         Log.d("KeXAudio", "Checking permissions for non-root user: " + selected_user);
                         if (isSuAvailable()) {
                             Log.d("KeXAudio", "Using su to start audio for non-root user");
-                            exe.RunAsRoot(new String[]{"su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd audio start'"});
-                            Toast.makeText(getActivity().getApplicationContext(), "Audio enabled for user:" + selected_user, Toast.LENGTH_SHORT).show();
+                            exe.RunAsRoot(new String[]{"su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd sudo -u kali audio start'"});
                         } else {
                             Log.w("KeXAudio", "User lacks necessary permissions or su is unavailable. Permission denied.");
                             Toast.makeText(getActivity().getApplicationContext(), "User lacks necessary permissions or su is unavailable.", Toast.LENGTH_SHORT).show();
@@ -431,13 +429,11 @@ public class VNCFragment extends Fragment {
                     if (selected_user.equals("root")) {
                         Log.d("KeXAudio", "Running audio disable command as root");
                         exe.RunAsRoot(new String[]{nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd audio stop"});
-                        Toast.makeText(getActivity().getApplicationContext(), "Audio disabled for user:" + selected_user, Toast.LENGTH_SHORT).show();
                     } else {
                         Log.d("KeXAudio", "Disabling audio for non-root user: " + selected_user);
                         if (isSuAvailable()) {
                             Log.d("KeXAudio", "Using su to stop audio for non-root user");
-                            exe.RunAsRoot(new String[]{"su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd audio stop'"});
-                            Toast.makeText(getActivity().getApplicationContext(), "Audio disabled for user:" + selected_user, Toast.LENGTH_SHORT).show();
+                            exe.RunAsRoot(new String[]{"su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd sudo -u kali audio stop'"});
                         } else {
                             Log.w("KeXAudio", "User lacks necessary permissions or su is unavailable. Permission denied.");
                             Toast.makeText(getActivity().getApplicationContext(), "User lacks necessary permissions or su is unavailable.", Toast.LENGTH_SHORT).show();
@@ -447,6 +443,7 @@ public class VNCFragment extends Fragment {
                     StartAudioButton.setText("Enable audio");
                     refreshVNC(rootView);
                     Log.d("KeXAudio", "Audio disabled for user: " + selected_user);
+                    Toast.makeText(getActivity().getApplicationContext(), "Audio disabled for user:" + selected_user, Toast.LENGTH_SHORT).show();
                 }
             } else {
                 Log.d("KeXAudio", "Audio script not found, attempting installation");
