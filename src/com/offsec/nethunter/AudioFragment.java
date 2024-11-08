@@ -50,6 +50,7 @@ public class AudioFragment extends Fragment {
 
     private Throwable error;
 
+    private boolean isServiceBound = false;
     private AudioPlaybackService boundService;
     private int itemId; // Store the itemId passed via newInstance
 
@@ -66,10 +67,12 @@ public class AudioFragment extends Fragment {
                     play(); // Optionally start playback if autostart is enabled
                 }
             }
+            isServiceBound = true;
         }
 
         public void onServiceDisconnected(ComponentName className) {
-            boundService = null;  // Clear the reference when the service is disconnected
+            boundService = null;
+            isServiceBound = false; // Clear the reference when the service is disconnected
         }
     };
 
@@ -152,7 +155,10 @@ public class AudioFragment extends Fragment {
 
     @Override
     public void onStop() {
-        requireActivity().unbindService(mConnection);
+        if (isServiceBound) {
+            requireActivity().unbindService(mConnection);
+            isServiceBound = false;
+        }
         super.onStop();
     }
 
@@ -163,9 +169,13 @@ public class AudioFragment extends Fragment {
         autoStartCheckBox = null;
         fullScrollView = null;
         playButton = null;
+        portInput = null;
         bufferHeadroomSpinner = null;
-        requireActivity().unbindService(mConnection);
-        mConnection = null;
+
+        if (isServiceBound) {
+            requireActivity().unbindService(mConnection);
+            isServiceBound = false;
+        }
     }
 
     private void setupDefaultAudioConfig() {
