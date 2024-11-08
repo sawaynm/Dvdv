@@ -217,7 +217,7 @@
     </string-array>
 
     <!-- KeX -->
-    <string name="kex_description">Welcome to the Kali NetHunter Desktop Experience.\nEnjoy the full potential of Kali Linux, straight from your pocket, even on HDMI output. Audio is also available, please use Simple Protocol Player app from GitHub to stream through KeX. Delay has been added to avoid soft reboot on some devices.</string>
+    <string name="kex_description">Welcome to the Kali NetHunter Desktop Experience.\nEnjoy the full potential of Kali Linux, straight from your pocket, even on HDMI output. Audio supported, Use the Audio Manager to stream sound through KeX. Delay has been added to avoid soft reboot on some devices.</string>
 
     <!-- BT Attacks -->
     <string name="bt_description">Welcome to Bluetooth Arsenal! Internal bluetooth support is now available for devices with RFCOMM, UART H4, VHCI and BINDER_IPC enabled in kernel, or devices with bt_smd driver.</string>
