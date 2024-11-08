@@ -108,27 +108,33 @@ public class AudioPlaybackService extends Service implements AudioPlaybackWorker
     public void onDestroy() {
         super.onDestroy();
 
+        // Stop playback and nullify worker references
         stop();
+        stopWorker();
 
-        if (wakeLock != null) {
-            if (wakeLock.isHeld()) {
-                wakeLock.release();
-                Log.d("AudioFragment", "WakeLock released.");
-            } else {
-                Log.d("AudioFragment", "WakeLock was not held.");
-            }
-            wakeLock = null;
-        } else {
-            Log.d("AudioFragment", "WakeLock is null.");
+        // Release the WakeLock if it is held
+        if (wakeLock != null && wakeLock.isHeld()) {
+            wakeLock.release();
+            Log.d("AudioFragment", "WakeLock released.");
         }
+        wakeLock = null;
 
+        // Remove all callbacks and messages from the Handler to avoid memory leaks
         if (handler != null) {
             handler.removeCallbacksAndMessages(null);
             Log.d("AudioFragment", "Handler callbacks removed.");
-            handler = null;
-        } else {
-            Log.d("AudioFragment", "Handler is null.");
         }
+        handler = null;
+
+        // Cancel notifications to release resources in the NotificationManager
+        if (notifManager != null) {
+            notifManager.cancel(NOTIFICATION);
+        }
+
+        // Ensure that the play state LiveData is cleared to release observers
+        playState.setValue(AudioPlayState.STOPPED);
+
+        Log.d("AudioFragment", "AudioPlaybackService destroyed and cleaned up.");
     }
 
     @SuppressLint("InlinedApi")
