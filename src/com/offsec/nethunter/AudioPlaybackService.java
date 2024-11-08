@@ -333,7 +333,7 @@ public class AudioPlaybackService extends Service implements AudioPlaybackWorker
                 .setContentTitle(getText(R.string.playback_service_label))
                 .setContentText(contentText)
                 .setContentIntent(contentIntent)
-                .setSmallIcon(R.drawable.ic_pulse)
+                .setSmallIcon(R.drawable.ic_stat_ic_nh_notificaiton)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .build();
     }

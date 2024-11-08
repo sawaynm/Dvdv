@@ -159,7 +159,9 @@ public class AudioFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         // Clear view references
+        autoStartCheckBox = null;
         fullScrollView = null;
+        playButton = null;
     }
 
     private void setupDefaultAudioConfig() {

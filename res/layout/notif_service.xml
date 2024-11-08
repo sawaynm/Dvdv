@@ -14,7 +14,7 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:drawableStart="@drawable/ic_pulse_dark"
+        android:drawableStart="@drawable/ic_stat_ic_nh_notificaiton"
         android:drawablePadding="3dp"
         android:drawableTint="?android:colorForeground"
         android:ellipsize="end"
