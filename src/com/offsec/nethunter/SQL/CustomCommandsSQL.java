@@ -44,11 +44,11 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
             {"4", "Start wlan1 in monitor mode",
                     "echo -ne \"\\033]0;Wlan1 monitor mode\\007\" && clear;ip link set wlan1 down && iw wlan1 set monitor control && ip link set wlan1 up;sleep 2 && exit",
                     "kali", "interactive", "0"},
-            {"5", "Start wlan0 in monitor mode (QCACLD-3.0)",
-                    "echo -ne \"\\033]0;Wlan0 Monitor Mode\\007\" && clear;su -c \"echo 4 > /sys/module/wlan/parameters/con_mode;ip link set wlan0 down;ip link set wlan0 up\";sleep 2 && exit",
+            {"5", "Start wlan0 in monitor mode",
+                    "echo -ne \"\\033]0;Wlan0 Monitor Mode\\007\" && clear;su -c \"[ -f /sys/module/wlan/parameters/con_mode ] && echo 4 > /sys/module/wlan/parameters/con_mode;ip link set wlan0 down;ip link set wlan0 up || echo 'Your device is not QCACLD3.0 or doesn't support monitor mode! Exiting..'\";echo 'Done! Exiting..' && sleep 2 && exit",
                     "android", "interactive", "0"},
-            {"6", "Stop wlan0 monitor mode (QCACLD-3.0)",
-                    "echo -ne \"\\033]0;Stopping Wlan0 Mon Mode\\007\" && clear;su -c \"ip link set wlan0 down; echo 0 > /sys/module/wlan/parameters/con_mode;ip link set wlan0 up; svc wifi enable\";sleep 2 && exit",
+            {"6", "Stop wlan0 monitor mode",
+                    "echo -ne \"\\033]0;Stopping Wlan0 Mon Mode\\007\" && clear;su -c \"[ -f /sys/module/wlan/parameters/con_mode ] && ip link set wlan0 down; echo 0 > /sys/module/wlan/parameters/con_mode;ip link set wlan0 up; svc wifi enable || echo 'Your device is not QCACLD3.0 or doesn't support monitor mode! Exiting..\";echo 'Done! Exiting..' && sleep 2 && exit",
                     "android", "interactive", "0"},
     };
 

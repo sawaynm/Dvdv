@@ -38,6 +38,10 @@ import androidx.fragment.app.Fragment;
 
 import java.io.File;
 import java.util.Arrays;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
+import java.io.IOException;
+import android.widget.Toast;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class VNCFragment extends Fragment {
@@ -398,16 +402,56 @@ public class VNCFragment extends Fragment {
         addClickListener(StartAudioButton, v -> {
             File audio = new File(NhPaths.CHROOT_PATH() + "/usr/bin/audio");
             if (audio.exists()) {
+                Log.d("KeXAudio", "Audio script exists at: " + audio.getAbsolutePath());
+
                 if (StartAudioButton.getText().equals("Enable audio")) {
-                    exe.RunAsRoot(new String[]{nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd audio start"});
+                    // START logic, as before
+                    if (selected_user.equals("root")) {
+                        Log.d("KeXAudio", "Running audio enable command as root");
+                        exe.RunAsRoot(new String[]{nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd audio start"});
+                        Toast.makeText(getActivity().getApplicationContext(), "Audio enabled for user:" + selected_user, Toast.LENGTH_SHORT).show();
+                    } else {
+                        Log.d("KeXAudio", "Checking permissions for non-root user: " + selected_user);
+                        if (isSuAvailable()) {
+                            Log.d("KeXAudio", "Using su to start audio for non-root user");
+                            exe.RunAsRoot(new String[]{"su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd audio start'"});
+                            Toast.makeText(getActivity().getApplicationContext(), "Audio enabled for user:" + selected_user, Toast.LENGTH_SHORT).show();
+                        } else {
+                            Log.w("KeXAudio", "User lacks necessary permissions or su is unavailable. Permission denied.");
+                            Toast.makeText(getActivity().getApplicationContext(), "User lacks necessary permissions or su is unavailable.", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                    }
+                    StartAudioButton.setText("Disable audio");
                     refreshVNC(rootView);
+                    Log.d("KeXAudio", "Audio enabled for user: " + selected_user);
+                    Toast.makeText(getActivity().getApplicationContext(), "Audio enabled for user:" + selected_user, Toast.LENGTH_SHORT).show();
                 } else {
-                    exe.RunAsRoot(new String[]{nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd audio stop"});
+                    // STOP logic
+                    if (selected_user.equals("root")) {
+                        Log.d("KeXAudio", "Running audio disable command as root");
+                        exe.RunAsRoot(new String[]{nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd audio stop"});
+                        Toast.makeText(getActivity().getApplicationContext(), "Audio disabled for user:" + selected_user, Toast.LENGTH_SHORT).show();
+                    } else {
+                        Log.d("KeXAudio", "Disabling audio for non-root user: " + selected_user);
+                        if (isSuAvailable()) {
+                            Log.d("KeXAudio", "Using su to stop audio for non-root user");
+                            exe.RunAsRoot(new String[]{"su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd audio stop'"});
+                            Toast.makeText(getActivity().getApplicationContext(), "Audio disabled for user:" + selected_user, Toast.LENGTH_SHORT).show();
+                        } else {
+                            Log.w("KeXAudio", "User lacks necessary permissions or su is unavailable. Permission denied.");
+                            Toast.makeText(getActivity().getApplicationContext(), "User lacks necessary permissions or su is unavailable.", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                    }
+                    StartAudioButton.setText("Enable audio");
                     refreshVNC(rootView);
+                    Log.d("KeXAudio", "Audio disabled for user: " + selected_user);
                 }
             } else {
+                Log.d("KeXAudio", "Audio script not found, attempting installation");
                 Toast.makeText(getActivity().getApplicationContext(), "Installing missing audio script in chroot..", Toast.LENGTH_SHORT).show();
-                run_cmd("echo -ne \"\\033]0;Kali NetHunter Utils\\007\" && clear;apt-get update && apt-get install nethunter-utils;sleep 2 && exit"); // since is a kali command we can send it as is
+                run_cmd("echo -ne \"\\033]0;Kali NetHunter Utils\\007\" && clear;apt-get update && apt-get install nethunter-utils;sleep 2 && exit");
             }
         });
         addClickListener(SetupVNCButton, v -> {
@@ -546,6 +590,47 @@ public class VNCFragment extends Fragment {
             }
         });
         return rootView;
+    }
+
+    // Helper method to check if sudo is available
+    private boolean isSuAvailable() {
+        try {
+            Process process = Runtime.getRuntime().exec("which su");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String output = reader.readLine();
+            if (output != null && output.contains("su")) {
+                Log.d("KeXAudio", "su is available.");
+                return true;
+            } else {
+                Log.w("KeXAudio", "su is not available in the environment.");
+                return false;
+            }
+        } catch (IOException e) {
+            Log.e("KeXAudio", "Error checking for su availability", e);
+            return false;
+        }
+    }
+
+    // Helper method to check user permissions
+    private boolean checkUserPermissions(String user) {
+        if (!isSuAvailable()) return false;  // Return early if sudo is unavailable
+
+        try {
+            Process process = Runtime.getRuntime().exec("sudo -l -U " + user);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String output;
+            while ((output = reader.readLine()) != null) {
+                if (output.contains("NOPASSWD")) {
+                    Log.d("KeXAudio", "User " + user + " has NOPASSWD sudo permissions.");
+                    return true;
+                }
+            }
+            Log.d("KeXAudio", "User " + user + " does not have NOPASSWD sudo permissions.");
+            return false;
+        } catch (IOException e) {
+            Log.e("KeXAudio", "Error checking permissions for user " + user, e);
+            return false;
+        }
     }
 
     private void reload() {

@@ -93,6 +93,23 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".DeAuthWhitelistActivity" />
         </activity>
+        <activity
+            android:name=".AudioFragment"
+            android:allowBackup="true"
+            android:fullBackupContent="true"
+            android:label="@string/module_name"
+            android:theme="@style/Theme.AppCompat.Light"
+            tools:ignore="GoogleAppIndexingWarning"        
+            android:exported="true"
+            android:launchMode="singleInstance">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MUSIC_PLAYER" />
+
+                <category android:name="android.intent.category.APP_MUSIC" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
         <receiver android:name=".receiver.BootCompletedReceiver"
             android:enabled="true"
@@ -108,6 +125,9 @@
             </intent-filter>
         </receiver>
 
+        <service
+            android:name=".AudioPlaybackService"
+            android:label="@string/playback_service_label" />
         <service
             android:name=".service.CompatCheckService"
             android:enabled="true"
