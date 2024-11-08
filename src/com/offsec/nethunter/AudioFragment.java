@@ -1,5 +1,6 @@
 package com.offsec.nethunter;
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -52,7 +53,7 @@ public class AudioFragment extends Fragment {
     private AudioPlaybackService boundService;
     private int itemId; // Store the itemId passed via newInstance
 
-    private final ServiceConnection mConnection = new ServiceConnection() {
+    private ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             boundService = ((AudioPlaybackService.LocalBinder) service).getService();
             if (boundService != null) {
@@ -162,6 +163,9 @@ public class AudioFragment extends Fragment {
         autoStartCheckBox = null;
         fullScrollView = null;
         playButton = null;
+        bufferHeadroomSpinner = null;
+        requireActivity().unbindService(mConnection);
+        mConnection = null;
     }
 
     private void setupDefaultAudioConfig() {
