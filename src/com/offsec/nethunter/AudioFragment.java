@@ -221,8 +221,15 @@ public class AudioFragment extends Fragment {
     }
 
     private void updatePrefs(AudioPlaybackService service) {
-        serverInput.setText(service.getServerPref());
-        portInput.setText(String.valueOf(service.getPortPref()));
+        String serverPref = service.getServerPref();
+        if (serverPref != null && !serverPref.isEmpty()) {
+            serverInput.setText(serverPref);
+        }
+
+        int portPref = service.getPortPref();
+        if (portPref > 0) {
+            portInput.setText(String.valueOf(portPref));
+        }
         autoStartCheckBox.setChecked(service.getAutostartPref());
 
         setUpSpinner(bufferHeadroomSpinner, VALUES_BUFFER_HEADROOM, service.getBufferHeadroom(), DEFAULT_INDEX_BUFFER_HEADROOM);
