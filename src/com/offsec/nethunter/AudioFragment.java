@@ -171,11 +171,15 @@ public class AudioFragment extends Fragment {
         playButton = null;
         portInput = null;
         bufferHeadroomSpinner = null;
+        serverInput = null;
+        targetLatencySpinner = null;
+        errorText = null;
 
         if (isServiceBound) {
             requireActivity().unbindService(mConnection);
             isServiceBound = false;
         }
+        boundService = null;
     }
 
     private void setupDefaultAudioConfig() {
