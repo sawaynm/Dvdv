@@ -115,6 +115,7 @@ public class AudioPlaybackService extends Service implements AudioPlaybackWorker
         // Release the WakeLock if it is held
         if (wakeLock != null && wakeLock.isHeld()) {
             wakeLock.release();
+            wakeLock = null;
             Log.d("AudioFragment", "WakeLock released.");
         }
         wakeLock = null;
@@ -122,6 +123,7 @@ public class AudioPlaybackService extends Service implements AudioPlaybackWorker
         // Remove all callbacks and messages from the Handler to avoid memory leaks
         if (handler != null) {
             handler.removeCallbacksAndMessages(null);
+            handler = null;
             Log.d("AudioFragment", "Handler callbacks removed.");
         }
         handler = null;
@@ -129,7 +131,10 @@ public class AudioPlaybackService extends Service implements AudioPlaybackWorker
         // Cancel notifications to release resources in the NotificationManager
         if (notifManager != null) {
             notifManager.cancel(NOTIFICATION);
+            notifManager = null;
         }
+
+        togglePendingIntent = null;
 
         // Ensure that the play state LiveData is cleared to release observers
         playState.setValue(AudioPlayState.STOPPED);
@@ -203,16 +208,15 @@ public class AudioPlaybackService extends Service implements AudioPlaybackWorker
 
     @MainThread
     private void stopWorker() {
+        // Nullify references to help with garbage collection
         if (playWorker != null) {
             playWorker.stop();
+            playWorker = null;
         }
         if (playWorkerThread != null) {
             playWorkerThread.interrupt();
+            playWorkerThread = null;
         }
-
-        // Nullify references to help with garbage collection
-        playWorker = null;
-        playWorkerThread = null;
     }
 
     public String getServerPref() {

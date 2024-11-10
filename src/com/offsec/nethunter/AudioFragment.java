@@ -171,11 +171,15 @@ public class AudioFragment extends Fragment {
         playButton = null;
         portInput = null;
         bufferHeadroomSpinner = null;
+        serverInput = null;
+        targetLatencySpinner = null;
+        errorText = null;
 
         if (isServiceBound) {
             requireActivity().unbindService(mConnection);
             isServiceBound = false;
         }
+        boundService = null;
     }
 
     private void setupDefaultAudioConfig() {
@@ -208,21 +212,17 @@ public class AudioFragment extends Fragment {
         return formattedValues;
     }
 
-    private String getDayWithSuffix(int day) {
-        if (day >= 11 && day <= 13) {
-            return day + "th";
-        }
-        switch (day % 10) {
-            case 1: return day + "st";
-            case 2: return day + "nd";
-            case 3: return day + "rd";
-            default: return day + "th";
-        }
-    }
 
     private void updatePrefs(AudioPlaybackService service) {
-        serverInput.setText(service.getServerPref());
-        portInput.setText(String.valueOf(service.getPortPref()));
+        String serverPref = service.getServerPref();
+        if (serverPref != null && !serverPref.isEmpty()) {
+            serverInput.setText(serverPref);
+        }
+
+        int portPref = service.getPortPref();
+        if (portPref > 0) {
+            portInput.setText(String.valueOf(portPref));
+        }
         autoStartCheckBox.setChecked(service.getAutostartPref());
 
         setUpSpinner(bufferHeadroomSpinner, VALUES_BUFFER_HEADROOM, service.getBufferHeadroom(), DEFAULT_INDEX_BUFFER_HEADROOM);
