@@ -33,7 +33,7 @@ echo "Checking for existing $APIFACE interface.."
 if ip link show $APIFACE; then
   echo "$APIFACE exists, continuing.."
 else
-  if [[ WLAN0TO1 == 1 ]]; then
+  if [[ $WLAN0TO1 == 1 ]]; then
     if [[ `iw list | grep '* AP'` == *"* AP"* ]]; then
       echo "wlan0 supports AP mode, creating AP interface.."
       iw dev wlan0 interface add $APIFACE type __ap
@@ -46,7 +46,7 @@ else
   fi
   fi
 fi
-echo "Adding iptables rules for internet sharing.."
+echo "Adding ip rules for internet sharing.."
 ip rule add from all lookup main pref 1 2> /dev/null
 ip rule add from all iif lo oif $APIFACE uidrange 0-0 lookup 97 pref 11000 2> /dev/null
 ip rule add from all iif lo oif $NETIFACE lookup $table pref 17000 2> /dev/null
@@ -64,7 +64,7 @@ fi
 sleep 20 && dnschef --interface 10.0.0.1 &
 wifipumpkin3 --xpulp "set interface $APIFACE; set interface_net $NETIFACE; set ssid $SSID; set channel $CHANNEL; $CaptiveCMD $TemplateCMD start; ap"
 pkill python3
-echo "Restoring iptables rules.."
+echo "Restoring ip rules.."
 ip rule del from all lookup main pref 1 2> /dev/null
 ip rule del from all iif lo oif $APIFACE uidrange 0-0 lookup 97 pref 11000 2> /dev/null
 ip rule del from all iif lo oif $NETIFACE lookup $table pref 17000 2> /dev/null
