@@ -7,7 +7,6 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.GpsStatus;
@@ -17,29 +16,27 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.HandlerThread;
 import android.os.IBinder;
-import android.os.Looper;
 import android.os.StrictMode;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.app.TaskStackBuilder;
-import androidx.core.content.ContextCompat;
 
 import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.offsec.nethunter.AppNavHomeActivity;
+import com.offsec.nethunter.KaliGpsServiceFragment;
 import com.offsec.nethunter.R;
 import com.offsec.nethunter.utils.NhPaths;
 
@@ -51,19 +48,20 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.Inet4Address;
 import java.net.UnknownHostException;
 import java.net.InetAddress;
 import java.util.Date;
-import java.util.Objects;
 
-
-public class LocationUpdateService extends Service {
+public class LocationUpdateService extends Service implements
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private static LocationUpdateService instance = null;
+
     private KaliGPSUpdates.Receiver updateReceiver;
     public static final String CHANNEL_ID = "NethunterLocationUpdateChannel";
     public static final int NOTIFY_ID = 1004;
     private static final String TAG = "LocationUpdateService";
-    private FusedLocationProviderClient fusedLocationProviderClient = null;
+    private GoogleApiClient apiClient = null;
     private DatagramSocket dSock = null;
     private InetAddress udpDestAddr = null;
     private static final String notificationTitle = "GPS Provider running";
@@ -122,13 +120,13 @@ public class LocationUpdateService extends Service {
         int satellites = 0;
         Bundle bundle = location.getExtras();
         // this doesn't work on all phones
-        if (bundle != null)
+        if(bundle != null)
             satellites = bundle.getInt("satellites");
-        if (satellites > 4)
+        if(satellites > 4)
             return "" + satellites;
 
-        if (Objects.equals(location.getProvider(), LocationManager.GPS_PROVIDER)) {
-            if (satellites == 0)
+        if (location.getProvider().equals(LocationManager.GPS_PROVIDER)) {
+            if(satellites == 0)
                 return "";
             else
                 return "" + satellites;
@@ -201,17 +199,21 @@ public class LocationUpdateService extends Service {
         return lat + "," + lon;
     }
 
+    @Override
     public void onConnected(@Nullable Bundle bundle) {
-        Log.d(TAG, "onConnected");
+        Log.d(TAG,"onConnected");
     }
 
+    @Override
     public void onConnectionSuspended(int i) {
 
     }
 
+    @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.d(TAG, "Google API Client connection failed");
     }
+
 
     public class ServiceBinder extends Binder {
         public LocationUpdateService getService() {
@@ -226,13 +228,13 @@ public class LocationUpdateService extends Service {
         return binder;
     }
 
-    public class MyConnectionCallback implements GoogleApiClient.ConnectionCallbacks {
+    public class MyConnectionCallback implements GoogleApiClient.ConnectionCallbacks
+    {
+
         @Override
         public void onConnected(@Nullable Bundle bundle) {
-            Log.d(TAG, "onConnected (MyConnectionCallback)");
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                startLocationUpdates();
-            }
+            Log.d(TAG,"onConnected (MyConnectionCallback)");
+            startLocationUpdates();
         }
 
         @Override
@@ -240,26 +242,31 @@ public class LocationUpdateService extends Service {
 
         }
     }
-
     public void requestUpdates(KaliGPSUpdates.Receiver receiver) {
         Log.d(TAG, "In requestUpdates");
-        if (receiver != null)
+        if(receiver != null)
             this.updateReceiver = receiver;
-        if (fusedLocationProviderClient == null) {
-            fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(LocationUpdateService.this);
+        if (apiClient == null) {
+            apiClient = new GoogleApiClient.Builder(LocationUpdateService.this, this, this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
+        if (!apiClient.isConnected()) {
+            apiClient.registerConnectionCallbacks(new MyConnectionCallback());
+            apiClient.connect();
         }
     }
 
     public void stopUpdates() {
         Log.d(TAG, "In stopUpdates");
+
         stopSelf();
     }
 
     private boolean locationUpdatesStarted = false;
-
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void startLocationUpdates() {
-        if (locationUpdatesStarted)
+        if(locationUpdatesStarted)
             return;
         locationUpdatesStarted = true;
         Log.d(TAG, "In startLocationUpdates");
@@ -272,17 +279,17 @@ public class LocationUpdateService extends Service {
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         Log.d(TAG, "Requesting permissions marshmallow");
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
 
             // register with Location services, so we can construct fake NMEA data
-            FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-            fusedLocationProviderClient.requestLocationUpdates(lr, locationListener, Looper.myLooper());
+            LocationServices.FusedLocationApi.requestLocationUpdates(apiClient, lr, locationListener);
 
             // try to register for actual NMEA data straight from the GPS
-            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            LocationManager locationManager = (LocationManager) getSystemService(Service.LOCATION_SERVICE);
             try { // reference: https://stackoverflow.com/questions/57975969/accessing-nmea-on-android-api-level-24-when-compiled-for-target-api-level-29
+                //noinspection JavaReflectionMemberAccess
                 Method addNmeaListener =
                         LocationManager.class.getMethod("addNmeaListener", GpsStatus.NmeaListener.class);
                 addNmeaListener.invoke(locationManager, nmeaListener);
@@ -319,10 +326,8 @@ public class LocationUpdateService extends Service {
     }
 
     private void initTimers() {
-        HandlerThread handlerThread = new HandlerThread("TimerThread");
-        handlerThread.start();
-        timerTaskHandler = new Handler(handlerThread.getLooper());
-        resetListenersTimerTaskHandler = new Handler(handlerThread.getLooper());
+        timerTaskHandler = new Handler();
+        resetListenersTimerTaskHandler = new Handler();
     }
 
     private void startTimers() {
@@ -331,7 +336,7 @@ public class LocationUpdateService extends Service {
         timerTask.run();
         // Android will stop sending us updates two hours after the request.
         // So, every hour, we will make a new request
-        resetListenersTimerTaskHandler.postDelayed(resetListenersTimerTask, 3600 * 1000);
+        resetListenersTimerTaskHandler.postDelayed(resetListenersTimerTask, 3600*1000);
         // resetListenersTimerTask.run();
     }
 
@@ -340,21 +345,24 @@ public class LocationUpdateService extends Service {
         resetListenersTimerTaskHandler.removeCallbacks(resetListenersTimerTask);
     }
 
-    private final Runnable resetListenersTimerTask = () -> {
-        // reset our listeners
-        Log.d(TAG, "Restarting listeners");
-        stopLocationUpdates();
-        requestUpdates(null);
+    private Runnable resetListenersTimerTask = new Runnable() {
+        @Override
+        public void run() {
+            try { // reset our listeners
+                Log.d(TAG, "Restarting listeners");
+                stopLocationUpdates();
+                requestUpdates(null);
+            } finally {
+            }
+        }
     };
 
-    private final Runnable timerTask = new Runnable() {
+    private Runnable timerTask = new Runnable() {
         @Override
         public void run() {
             try {
                 if (lastLocationLatitude != 0.0)
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        updateNotification();
-                    }
+                    updateNotification();
             } finally {
                 // once per second
                 timerTaskHandler.postDelayed(timerTask, 1000);
@@ -366,15 +374,15 @@ public class LocationUpdateService extends Service {
     private void updateNotification() {
         Date now = new Date();
         long age = (now.getTime() - lastLocationTime.getTime()) / 1000;
-        String ageStr;
-        if (age <= 10)
+        String ageStr = "?";
+        if(age <= 10)
             ageStr = "current";
-        else if (age < 60)
-            ageStr = age + "s";
-        else if (age < 3600)
-            ageStr = (age / 60) + "m";
+        else if(age < 60)
+            ageStr = "" + age + "s";
+        else if(age < 3600)
+            ageStr = "" + (age/60) + "m";
         else
-            ageStr = (age / 3600) + "h";
+            ageStr = "" + (age/3600) + "h";
         String updatedText = String.format("Latitude: %1.5f  Longitude: %1.5f  +/- %1.1fm  Source: %s  Age: %s  Satellites: %d",
                 lastLocationLatitude, lastLocationLongitude, lastLocationAccuracy,
                 lastLocationSourcePublished, ageStr, lastLocationSats);
@@ -382,7 +390,7 @@ public class LocationUpdateService extends Service {
         // Log.d(TAG, "Notification Update: " + updatedText);
         // we're not actually going to set this text, but we are going to use it to see if anything has changed since last update
         // if nothing has changed, we won't update the notification
-        if (updatedText.equals(lastNotificationText))
+        if(updatedText.equals(lastNotificationText))
             return;
         lastNotificationText = updatedText;
 
@@ -401,7 +409,7 @@ public class LocationUpdateService extends Service {
 
         contentView.setTextViewText(R.id.gps_notification_source, lastLocationSourcePublished);
         contentView.setTextViewText(R.id.gps_notification_age, ageStr);
-        if (lastLocationSourcePublished.equals("GPS"))
+        if(lastLocationSourcePublished.equals("GPS"))
             contentView.setTextViewText(R.id.gps_notification_sats, String.format("%d", lastLocationSats));
         else
             contentView.setTextViewText(R.id.gps_notification_sats, "-");
@@ -418,58 +426,58 @@ public class LocationUpdateService extends Service {
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setContentIntent(resultPendingIntent);
         Notification notification = builder.build();
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
         notificationManagerCompat.notify(NOTIFY_ID, notification);
         Log.d(TAG, "Notification Sent: " + updatedText);
     }
 
-    private final GpsStatus.NmeaListener nmeaListener = (l, s) -> {
-        if (!s.startsWith("$GPGGA")) {
-            // if we're using the real GPS as our source, go ahead and send these extra information strings to gpsd
-            if ("GPS".equals(lastLocationSourcePublished))
-                sendUdpPacket(s);
-            return;
+    private final GpsStatus.NmeaListener nmeaListener = new GpsStatus.NmeaListener() {
+        @Override
+        public void onNmeaReceived(long l, String s) {
+            if(!s.startsWith("$GPGGA")) {
+                // if we're using the real GPS as our source, go ahead and send these extra information strings to gpsd
+                if("GPS".equals(lastLocationSourcePublished))
+                    sendUdpPacket(s);
+                return;
+            }
+            String[] fields = s.split(",");
+            int fixType = 0;
+            // int sats = 0;
+            try {
+                fixType = Integer.parseInt(fields[6]);
+                // sats = Integer.parseInt(fields[7]);
+            } catch (NumberFormatException ignored) {
+            } catch (ArrayIndexOutOfBoundsException ignored) {
+            }
+            if(fixType == 0)
+                return;
+            // Log.d(TAG, "sats = " + sats);
+            Log.d(TAG, "Real NMEA: " + s);
+            lastLocationSourceReceived = "NmeaListener";
+            publishLocation(s, "GPS");
         }
-        String[] fields = s.split(",");
-        int fixType = 0;
-        // int sats = 0;
-        try {
-            fixType = Integer.parseInt(fields[6]);
-            // sats = Integer.parseInt(fields[7]);
-        } catch (NumberFormatException | ArrayIndexOutOfBoundsException ignored) {
-        }
-        if (fixType == 0)
-            return;
-        // Log.d(TAG, "sats = " + sats);
-        Log.d(TAG, "Real NMEA: " + s);
-        lastLocationSourceReceived = "NmeaListener";
-        publishLocation(s, "GPS");
     };
 
     private boolean firstupdate = true;
-    private final LocationListener locationListener = location -> {
-        String nmeaSentence = nmeaSentenceFromLocation(location);
+    private final LocationListener locationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+            String nmeaSentence = nmeaSentenceFromLocation(location);
 
-        Log.d(TAG, "Constructed NMEA: "+nmeaSentence);
-        // we will only publish these constructed sentences if we aren't currently getting real ones from the NmeaListener
-        if (lastLocationSourceReceived.equals("LocationListener"))
-            publishLocation(nmeaSentence, "Network");
-        lastLocationSourceReceived = "LocationListener";
+            Log.d(TAG, "Constructed NMEA: "+nmeaSentence);
+            // we will only publish these constructed sentences if we aren't currently getting real ones from the NmeaListener
+            if(lastLocationSourceReceived.equals("LocationListener"))
+                publishLocation(nmeaSentence, "Network");
+            lastLocationSourceReceived = "LocationListener";
+        }
     };
 
     private void publishLocation(String nmeaSentence, String source) {
         // Workaround to allow network operations in main thread
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
+        if (android.os.Build.VERSION.SDK_INT > 8)
+        {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
         try {
             String[] fields = nmeaSentence.split(",");
             String latStr = fields[2];
@@ -485,9 +493,9 @@ public class LocationUpdateService extends Service {
             int lonDeg = Integer.parseInt(lonStr.substring(0, 3));
             double lonMin = Float.parseFloat(lonStr.substring(3));
             double lon = lonDeg + lonMin/60.0;
-            if (ns.equalsIgnoreCase("S"))
+            if(ns.toUpperCase().equals("S"))
                 lat *= -1;
-            if (Objects.equals(ew.toUpperCase(), "W"))
+            if(ew.toUpperCase().equals("W"))
                 lon *= -1;
 
             lastLocationLatitude = lat;
@@ -496,7 +504,8 @@ public class LocationUpdateService extends Service {
             lastLocationAccuracy = accuracy;
             lastLocationTime = new Date();
             lastLocationSourcePublished = source;
-        } catch (NumberFormatException | ArrayIndexOutOfBoundsException ignored) {
+        } catch (NumberFormatException ignored) {
+        } catch (ArrayIndexOutOfBoundsException ignored) {
         }
 
         if (updateReceiver != null) {
@@ -510,11 +519,12 @@ public class LocationUpdateService extends Service {
         sendUdpPacket(nmeaSentence);
     }
 
+
     private void sendUdpPacket(String nmeaSentence) {
         if(udpDestAddr == null)
         {
             try {
-                udpDestAddr = InetAddress.getByName("127.0.0.1");
+                udpDestAddr = Inet4Address.getByName("127.0.0.1");
             } catch (UnknownHostException e) {
                 Log.d(TAG, "UnknownHostException: " + e.toString());
             }
@@ -530,7 +540,7 @@ public class LocationUpdateService extends Service {
             }
         }
 
-        if (dSock != null && udpDestAddr != null) {
+        if(dSock != null && udpDestAddr != null) {
             try {
                 // dSock.setBroadcast(true);
                 nmeaSentence += "\n";
@@ -564,7 +574,7 @@ public class LocationUpdateService extends Service {
         locationUpdatesStarted = false;
 
         // unregister our NmeaListener
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        LocationManager locationManager = (LocationManager) getSystemService(Service.LOCATION_SERVICE);
         try { // reference: https://stackoverflow.com/questions/57975969/accessing-nmea-on-android-api-level-24-when-compiled-for-target-api-level-29
               //noinspection JavaReflectionMemberAccess
             Method removeNmeaListener =
@@ -576,8 +586,9 @@ public class LocationUpdateService extends Service {
         }
 
         // unregister with LocationServices
-        if (fusedLocationProviderClient != null) {
-            fusedLocationProviderClient.removeLocationUpdates(locationListener);
+        if (apiClient != null && apiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(apiClient, locationListener);
+            apiClient.disconnect();
         }
     }
 
@@ -589,7 +600,10 @@ public class LocationUpdateService extends Service {
 
         // stop our Notification update timer
         stopTimers();
+
         stopLocationUpdates();
+
         super.onDestroy();
     }
 }
+

@@ -1,5 +1,6 @@
 package com.offsec.nethunter.gps;
 
+
 import android.location.GpsSatellite;
 import android.location.GpsStatus;
 import android.location.Location;
@@ -8,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-
 /**
  * This class is a container for several static methods which help
  * with generating NMEA data.
@@ -16,6 +16,8 @@ import java.util.List;
  * A nice reference for NMEA is at http://www.gpsinformation.org/dale/nmea.htm
  */
 final class NMEA {
+
+
     /**
      * Formats the speed in knots from the #Location into a string.
      * If the speed is unknown, it returns an empty string.
@@ -41,19 +43,19 @@ final class NMEA {
 
     public static String formatGpsGsa(GpsStatus gps) {
         String fix = "1";
-        StringBuilder prn = new StringBuilder();
+        String prn = "";
         int nbr_sat = 0;
         Iterator<GpsSatellite> satellites = gps.getSatellites().iterator();
         for (int i = 0; i < 12; i++) {
             if (satellites.hasNext()) {
                 GpsSatellite sat = satellites.next();
                 if (sat.usedInFix()) {
-                    prn.append(sat.getPrn());
+                    prn = prn + sat.getPrn();
                     nbr_sat++;
                 }
             }
 
-            prn.append(",");
+            prn = prn + ",";
         }
 
         if (nbr_sat > 3)
@@ -66,7 +68,7 @@ final class NMEA {
     }
 
     public static List<String> formatGpsGsv(GpsStatus gps) {
-        List<String> gsv = new ArrayList<>();
+        List<String> gsv = new ArrayList<String>();
         int nbr_sat = 0;
         for (GpsSatellite sat : gps.getSatellites())
             nbr_sat++;
@@ -74,14 +76,15 @@ final class NMEA {
         Iterator<GpsSatellite> satellites = gps.getSatellites().iterator();
         for (int i = 0; i < 3; i++) {
             if (satellites.hasNext()) {
-                StringBuilder g = new StringBuilder(Integer.toString(nbr_sat));
+                String g = Integer.toString(nbr_sat);
                 for (int n = 0; n < 4; n++) {
                     if (satellites.hasNext()) {
                         GpsSatellite sat = satellites.next();
-                        g.append(",").append(sat.getPrn()).append(",").append(sat.getElevation()).append(",").append(sat.getAzimuth()).append(",").append(sat.getSnr());
+                        g = g + "," + sat.getPrn() + "," + sat.getElevation() +
+                                "," + sat.getAzimuth() + "," + sat.getSnr();
                     }
                 }
-                gsv.add(g.toString());
+                gsv.add(g);
             }
         }
         return gsv;
