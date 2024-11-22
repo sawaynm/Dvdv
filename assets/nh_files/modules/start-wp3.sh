@@ -46,7 +46,7 @@ else
   fi
   fi
 fi
-echo "Adding ip rules for internet sharing.."
+echo "Adding iptables rules for internet sharing.."
 ip rule add from all lookup main pref 1 2> /dev/null
 ip rule add from all iif lo oif $APIFACE uidrange 0-0 lookup 97 pref 11000 2> /dev/null
 ip rule add from all iif lo oif $NETIFACE lookup $table pref 17000 2> /dev/null
@@ -64,9 +64,10 @@ fi
 sleep 20 && dnschef --interface 10.0.0.1 &
 wifipumpkin3 --xpulp "set interface $APIFACE; set interface_net $NETIFACE; set ssid $SSID; set channel $CHANNEL; $CaptiveCMD $TemplateCMD start; ap"
 pkill python3
-echo "Restoring ip rules.."
+echo "Restoring iptables rules.."
 ip rule del from all lookup main pref 1 2> /dev/null
 ip rule del from all iif lo oif $APIFACE uidrange 0-0 lookup 97 pref 11000 2> /dev/null
 ip rule del from all iif lo oif $NETIFACE lookup $table pref 17000 2> /dev/null
 ip rule del from all iif lo oif $APIFACE lookup 97 pref 17000 2> /dev/null
+
 ip rule del from all iif $APIFACE lookup $table pref 21000 2> /dev/null
