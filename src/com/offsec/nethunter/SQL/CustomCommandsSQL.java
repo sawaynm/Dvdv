@@ -48,7 +48,7 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
                     "echo -ne \"\\033]0;Wlan0 Monitor Mode\\007\" && clear;su -c \"[ -f /sys/module/wlan/parameters/con_mode ] && echo 4 > /sys/module/wlan/parameters/con_mode;ip link set wlan0 down;ip link set wlan0 up || echo 'Your device is not QCACLD3.0 or does not support monitor mode! Exiting..'\";echo 'Done! Exiting..' && sleep 2 && exit",
                     "android", "interactive", "0"},
             {"6", "Stop wlan0 monitor mode",
-                    "echo -ne \"\\033]0;Stopping Wlan0 Mon Mode\\007\" && clear;su -c \"[ -f /sys/module/wlan/parameters/con_mode ] && ip link set wlan0 down; echo 0 > /sys/module/wlan/parameters/con_mode;ip link set wlan0 up; svc wifi enable || echo 'Your device is not QCACLD3.0 or does not support monitor mode! Exiting..\";echo 'Done! Exiting..' && sleep 2 && exit",
+                    "echo -ne \"\\033]0;Stopping Wlan0 Mon Mode\\007\" && clear;su -c \"[ -f /sys/module/wlan/parameters/con_mode ] && ip link set wlan0 down; echo 0 > /sys/module/wlan/parameters/con_mode;ip link set wlan0 up; svc wifi enable || echo 'Your device is not QCACLD3.0 or does not support monitor mode! Exiting..'\";echo 'Done! Exiting..' && sleep 2 && exit",
                     "android", "interactive", "0"},
     };
 
