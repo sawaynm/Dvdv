@@ -69,5 +69,4 @@ ip rule del from all lookup main pref 1 2> /dev/null
 ip rule del from all iif lo oif $APIFACE uidrange 0-0 lookup 97 pref 11000 2> /dev/null
 ip rule del from all iif lo oif $NETIFACE lookup $table pref 17000 2> /dev/null
 ip rule del from all iif lo oif $APIFACE lookup 97 pref 17000 2> /dev/null
-
 ip rule del from all iif $APIFACE lookup $table pref 21000 2> /dev/null
