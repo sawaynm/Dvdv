@@ -132,7 +132,6 @@
     <string name="launch_wifite">Launch Wifite</string>
     <string name="update_kali_chroot">Update Kali chroot</string>
     <string name="turn_off_external_wifi">Turn Off External Wifi</string>
-    <string name="kali_dumpmifare">Dump Mifare</string>
 
 
     <string name="update">Update</string>
