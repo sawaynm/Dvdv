@@ -598,9 +598,6 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                         case R.id.mpc_item:
                             changeFragment(fragmentManager, MPCFragment.newInstance(itemId));
                             break;
-                        case R.id.mitmf_item:
-                            changeFragment(fragmentManager, MITMfFragment.newInstance(itemId));
-                            break;
                         case R.id.vnc_item:
                             if (getApplicationContext().getPackageManager().getLaunchIntentForPackage("com.offsec.nethunter.kex") == null) {
                                 showWarningDialog("", "NetHunter KeX is not installed yet, please install from the store!", false);
