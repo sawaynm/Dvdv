@@ -609,4 +609,5 @@
     <string name="moduleInfo">Module Based on PulseDroid by dront78</string>
     <string name="sort">Sort</string>
     <string name="show_networks">Show</string>
+    <string name="clear">Clear</string>
 </resources>
