@@ -484,6 +484,13 @@
     <string name="nmap_udpscan">UDP Scan</string>
     <!-- End NMAP -->
 
+    <!-- Drawable Icons -->
+    <string name="mtrl_checkbox_button_icon_path_indeterminate">M10,10 L20,20</string>
+    <string name="mtrl_checkbox_button_icon_path_checked">M10,10 L20,20</string>
+    <string name="mtrl_switch_thumb_path_pressed">M10,10 L20,20</string>
+    <string name="mtrl_switch_thumb_path_checked">M10,10 L20,20</string>
+    <string name="mtrl_switch_thumb_path_morphing">M10,10 L20,20</string>
+    <string name="mtrl_switch_thumb_path_unchecked">M10,10 L20,20</string>
 
     <!-- Start PineappleFragment -->
     <string name="pineapple_description">The pineapple connector is used in conjunction with the Hak5 Pineapple Nano and a USB OTG cable.   This helper will connect the Pineapple Nano over ethernet and upstream your wifi connection.</string>
@@ -610,4 +617,9 @@
     <string name="sort">Sort</string>
     <string name="show_networks">Show</string>
     <string name="clear">Clear</string>
+
+    <!-- NetHunter WiFi -->
+    <string name="wifi_bottom_navigation_home">Scan</string>
+    <string name="wifi_bottom_navigation_attack">Attack</string>
+    <string name="wifi_bottom_navigation_crack">Crack</string>
 </resources>

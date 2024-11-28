@@ -25,13 +25,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.offsec.nethunter.utils.ShellExecuter;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -91,6 +90,23 @@ public class WifiScannerFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(() -> {
             scanWifi();
             swipeRefreshLayout.setRefreshing(false);
+        });
+
+        // Initialize Bottom Navigation View
+        BottomNavigationView bottomNavigationView = rootView.findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.navigation_home:
+                    // Handle home action
+                    return true;
+                case R.id.navigation_dashboard:
+                    // Handle dashboard action
+                    return true;
+                case R.id.navigation_notifications:
+                    // Handle notifications action
+                    return true;
+            }
+            return false;
         });
 
         // Detecting watch
