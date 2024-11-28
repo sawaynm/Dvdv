@@ -8,7 +8,7 @@
         android:title="Snowfall"
         app:showAsAction="always" /> <!--
         android:visible="false" />
-    <!-- Snowfall enable 1/2 above -->
+     Snowfall enable 1/2 above -->
 
     <item
         android:id="@+id/f_nethunter_action_search"
