@@ -222,7 +222,7 @@ public class WPSFragment extends Fragment {
             getActivity().runOnUiThread(() -> {
                 //Disabling bluetooth so wifi will be definitely available for scanning
                 if (iswatch) {
-                    exe.RunAsRoot(new String[]{"svc bluetooth disable;settings put system clockwork_wifi_setting on"});
+                    exe.RunAsRoot(new String[]{"svc bluetooth disable; ifconfig wlan0 down; ifconfig wlan0 up; settings put system clockwork_wifi_setting on"});
                 }
                 else exe.RunAsRoot(new String[]{"svc wifi enable"});
                 arrayList.clear();
