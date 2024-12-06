@@ -11,14 +11,13 @@
         android:orientation="vertical"
         android:weightSum="1">
 
-        <!--
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
-        -->
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -43,6 +42,30 @@
             android:layout_height="48dp" />
 
         <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:text="@string/show_networks"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/show_networks" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/sort_networks"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sort" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/clear_networks"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/clear" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -53,7 +76,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/signal2"
+                android:text="@string/signal"
                 android:textStyle="bold"
                 android:gravity="center" />
 
@@ -62,7 +85,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/channel2"
+                android:text="@string/channel"
                 android:textStyle="bold"
                 android:gravity="center" />
 
@@ -71,7 +94,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/bssid3"
+                android:text="@string/bssid2"
                 android:textStyle="bold"
                 android:gravity="center" />
 
@@ -80,7 +103,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/encryption2"
+                android:text="@string/encryption"
                 android:textStyle="bold"
                 android:gravity="center" />
         </LinearLayout>
@@ -102,15 +125,14 @@
                 android:textSize="11sp"
                 tools:ignore="LabelFor" />
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/bottom_navigation"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:backgroundTint="@color/common_google_signin_btn_text_dark_focused"
-            app:itemIconTint="@color/nav_item_color"
-            app:itemTextColor="@color/nav_item_color"
-            app:labelVisibilityMode="labeled"
-            app:menu="@menu/wifi_bottom_navigation_menu" />
     </LinearLayout>
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navigation_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:menu="@menu/wifi_bottom_navigation_menu"
+        app:itemIconTint="@color/white"
+        app:itemTextColor="@color/white" />
 </androidx.drawerlayout.widget.DrawerLayout>

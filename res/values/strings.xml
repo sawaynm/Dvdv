@@ -622,4 +622,19 @@
     <string name="wifi_bottom_navigation_home">Scan</string>
     <string name="wifi_bottom_navigation_attack">Attack</string>
     <string name="wifi_bottom_navigation_crack">Crack</string>
+    <string name="settings">Settings</string>
+    <string name="clear2">Clear</string>
+    <string name="signal">Signal</string>
+    <string name="channel">Chan</string>
+    <string name="bssid2">BSSID</string>
+    <string name="encryption">Enc</string>
+    <string name="encryption2">Enc</string>
+    <string name="bssid3">BSSID</string>
+    <string name="channel2">Chan</string>
+    <string name="signal2">Signal</string>
+    <string name="apply">Apply</string>
+    <string name="cancel2">Cancel</string>
+    <string name="sort_networks">Sort networks by:</string>
+    <string name="show_networks_without_ssid">Show networks without SSID</string>
+    <string name="wifite2_settings">WiFite2 Settings</string>
 </resources>

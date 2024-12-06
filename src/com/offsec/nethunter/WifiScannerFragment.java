@@ -1,6 +1,8 @@
 package com.offsec.nethunter;
 
+
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -10,22 +12,31 @@ import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.PopupMenu;
 import android.Manifest;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.viewmodel.CreationExtras;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -41,25 +52,22 @@ import java.util.List;
 import java.util.Collections;
 import java.util.Objects;
 
-
-public class WifiScannerFragment extends Fragment {
+public class WifiScannerFragment extends Fragment implements WifiteSettingsDialogFragment.SettingsDialogListener {
+    private boolean showNetworksWithoutSSID = true;
     public static final String TAG = "WifiScannerFragment";
     private static final String ARG_SECTION_NUMBER = "section_number";
-    private boolean showSignalStrength = true;
-    private boolean showChannel = true;
-    private boolean showBSSID = false;
     private ListView wifiNetworksList;
     private final ArrayList<String> arrayList = new ArrayList<>();
     private Context context;
-    private Activity activity;
+    public Activity activity;
     private final ShellExecuter exe = new ShellExecuter();
     private Boolean iswatch;
     private WifiManager wifiManager;
     private final Handler handler = new Handler();
     private Runnable scanRunnable;
-    private String selectedSSID = null;
     private SwipeRefreshLayout swipeRefreshLayout;
     private int refreshInterval = 10000; // Default to 10 seconds
+
 
     public static WifiScannerFragment newInstance(int sectionNumber) {
         WifiScannerFragment fragment = new WifiScannerFragment();
@@ -70,17 +78,39 @@ public class WifiScannerFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        context = getContext();
-        activity = getActivity();
-        //Snackbar.make(requireView(), "Preparing WiFi Scanner and utilities ..", Snackbar.LENGTH_SHORT).show();
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        this.context = context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        this.context = null;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (context != null) {
+            wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.wifi_scanner, container, false);
-        //Snackbar.make(requireView(), "Preparing WiFi Scanner and utilities ..", Snackbar.LENGTH_SHORT).show();
+
+        // Initialize Toolbar
+        Toolbar toolbar = rootView.findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
+            Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setTitle("WiFi Scanner");
+            setHasOptionsMenu(true);
+        } else {
+            Log.e(TAG, "Toolbar is null");
+        }
+        setHasOptionsMenu(true);
 
         // Initialize WifiManager
         wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
@@ -109,20 +139,21 @@ public class WifiScannerFragment extends Fragment {
             return false;
         });
 
+        bottomNavigationView = rootView.findViewById(R.id.bottom_navigation);
+
+        // Example: Start scanning
+        //startScanning();
+        context = getContext();
+        activity = getActivity();
+
+        // Disable the "Attack" menu item initially
+        bottomNavigationView.getMenu().findItem(R.id.navigation_dashboard).setEnabled(false);
+
         // Detecting watch
         SharedPreferences sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
         iswatch = sharedpreferences.getBoolean("running_on_wearos", false);
 
         // WIFI Scanner
-        Button showButton = rootView.findViewById(R.id.show_networks);
-        showButton.setOnClickListener(view -> showShowMenu(showButton));
-
-        Button sortButton = rootView.findViewById(R.id.sort_networks);
-        sortButton.setOnClickListener(view -> showSortMenu(sortButton));
-
-        Button clearButton = rootView.findViewById(R.id.clear_networks);
-        clearButton.setOnClickListener(view -> clearList());
-
         Spinner wlanInterface = rootView.findViewById(R.id.wlan_interface);
         Spinner wifiChannel = rootView.findViewById(R.id.wifi_channel);
         wifiNetworksList = rootView.findViewById(R.id.wifi_networks_list);
@@ -130,11 +161,11 @@ public class WifiScannerFragment extends Fragment {
         wifiNetworksList.setAdapter(wifiAdapter);
 
         Spinner refreshIntervalSpinner = rootView.findViewById(R.id.refresh_interval);
-        List<String> refreshOptions = Arrays.asList("OFF", "5 seconds", "8 seconds", "10 seconds", "15 seconds", "20 seconds");
+        List<String> refreshOptions = Arrays.asList("OFF", "8 seconds", "10 seconds", "15 seconds", "20 seconds");
         ArrayAdapter<String> refreshAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, refreshOptions);
         refreshAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         refreshIntervalSpinner.setAdapter(refreshAdapter);
-        refreshIntervalSpinner.setSelection(3); // Set default to '10 seconds'
+        refreshIntervalSpinner.setSelection(2); // Set default to '10 seconds'
 
         refreshIntervalSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -144,18 +175,15 @@ public class WifiScannerFragment extends Fragment {
                         refreshInterval = 0;
                         break;
                     case 1:
-                        refreshInterval = 5000;
-                        break;
-                    case 2:
                         refreshInterval = 8000;
                         break;
-                    case 3:
+                    case 2:
                         refreshInterval = 10000;
                         break;
-                    case 4:
+                    case 3:
                         refreshInterval = 15000;
                         break;
-                    case 5:
+                    case 4:
                         refreshInterval = 20000;
                         break;
                 }
@@ -179,7 +207,7 @@ public class WifiScannerFragment extends Fragment {
                 }
             }
         } catch (SocketException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Error getting network interfaces", e);
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, wifiAdapters);
@@ -187,17 +215,38 @@ public class WifiScannerFragment extends Fragment {
         wlanInterface.setAdapter(adapter);
 
         // Populate Spinner with available WiFi channels
-        List<String> wifiChannels = new ArrayList<>();
-        wifiChannels.add("All Channels");
-        for (int i = 1; i <= 14; i++) {
-            wifiChannels.add(String.valueOf(i));
-        }
+        List<String> wifiChannels = Arrays.asList("All Channels", "2.4 ghz channels", "5 ghz channels", "6 ghz channels");
 
         ArrayAdapter<String> channelAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, wifiChannels);
         channelAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         wifiChannel.setAdapter(channelAdapter);
 
+        wifiChannel.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                switch (position) {
+                    case 0:
+                        // Handle "All Channels"
+                        break;
+                    case 1:
+                        // Handle "2.4 ghz channels"
+                        break;
+                    case 2:
+                        // Handle "5 ghz channels"
+                        break;
+                    case 3:
+                        // Handle "6 ghz channels"
+                        break;
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Do nothing
+            }
+        });
+
         // Set OnItemClickListener to hold selection
+        BottomNavigationView finalBottomNavigationView = bottomNavigationView;
         wifiNetworksList.setOnItemClickListener((parent, view, position, id) -> {
             for (int i = 0; i < parent.getChildCount(); i++) {
                 parent.getChildAt(i).setBackgroundColor(Color.TRANSPARENT); // Reset background color for all items
@@ -211,59 +260,81 @@ public class WifiScannerFragment extends Fragment {
 
             // Set the scanner time spinner to 'OFF'
             refreshIntervalSpinner.setSelection(0);
+
+            // Enable the "Attack" menu item when a target is selected
+            finalBottomNavigationView.getMenu().findItem(R.id.navigation_dashboard).setEnabled(true);
         });
 
         return rootView;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.toolbar_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                com.offsec.nethunter.WifiteSettingsDialogFragment settingsDialog = new com.offsec.nethunter.WifiteSettingsDialogFragment();
+                settingsDialog.setSettingsDialogListener(this);
+                settingsDialog.show(getParentFragmentManager(), "SettingsDialog");
+                return true;
+            case R.id.action_clear:
+                clearList();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onSettingsChanged(boolean showNetworksWithoutSSID) {
+        this.showNetworksWithoutSSID = showNetworksWithoutSSID;
+        scanWifi();
+    }
+
+    @NonNull
+    @Override
+    public CreationExtras getDefaultViewModelCreationExtras() {
+        return super.getDefaultViewModelCreationExtras();
+    }
+
+    public static class WifiteSettingsDialogFragment extends DialogFragment {
+        public interface SettingsDialogListener {
+            void onSettingsChanged(boolean showNetworksWithoutSSID);
+        }
+
+        public SettingsDialogListener listener;
+
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+            LayoutInflater inflater = requireActivity().getLayoutInflater();
+            View view = inflater.inflate(R.layout.dialog_settings, null);
+
+            CheckBox checkboxOption = view.findViewById(R.id.checkbox_option);
+
+            builder.setView(view)
+                    .setTitle("Settings")
+                    .setPositiveButton("OK", (dialog, id) -> {
+                        if (listener != null) {
+                            listener.onSettingsChanged(checkboxOption.isChecked());
+                        }
+                    })
+                    .setNegativeButton("Cancel", (dialog, id) -> dialog.dismiss());
+
+            return builder.create();
+        }
     }
 
     private void clearList() {
         arrayList.clear();
         updateListView();
         Snackbar.make(requireView(), "Terminal was cleared", Snackbar.LENGTH_SHORT).show();
-    }
-
-    private void showShowMenu(View view) {
-        PopupMenu popup = new PopupMenu(getContext(), view);
-        popup.getMenuInflater().inflate(R.menu.show_menu, popup.getMenu());
-        popup.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.show_signal_strength:
-                    showSignalStrength = !showSignalStrength;
-                    break;
-                case R.id.show_channel:
-                    showChannel = !showChannel;
-                    break;
-                case R.id.show_bssid:
-                    showBSSID = !showBSSID;
-                    break;
-                default:
-                    return false;
-            }
-            scanWifi(); // Refresh the list
-            return true;
-        });
-        popup.show();
-    }
-
-    private void showSortMenu(View view) {
-        PopupMenu popup = new PopupMenu(getContext(), view);
-        popup.getMenuInflater().inflate(R.menu.sort_menu, popup.getMenu());
-        popup.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.sort_by_signal:
-                    sortBySignal();
-                    return true;
-                case R.id.sort_by_channel:
-                    sortByChannel();
-                    return true;
-                case R.id.sort_by_name:
-                    sortByName();
-                    return true;
-                default:
-                    return false;
-            }
-        });
-        popup.show();
     }
 
     private void sortBySignal() {
@@ -275,32 +346,11 @@ public class WifiScannerFragment extends Fragment {
         updateListView();
     }
 
-    private void sortByChannel() {
-        Collections.sort(arrayList, (a, b) -> {
-            int channelA = getChannelFromString(a);
-            int channelB = getChannelFromString(b);
-            return Integer.compare(channelA, channelB);
-        });
-        updateListView();
-    }
-
-    private void sortByName() {
-        Collections.sort(arrayList, String::compareTo);
-        updateListView();
-    }
-
     private int getSignalFromString(String str) {
         // Extract signal strength from the string
         // Assuming the format is "Signal% - Channel - SSID - BSSID - ENC"
         String[] parts = str.split(" - ");
         return Integer.parseInt(parts[0].replace("%", ""));
-    }
-
-    private int getChannelFromString(String str) {
-        // Extract channel from the string
-        // Assuming the format is "Signal% - Channel - SSID - BSSID - ENC"
-        String[] parts = str.split(" - ");
-        return Integer.parseInt(parts[1]);
     }
 
     private void updateListView() {
@@ -336,21 +386,8 @@ public class WifiScannerFragment extends Fragment {
                 channel.setText(parts.length > 1 && !parts[1].isEmpty() ? parts[1] : "");
                 bssid.setText(parts.length > 2 && !parts[2].isEmpty() ? parts[2] : "");
                 encryption.setText(parts.length > 3 && !parts[3].isEmpty() ? parts[3] : "");
-
-                if (selectedSSID != null && selectedSSID.equals(parts[2])) {
-                    convertView.setBackgroundColor(Color.DKGRAY); // Set background color for selected item
-                    signal.setTextColor(Color.RED); // Set text color to red for selected item
-                    channel.setTextColor(Color.RED);
-                    bssid.setTextColor(Color.RED);
-                    encryption.setTextColor(Color.RED);
-                } else {
-                    convertView.setBackgroundColor(Color.TRANSPARENT); // Reset background color for non-selected items
-                    //signal.setTextColor(Color.WHITE); // Reset text color for non-selected items
-                    //channel.setTextColor(Color.WHITE);
-                    //bssid.setTextColor(Color.WHITE);
-                    encryption.setTextColor(Color.parseColor("#FFA500")); // Set text color to orange for non-selected items
-                }
-
+                convertView.setBackgroundColor(Color.TRANSPARENT); // Reset background color for non-selected items
+                encryption.setTextColor(Color.parseColor("#FFA500")); // Set text color to orange for non-selected items
                 return convertView;
             }
         };
@@ -361,7 +398,7 @@ public class WifiScannerFragment extends Fragment {
         AsyncTask.execute(() -> {
             Activity activity = getActivity();
             assert activity != null;
-            if (activity != null) {
+            {
                 activity.runOnUiThread(() -> {
                     // Disabling bluetooth so wifi will be definitely available for scanning
                     if (iswatch) {
@@ -373,6 +410,29 @@ public class WifiScannerFragment extends Fragment {
                     arrayList.add("Scanning...");
                     wifiNetworksList.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, arrayList));
                     wifiNetworksList.setVisibility(View.VISIBLE);
+                });
+                if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    return;
+                }
+                List<ScanResult> results = wifiManager.getScanResults();
+                activity.runOnUiThread(() -> {
+                    if (results.isEmpty()) {
+                        final ArrayList<String> noTargets = new ArrayList<>();
+                        noTargets.add("No nearby WiFi networks");
+                        wifiNetworksList.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, noTargets));
+                        //Snackbar.make(requireView(), "No nearby WiFi networks", Snackbar.LENGTH_SHORT).show();
+                    } else {
+                        ArrayList<String> scanResults = new ArrayList<>();
+                        for (ScanResult result : results) {
+                            if (showNetworksWithoutSSID || !result.SSID.isEmpty()) {
+                                StringBuilder resultString = getStringBuilder(result);
+                                scanResults.add(resultString.toString());
+                            }
+                        }
+                        arrayList.clear();
+                        arrayList.addAll(scanResults);
+                        sortBySignal(); // Sort by signal strength by default
+                    }
                 });
             }
 
@@ -432,16 +492,9 @@ public class WifiScannerFragment extends Fragment {
         int signalPercent = getSignalStrengthInPercent(result.level);
         String encryptionType = getEncryptionType(result);
         StringBuilder resultString = new StringBuilder();
-        if (showSignalStrength) {
-            resultString.append(signalPercent).append("% - ");
-        }
-        if (showChannel) {
-            resultString.append(channel).append(" - ");
-        }
+        resultString.append(signalPercent).append("% - ");
+        resultString.append(channel).append(" - ");
         resultString.append(result.SSID);
-        if (showBSSID) {
-            resultString.append(" - ").append(result.BSSID);
-        }
         resultString.append(" - ").append(encryptionType);
         return resultString;
     }
