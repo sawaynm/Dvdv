@@ -203,6 +203,14 @@ public class WifiScannerFragment extends Fragment {
                 parent.getChildAt(i).setBackgroundColor(Color.TRANSPARENT); // Reset background color for all items
             }
             view.setBackgroundColor(Color.LTGRAY); // Set background color for selected item
+
+            // Stop scanning for WiFi
+            if (scanRunnable != null) {
+                handler.removeCallbacks(scanRunnable);
+            }
+
+            // Set the scanner time spinner to 'OFF'
+            refreshIntervalSpinner.setSelection(0);
         });
 
         return rootView;
@@ -283,14 +291,14 @@ public class WifiScannerFragment extends Fragment {
 
     private int getSignalFromString(String str) {
         // Extract signal strength from the string
-        // Assuming the format is "SSID - Channel - BSSID - Signal - ENC"
+        // Assuming the format is "Signal% - Channel - SSID - BSSID - ENC"
         String[] parts = str.split(" - ");
         return Integer.parseInt(parts[0].replace("%", ""));
     }
 
     private int getChannelFromString(String str) {
         // Extract channel from the string
-        // Assuming the format is "SSID - Channel - BSSID - Signal - ENC"
+        // Assuming the format is "Signal% - Channel - SSID - BSSID - ENC"
         String[] parts = str.split(" - ");
         return Integer.parseInt(parts[1]);
     }
@@ -353,18 +361,20 @@ public class WifiScannerFragment extends Fragment {
         AsyncTask.execute(() -> {
             Activity activity = getActivity();
             assert activity != null;
-            activity.runOnUiThread(() -> {
-                // Disabling bluetooth so wifi will be definitely available for scanning
-                if (iswatch) {
-                    exe.RunAsRoot(new String[]{"svc bluetooth disable;settings put system clockwork_wifi_setting on"});
-                } else {
-                    exe.RunAsRoot(new String[]{"svc wifi enable"});
-                }
-                arrayList.clear();
-                arrayList.add("Scanning...");
-                wifiNetworksList.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, arrayList));
-                wifiNetworksList.setVisibility(View.VISIBLE);
-            });
+            if (activity != null) {
+                activity.runOnUiThread(() -> {
+                    // Disabling bluetooth so wifi will be definitely available for scanning
+                    if (iswatch) {
+                        exe.RunAsRoot(new String[]{"svc bluetooth disable;settings put system clockwork_wifi_setting on"});
+                    } else {
+                        exe.RunAsRoot(new String[]{"svc wifi enable"});
+                    }
+                    arrayList.clear();
+                    arrayList.add("Scanning...");
+                    wifiNetworksList.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, arrayList));
+                    wifiNetworksList.setVisibility(View.VISIBLE);
+                });
+            }
 
             // Start WiFi scan
             wifiManager.startScan();
