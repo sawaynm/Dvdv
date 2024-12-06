@@ -94,7 +94,7 @@ public class WifiScannerFragment extends Fragment {
 
         // Initialize Bottom Navigation View
         BottomNavigationView bottomNavigationView = rootView.findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+        bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
                     // Handle home action
