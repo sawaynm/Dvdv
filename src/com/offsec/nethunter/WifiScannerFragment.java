@@ -322,11 +322,11 @@ public class WifiScannerFragment extends Fragment {
                     int signalPercent = Integer.parseInt(parts[0].replace("%", ""));
                     signal.setText(parts[0]);
 
-                    if (signalPercent >= 1 && signalPercent <= 20) {
+                    if (signalPercent >= 1 && signalPercent <= 25) {
                         signal.setTextColor(Color.RED);
-                    } else if (signalPercent >= 21 && signalPercent <= 40) {
+                    } else if (signalPercent >= 26 && signalPercent <= 45) {
                         signal.setTextColor(Color.YELLOW);
-                    } else if (signalPercent > 40) {
+                    } else if (signalPercent > 46) {
                         signal.setTextColor(Color.GREEN);
                     }
                 } else {
