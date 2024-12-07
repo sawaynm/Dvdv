@@ -77,10 +77,6 @@
             android:icon="@drawable/ic_baseline_portrait_24"
             android:title="@string/drawertitleset" />
          <item
-             android:id="@+id/mitmf_item"
-             android:icon="@drawable/ic_share_black_24dp"
-             android:title="@string/drawertitlemitmf" />
-         <item
              android:id="@+id/nmap_item"
              android:icon="@drawable/ic_cast_connected_black_24dp"
              android:title="@string/drawertitlenmap" />

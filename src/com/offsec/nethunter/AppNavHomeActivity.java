@@ -376,7 +376,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         Boolean snowfall;
 
         // Snowfall enable 2/2
-        prefs.edit().putBoolean("snowfall_enabled", false).apply();
+        //prefs.edit().putBoolean("snowfall_enabled", false).apply();
 
         String model = Build.HARDWARE;
         if(iswatch){
@@ -387,13 +387,13 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
             if (model.equals("catfish") || model.equals("catshark") || model.equals("catshark-4g")) navigationView.getMenu().getItem(8).setVisible(false);
             navigationView.getMenu().getItem(9).setVisible(false);
             navigationView.getMenu().getItem(14).setVisible(false);
+            navigationView.getMenu().getItem(16).setVisible(false);
             navigationView.getMenu().getItem(17).setVisible(false);
-            navigationView.getMenu().getItem(18).setVisible(false);
+            navigationView.getMenu().getItem(19).setVisible(false);
             navigationView.getMenu().getItem(20).setVisible(false);
             navigationView.getMenu().getItem(21).setVisible(false);
             navigationView.getMenu().getItem(22).setVisible(false);
             navigationView.getMenu().getItem(23).setVisible(false);
-            navigationView.getMenu().getItem(24).setVisible(false);
         } else {
             snowfall = prefs.getBoolean("snowfall_enabled", true);
         }
@@ -597,9 +597,6 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                             break;
                         case R.id.mpc_item:
                             changeFragment(fragmentManager, MPCFragment.newInstance(itemId));
-                            break;
-                        case R.id.mitmf_item:
-                            changeFragment(fragmentManager, MITMfFragment.newInstance(itemId));
                             break;
                         case R.id.vnc_item:
                             if (getApplicationContext().getPackageManager().getLaunchIntentForPackage("com.offsec.nethunter.kex") == null) {
