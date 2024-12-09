@@ -123,18 +123,21 @@ public class WifiScannerFragment extends Fragment implements WifiteSettingsDialo
         });
 
         // Initialize Bottom Navigation View
-        BottomNavigationView bottomNavigationView = rootView.findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setOnItemSelectedListener(item -> switch (item.getItemId()) {
-            case R.id.navigation_home ->
-                // Handle home action
-                    true;
-            case R.id.navigation_dashboard ->
-                // Handle dashboard action
-                    true;
-            case R.id.navigation_notifications ->
-                // Handle notifications action
-                    true;
-            default -> false;
+        BottomNavigationView bottomNavigationView = null;
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.navigation_home:
+                    // Handle home action
+                    return true;
+                case R.id.navigation_dashboard:
+                    // Handle dashboard action
+                    return true;
+                case R.id.navigation_notifications:
+                    // Handle notifications action
+                    return true;
+                default:
+                    return false;
+            }
         });
 
         bottomNavigationView = rootView.findViewById(R.id.bottom_navigation);
@@ -352,7 +355,7 @@ public class WifiScannerFragment extends Fragment implements WifiteSettingsDialo
     }
 
     private void updateListView() {
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), R.layout.wifi_network_item, arrayList) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(requireContext(), R.layout.wifi_network_item, arrayList) {
             @NonNull
             @Override
             public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
