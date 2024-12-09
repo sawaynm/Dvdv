@@ -24,3 +24,7 @@ cd kali-nethunter-app || exit
 
 # Build the app
 ./gradlew build
+
+# Copy the APK to the output directory
+mkdir -p /workspace/output
+cp app/build/outputs/apk/debug/app-debug.apk /workspace/output/
