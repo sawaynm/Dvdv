@@ -436,7 +436,7 @@ public class WifiScannerFragment extends Fragment implements WifiteSettingsDialo
                 if (isIwAvailable && isWlan1Available) {
                     // Use "iw" command to scan for networks on "wlan1"
                     String[] scanCommand = {"iw", "dev", "wlan1", "scan"};
-                    String scanResults = exe.RunAsRoot(scanCommand);
+                    String scanResults = exe.Executer(scanCommand); // Ensure Executer returns a String
                     activity.runOnUiThread(() -> {
                         if (scanResults.isEmpty()) {
                             final ArrayList<String> noTargets = new ArrayList<>();
