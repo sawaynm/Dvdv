@@ -2,5 +2,15 @@ FROM ubuntu:20.04
 
 # Install basic dependencies
 RUN apt-get update && \
-    apt-get install -y git openjdk-8-jdk gradle wget curl && \
+    apt-get install -y \
+    git \
+    openjdk-8-jdk \
+    gradle \
+    wget \
+    curl \
+    zip \
+    unzip && \
     apt-get clean
+
+# Set JAVA_HOME for Gradle
+ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
