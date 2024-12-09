@@ -123,7 +123,7 @@ public class WifiScannerFragment extends Fragment implements WifiteSettingsDialo
         });
 
         // Initialize Bottom Navigation View
-        BottomNavigationView bottomNavigationView = null;
+        BottomNavigationView bottomNavigationView = rootView.findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
@@ -139,8 +139,6 @@ public class WifiScannerFragment extends Fragment implements WifiteSettingsDialo
                     return false;
             }
         });
-
-        bottomNavigationView = rootView.findViewById(R.id.bottom_navigation);
 
         // Example: Start scanning
         //startScanning();
