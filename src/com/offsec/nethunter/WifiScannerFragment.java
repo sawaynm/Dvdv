@@ -410,61 +410,99 @@ public class WifiScannerFragment extends Fragment implements WifiteSettingsDialo
                     wifiNetworksList.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, arrayList));
                     wifiNetworksList.setVisibility(View.VISIBLE);
                 });
+
                 if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     return;
                 }
+
+                // Check if "iw" binary is available
+                boolean isIwAvailable = exe.Executer("which iw").trim().length() > 0;
+
+                // Check if "wlan1" is available
+                boolean isWlan1Available = false;
+                try {
+                    Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+                    while (interfaces.hasMoreElements()) {
+                        NetworkInterface networkInterface = interfaces.nextElement();
+                        if (networkInterface.isUp() && !networkInterface.isLoopback() && networkInterface.getName().equals("wlan1")) {
+                            isWlan1Available = true;
+                            break;
+                        }
+                    }
+                } catch (SocketException e) {
+                    Log.e(TAG, "Error getting network interfaces", e);
+                }
+
+                if (isIwAvailable && isWlan1Available) {
+                    // Use "iw" command to scan for networks on "wlan1"
+                    String[] scanCommand = {"iw", "dev", "wlan1", "scan"};
+                    String scanResults = exe.RunAsRoot(scanCommand);
+                    activity.runOnUiThread(() -> {
+                        if (scanResults.isEmpty()) {
+                            final ArrayList<String> noTargets = new ArrayList<>();
+                            noTargets.add("No nearby WiFi networks");
+                            wifiNetworksList.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, noTargets));
+                        } else {
+                            ArrayList<String> scanResultsList = new ArrayList<>(Arrays.asList(scanResults.split("\n")));
+                            arrayList.clear();
+                            arrayList.addAll(scanResultsList);
+                            sortBySignal(); // Sort by signal strength by default
+                        }
+                    });
+                } else {
+                    // Use default WiFiManager to scan for networks on "wlan0"
+                    List<ScanResult> results = wifiManager.getScanResults();
+                    activity.runOnUiThread(() -> {
+                        if (results.isEmpty()) {
+                            final ArrayList<String> noTargets = new ArrayList<>();
+                            noTargets.add("No nearby WiFi networks");
+                            wifiNetworksList.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, noTargets));
+                        } else {
+                            ArrayList<String> scanResults = new ArrayList<>();
+                            for (ScanResult result : results) {
+                                if (showNetworksWithoutSSID || !result.SSID.isEmpty()) {
+                                    StringBuilder resultString = getStringBuilder(result);
+                                    scanResults.add(resultString.toString());
+                                }
+                            }
+                            arrayList.clear();
+                            arrayList.addAll(scanResults);
+                            sortBySignal(); // Sort by signal strength by default
+                        }
+                    });
+                }
+
+                // Start WiFi scan
+                wifiManager.startScan();
+                if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+                    return;
+                }
                 List<ScanResult> results = wifiManager.getScanResults();
+
                 activity.runOnUiThread(() -> {
                     if (results.isEmpty()) {
                         final ArrayList<String> noTargets = new ArrayList<>();
                         noTargets.add("No nearby WiFi networks");
                         wifiNetworksList.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, noTargets));
-                        //Snackbar.make(requireView(), "No nearby WiFi networks", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(requireView(), "No nearby WiFi networks", Snackbar.LENGTH_SHORT).show();
                     } else {
                         ArrayList<String> scanResults = new ArrayList<>();
                         for (ScanResult result : results) {
-                            if (showNetworksWithoutSSID || !result.SSID.isEmpty()) {
-                                StringBuilder resultString = getStringBuilder(result);
-                                scanResults.add(resultString.toString());
-                            }
+                            StringBuilder resultString = getStringBuilder(result);
+                            scanResults.add(resultString.toString());
                         }
                         arrayList.clear();
                         arrayList.addAll(scanResults);
                         sortBySignal(); // Sort by signal strength by default
+                        //Snackbar.make(requireView(), "Scan complete", Snackbar.LENGTH_SHORT).show();
                     }
                 });
-            }
 
-            // Start WiFi scan
-            wifiManager.startScan();
-            if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-                return;
-            }
-            List<ScanResult> results = wifiManager.getScanResults();
-
-            activity.runOnUiThread(() -> {
-                if (results.isEmpty()) {
-                    final ArrayList<String> noTargets = new ArrayList<>();
-                    noTargets.add("No nearby WiFi networks");
-                    wifiNetworksList.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, noTargets));
-                    Snackbar.make(requireView(), "No nearby WiFi networks", Snackbar.LENGTH_SHORT).show();
-                } else {
-                    ArrayList<String> scanResults = new ArrayList<>();
-                    for (ScanResult result : results) {
-                        StringBuilder resultString = getStringBuilder(result);
-                        scanResults.add(resultString.toString());
-                    }
-                    arrayList.clear();
-                    arrayList.addAll(scanResults);
-                    sortBySignal(); // Sort by signal strength by default
-                    //Snackbar.make(requireView(), "Scan complete", Snackbar.LENGTH_SHORT).show();
+                if (iswatch) {
+                    // Re-enabling bluetooth
+                    exe.RunAsRoot(new String[]{"svc bluetooth enable"});
                 }
-            });
-
-            if (iswatch) {
-                // Re-enabling bluetooth
-                exe.RunAsRoot(new String[]{"svc bluetooth enable"});
             }
         });
     }
