@@ -12,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 public class WifiteSettingsDialogFragment extends DialogFragment {
-
     public interface SettingsDialogListener {
         void onSettingsChanged(boolean showNetworksWithoutSSID);
     }
